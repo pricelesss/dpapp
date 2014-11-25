@@ -30,19 +30,27 @@ var _ = require('underscore');
                 ifr.parentNode.removeChild(ifr);
             }, 0);
         },
+
+        callback:function(callbackId, retValue) {
+            var callback = callbacks[callbackId];
+            if (!callback) {
+                return;
+            }
+            setTimeout(function () {
+                callback.apply(null, [retValue]);
+            },0);
+        },
+
+        setModel: function (model) {
+            translate.setModel(model);
+            return window.Efte;
+        },
+
         share: function (shareConfig, callback) {
             console.log('share active');
             Efte.send_message('share', shareConfig, function (result) {
                 callback(result);
             });
-        },
-
-        callback:function(callbackId, retValue) {
-            var callback = callbacks[callbackId];
-            if (!callback) return;
-            setTimeout(function () {
-                callback.apply(null, [retValue]);
-            },0);
         },
 
         ga: function (category, action, label, value, extra) {
@@ -150,6 +158,11 @@ var _ = require('underscore');
                 }, function() {
                     delete callbacks[cid];
                 });
+            },
+            openScheme: function (url) {
+                Efte.send_message('actionscheme', {url: url}, function (result) {
+                    console.log(result);
+                });
             }
         },
 
@@ -215,6 +228,12 @@ var _ = require('underscore');
                     fail(data);
                 }
             });
+        },
+
+        getWXTicket: function(callback) {
+            Efte.send_message('wechat_snsticket', {}, function (result) {
+                callback(result.ticket);
+            });
         }
     };
 })();
@@ -269,4 +288,3 @@ if (window.location.protocol == 'http:' && !Efte._adapted) {
 }
 
 module.exports = window.Efte;
-

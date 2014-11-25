@@ -1,4 +1,4 @@
-var models = require('./model');
+var models = {};
 var _ = require('underscore');
 
 function translate(obj) {
@@ -19,6 +19,10 @@ function translate(obj) {
         }
     } 
     return obj;
+}
+
+translate.setModel = function (model) {
+    models = model;
 }
 
 module.exports = translate;
