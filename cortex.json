@@ -1,7 +1,7 @@
 // You could write comments in cortex.json.
 {
   "name": "dpapp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "DPApp.js. Support DPScope JSBridge",
   "main": "index.js",
   // // By default, all javascript modules of the current package will be bundled
