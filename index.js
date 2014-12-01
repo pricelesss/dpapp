@@ -160,8 +160,10 @@ var _ = require('underscore');
                 });
             },
             openScheme: function (url) {
+                Efte.send_message('actionScheme', {url: url}, function (result) {
+                });
+                
                 Efte.send_message('actionscheme', {url: url}, function (result) {
-                    console.log(result);
                 });
             }
         },
