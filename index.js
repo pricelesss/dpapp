@@ -234,7 +234,13 @@ var _ = require('underscore');
 
         getWXTicket: function(callback) {
             Efte.send_message('wechat_snsticket', {}, function (result) {
-                callback(result.ticket);
+                _.isFunction(callback) && callback(result.ticket);
+            });
+        },
+
+        getWXAuthCode: function (callback) {
+            Efte.send_message('wechat_get_auth_code', {}, function (result) {
+                _.isFunction(callback) && callback(result.code);
             });
         }
     };
