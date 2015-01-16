@@ -1,7 +1,7 @@
 // You could write comments in cortex.json.
 {
   "name": "dpapp",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "DPApp.js. Support DPScope JSBridge",
   "main": "index.js",
   // // By default, all javascript modules of the current package will be bundled
@@ -31,9 +31,9 @@
   //   "prebuild": "gulp"
   // },
   // "directories": {
-  //   // By default, only `cortex.main`, `cortex.css`, `cortex.entries` are treated as 
+  //   // By default, only `cortex.main`, `cortex.css`, `cortex.entries` are treated as
   //   // the resources of the package.
-  //   // To include more files, 
+  //   // To include more files,
   //   // they should be put into a folder named the value of `directories.src`
   //   "src": "src"
   // },

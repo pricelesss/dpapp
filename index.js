@@ -13,7 +13,7 @@ var _ = require('underscore');
         NVCacheTypePersistent: 2,
         NVCacheTypeCritical: 3,
         NVCacheTypeDaily: 4,
-        
+
         send_message: function (method, args, callback) {
             // console.log('send_message', arguments);
             var hasCallback = callback && typeof callback == 'function';
@@ -97,7 +97,7 @@ var _ = require('underscore');
                         try {
                             oldJson = JSON.parse(data.responseText);
                         } catch (ignore) {}
-                    } 
+                    }
                     if (data.hashJson && data.hashJson.length > 0) {
                         try {
                             newJson = JSON.parse(data.hashJson);
@@ -162,7 +162,7 @@ var _ = require('underscore');
             openScheme: function (url) {
                 Efte.send_message('actionScheme', {url: url}, function (result) {
                 });
-                
+
                 Efte.send_message('actionscheme', {url: url}, function (result) {
                 });
             }
@@ -181,7 +181,7 @@ var _ = require('underscore');
         onApplicationDidBecomeActive: function(){
 
         },
-        
+
         stopRefresh: function () {
             Efte.send_message('stopRefresh', {}, function() {});
         },
@@ -203,7 +203,7 @@ var _ = require('underscore');
         },
         login: function () {
             Efte.getEnv(function (env) {
-                var url = ["http://m.dianping.com/login/app?", 
+                var url = ["http://m.dianping.com/login/app?",
                     "&version=" + env.version,
                     "&dpid=" + env.dpid,
                     "&lng=" + env.longitude,
@@ -222,7 +222,7 @@ var _ = require('underscore');
         pay: function (opts) {
             var success = opts.success || function () {};
             var fail = opts.fail || function () {};
-            
+
             Efte.send_message('pay', opts, function(data) {
                 if (data.payresult) {
                     success(data);
@@ -241,6 +241,19 @@ var _ = require('underscore');
         getWXAuthCode: function (callback) {
             Efte.send_message('wechat_get_auth_code', {}, function (result) {
                 _.isFunction(callback) && callback(result.code);
+            });
+        },
+
+        addToWeiXinCard: function (opts) {
+            var success = opts.success || function () {};
+            var fail = opts.fail || function () {};
+
+            Efte.send_message('addtoweixincard', opts, function(data) {
+                if (data.addtoweixinresult) {
+                    success(data);
+                } else {
+                    fail(data);
+                }
             });
         }
     };
