@@ -1,6 +1,7 @@
 var translate = require('./translate');
 var $ = require('zepto');
 var _ = require('underscore');
+var EfteWeb = require('./efte.web');
 
 (function () {
 
@@ -255,57 +256,41 @@ var _ = require('underscore');
                     fail(data);
                 }
             });
+        },
+
+        ready: function (fn) {
+            fn = fn || function (){};
+            // app 7.0+
+            var detected = false;
+            if (window.navigator.userAgent.indexOf('dpscope') != -1) {
+                DPApp._inApp = true;
+                !detected && fn();
+                detected = true;
+                return ;
+            }
+            // 通过getEnv检测是否在App内
+            var timer = setTimeout(function () {
+                // 禁用native jsbridge
+                DPApp.send_message = function () {};
+                DPApp.getEnv = EfteWeb.getEnv;
+
+                // 
+                DPApp._inApp = false;
+                !detected && fn();
+                detected = true;
+            }, 100);
+            DPApp.getEnv(function () {
+                clearTimeout(timer);
+                DPApp._inApp = true;
+                !detected && fn();
+                detected = true;
+            });
+        },
+
+        inApp: function () {
+            return DPApp._inApp;
         }
     };
 })();
 
-if (window.location.protocol == 'http:' && !Efte._adapted) {
-    var WebEfte = require('./efte.web');
-    Efte._adapted = true;
-    var nativeGetEnv = Efte.getEnv;
-    Efte.getEnv = function (callback) {
-        var timer = setTimeout(function () {
-            // native getEnv not invoke, in web browser mode
-            console.log('in web');
-            Efte.getEnv = WebEfte.getEnv;
-            Efte.ajax = WebEfte.ajax;
-            WebEfte.getEnv(callback);
-
-            // add qrcode for device debug
-            window.qrcode = function () {
-                var w = $(window).width();
-                var div = $('<div />');
-                div.css({
-                    width: w + 'px',
-                    height: w + 'px',
-                    position: 'fixed',
-                    top: '10px',
-                    left: '10px',
-                    'z-index': 9999
-                });
-                var QRCode = require('./qrcode');
-                new QRCode(div.get(0), 'dianping://efte?url=' + encodeURIComponent(window.location.href));
-                $('body').append(div);
-            }
-        }, 1000);
-        nativeGetEnv(function (env) {
-            callback(env);
-            Efte.getEnv = function (callback) {
-                nativeGetEnv(function (env) {
-                    try {
-                        var q = JSON.parse(window.localStorage.efteQuery);
-                        env.query = q;
-                    } catch (ignore) {};
-                    callback(env);
-                });
-            }
-            clearTimeout(timer);
-        });
-    };
-    Efte.loadImage = WebEfte.loadImage;
-    Efte.action = WebEfte.action;
-
-    Efte.getEnv(function () {});
-}
-
-module.exports = window.Efte;
+module.exports = window.DPApp;

@@ -71,20 +71,39 @@ var translate = require('./translate');
         },
 
         getEnv: function(callback) {
-            var env = {
-                "dpid": "-3677724576286974906",
-                "cityid": "1",
-                "network": "wifi",
-                "token": "",
-                "latitude": "31.21587",
-                "version": "6.9",
-                "longitude": "121.4191",
-                "query": {}
-            };
+            callback = callback || function () {};
+            var env = {}
+
+            // get cityid from cookie
+            try {
+                var items = document.cookie.split(/;\s*/);
+                items.forEach(function (item) {
+                    var kv = item.split('=');
+                    var k = (kv[0] || '');
+                    var v = (kv[1] || '');
+                    if (k == 'cityid') {
+                        env.cityid = v;
+                    }
+                });
+            } catch (ignore) {}
+            
             try {
                 env.query = JSON.parse(window.localStorage.efteQuery);
             } catch (ignore) {};
-            callback && callback(env);
+  
+            var executed = false;
+            window.navigator.geolocation.getCurrentPosition(function (location) {
+                // console.log(location.coords.latitude, location.coords.longitude);
+                env.latitude = location.coords.latitude;
+                env.longitude = location.coords.longitude;
+                !executed && callback(env);
+                executed = true;
+            }, function (error) {
+                !executed && callback(env);
+                executed = true;
+            }, {
+                timeout: 3000
+            });
         },
 
         loadImage: function(imageurl, callback) {
