@@ -258,6 +258,16 @@ var EfteWeb = require('./efte.web');
             });
         },
 
+        /**
+         * opts.uploadUrl
+         * opts.compressFactor
+         * opts.maxNum
+         * opts.extra
+         */
+        uploadImage: function (opts, callback) {
+            DPApp.send_message('uploadImage', opts, callback);
+        },
+
         ready: function (fn) {
             fn = fn || function (){};
             // app 7.0+

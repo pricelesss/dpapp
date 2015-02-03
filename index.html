@@ -1,7 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
+    <meta charset="utf-8" />
+    <title>Title</title>
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no, minimal-ui" />
+    <meta name="format-detection" content="telephone=no">
+    <meta name="format-detection" content="email=no" />
 
 <!-- cortex build will generate the two files below. -->
 <script src="./neurons/neuron.js"></script>
@@ -15,6 +20,7 @@
 </head>
 
 <body>
+<button id="btn_uploadImage">uploadImage</button>
 <script>
 
 // method `facade` will load a module
@@ -32,7 +38,27 @@ facade({
 			DPApp.getEnv(function (env) {
 				console.log(new Date(), 'get env', env);
 			});
-		})
+		});
+
+		document.getElementById('btn_uploadImage').addEventListener('click', function () {
+			DPApp.uploadImage({
+				// uploadUrl: 'http://192.168.211.236/upload',
+				uploadUrl: 'http://m.api.51ping.com/shop/uploadfile.bin',
+				// uploadUrl: 'http://192.168.213.33/shop/uploadfile.bin',
+				// uploadUrl: 'http://m.api.dianping.com/shop/uploadfile.bin',
+				extra: {
+					businessType: 'community',
+					uploadurl: 'http://192.168.211.236/upload',
+					params: JSON.stringify({
+						"nut": "eyJ1cGxvYWREaWVkRGF0ZSI6MTczODI0MDM0OSwicGFpciI6eyJ0eXBlIjoiMSJ9LCJ1c2VySWQiOjI5MDA3NTA0LCJyZWZlcklkIjo1MDAwMDAsImJpeklkIjoxLCJjbGllbnRUeXBlIjoxMDAsInVzZXJOaWNrTmFtZSI6ImRwXzMzIiwidmVyc2lvbiI6IjEuMC4wIn0=",
+						"sign": "a3e30b6aa1ad7531f87c59f0d829a943"
+					})
+				},
+				maxNum: 3
+			}, function () {
+				console.log(arguments);
+			});
+		}, false);
 		// DPApp.getEnv(function (env) {
 		// 	console.log(new Date(), env);
 		// })
