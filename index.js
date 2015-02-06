@@ -268,6 +268,13 @@ var EfteWeb = require('./efte.web');
             DPApp.send_message('uploadImage', opts, callback);
         },
 
+		/**
+		 *
+		 */
+		subscribe: function (action, callback) {
+			Efte.send_message('subscribe', {'action': action}, callback);
+		},
+
         ready: function (fn) {
             fn = fn || function (){};
             // app 7.0+
