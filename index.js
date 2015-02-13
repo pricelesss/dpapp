@@ -279,7 +279,8 @@ var EfteWeb = require('./efte.web');
             fn = fn || function (){};
             // app 7.0+
             var detected = false;
-            if (window.navigator.userAgent.indexOf('dpscope') != -1) {
+            if (window.navigator.userAgent.indexOf('dpscope') != -1
+                || window.navigator.userAgent.indexOf('com.dianping.v1') != -1) {
                 DPApp._inApp = true;
                 !detected && fn();
                 detected = true;
@@ -295,7 +296,7 @@ var EfteWeb = require('./efte.web');
                 DPApp._inApp = false;
                 !detected && fn();
                 detected = true;
-            }, 100);
+            }, 500);
             DPApp.getEnv(function () {
                 clearTimeout(timer);
                 DPApp._inApp = true;

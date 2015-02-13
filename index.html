@@ -31,10 +31,10 @@ facade({
 
 </script>
 <script type="text/javascript">
-    _use("dpapp@0.1.5",function(DPApp){
+    _use("dpapp@0.2.2",function(DPApp){
 		// console.log(DPApp);
 		DPApp.ready(function () {
-			console.log(new Date(), 'ready');
+			console.log(new Date(), 'ready', DPApp.inApp());
 			DPApp.getEnv(function (env) {
 				console.log(new Date(), 'get env', env);
 			});
