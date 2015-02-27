@@ -1,152 +1,300 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-<meta charset="UTF-8">
-<style>
-	.btn{
-		display: block;
-		background-color: #f63;
-		color:#fff;
-		text-decoration: none;
-		text-align: center;
-		font-size: 16px;
-		padding: 10px 5px;
-		margin: 10px 5px;
-		border-radius: 5px
-	}
-</style>
-<!-- cortex build will generate the two files below. -->
-<script src="./neurons/neuron.js"></script>
-<script src="./neurons/config.js"></script>
-<script>
-  neuron.config({
-    // cortex build will generate a folder named `'neurons'` as well as the `'node_modules'` of node.js
-    path: './neurons'
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>DP App 主app JsBridge by efte</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>DP App 主app JsBridge</h1>
+        <p>js bridge for main app of dianping</p>
+        <p class="view"><a href="https://github.com/efte/dpapp">View the Project on GitHub <small>efte/dpapp</small></a></p>
+        <ul>
+          <li><a href="https://github.com/efte/dpapp/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/efte/dpapp/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/efte/dpapp">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a id="点评jsbridge-v100" class="anchor" href="#%E7%82%B9%E8%AF%84jsbridge-v100" aria-hidden="true"><span class="octicon octicon-link"></span></a>点评Jsbridge v1.0.0</h1>
+
+<h2>
+<a id="概述" class="anchor" href="#%E6%A6%82%E8%BF%B0" aria-hidden="true"><span class="octicon octicon-link"></span></a>概述</h2>
+
+<p>dpapp是用于主app的jsbridge，为web页面提供调用native功能的能力，同时检测客户端环境，使得在app之外的浏览器中也能够尽可能的实现相同功能，以避免一个功能产生多套代码。</p>
+
+<h2>
+<a id="引入" class="anchor" href="#%E5%BC%95%E5%85%A5" aria-hidden="true"><span class="octicon octicon-link"></span></a>引入</h2>
+
+<ul>
+<li>使用cortex的efte-template新建项目，在业务代码中通过require引入。efte-template文档请移步这里。</li>
+</ul>
+
+<pre><code>var DPApp = require('dpapp');
+</code></pre>
+
+<ul>
+<li>直接引入</li>
+</ul>
+
+<p>在html代码中引入</p>
+
+<div class="highlight highlight-html"><pre>&lt;<span class="pl-ent">script</span> <span class="pl-e">src</span>=<span class="pl-s1"><span class="pl-pds">"</span>http://i2.dpfile.com/mod/dpapp/1.0.0/dpapp.js<span class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">script</span>&gt;</pre></div>
+
+<h3>
+<a id="接口调用说明" class="anchor" href="#%E6%8E%A5%E5%8F%A3%E8%B0%83%E7%94%A8%E8%AF%B4%E6%98%8E" aria-hidden="true"><span class="octicon octicon-link"></span></a>接口调用说明</h3>
+
+<h4>
+<a id="调用协议" class="anchor" href="#%E8%B0%83%E7%94%A8%E5%8D%8F%E8%AE%AE" aria-hidden="true"><span class="octicon octicon-link"></span></a>调用协议</h4>
+
+<p>所有方法皆只接受一个javascript对象作为参数，其中success，fail分别为成功与失败后的回调。
+回调函数接受一个json对象作为参数。对象中的字段含义如下：
+status: 代表业务执行结果，其值为 success（成功），fail（失败）或 cancel（主动取消）
+result: 回调函数的执行结果，其值为 next（需要多次回调，执行后不销毁方法），error（执行错误），complete（执行成功）
+errMsg: 业务执行为fail时的错误信息</p>
+
+<p>所有方法调用之前，需要使用DPApp.ready确保native已就绪。</p>
+
+<p>示例：</p>
+
+<div class="highlight highlight-javascript"><pre><span class="pl-c">// 调出分享界面</span>
+DPApp.ready(<span class="pl-st">function</span>(){
+  DPApp.share({
+    title<span class="pl-k">:</span><span class="pl-s1"><span class="pl-pds">"</span>分享标题<span class="pl-pds">"</span></span>,
+    desc<span class="pl-k">:</span><span class="pl-s1"><span class="pl-pds">"</span>分享描述<span class="pl-pds">"</span></span>,
+    image<span class="pl-k">:</span><span class="pl-s1"><span class="pl-pds">"</span>http://www.dpfile.com/toevent/img/16d05c85a71b135edc39d197273746d6.png<span class="pl-pds">"</span></span>,
+    url<span class="pl-k">:</span><span class="pl-s1"><span class="pl-pds">"</span>http://m.dianping.com<span class="pl-pds">"</span></span>,
+    <span class="pl-en">success</span>: <span class="pl-st">function</span>(){
+      <span class="pl-s3">alert</span>(<span class="pl-s1"><span class="pl-pds">'</span>分享成功<span class="pl-pds">'</span></span>);
+    },
+    <span class="pl-en">fail</span>: <span class="pl-st">function</span>(<span class="pl-vpf">e</span>){
+      <span class="pl-s3">alert</span>(e.errMsg);
+    }
   });
-</script>
-</head>
+});</pre></div>
 
-<body>
+<h2>
+<a id="接口说明" class="anchor" href="#%E6%8E%A5%E5%8F%A3%E8%AF%B4%E6%98%8E" aria-hidden="true"><span class="octicon octicon-link"></span></a>接口说明</h2>
 
-	<a class="btn" id="callMulti" href="javascript:;">连续方法调用</a>
-	<a class="btn" id="getUserInfo" href="javascript:;">获取用户信息</a>
-	<a class="btn" id="getLocation" href="javascript:;">获取地理位置</a>
-	<a class="btn" id="getNetworkType" href="javascript:;">获取网络状态</a>
-	<a class="btn" id="getContactList" href="javascript:;">获取联系人列表</a>
-	<a class="btn" id="getCX" href="javascript:;">获取诚信数据</a>
-	<a class="btn" id="ajax" href="javascript:;">Ajax</a>
-	<a class="btn" id="ga" href="javascript:;">ga</a>
+<h3>
+<a id="获取用户信息" class="anchor" href="#%E8%8E%B7%E5%8F%96%E7%94%A8%E6%88%B7%E4%BF%A1%E6%81%AF" aria-hidden="true"><span class="octicon octicon-link"></span></a>获取用户信息</h3>
 
-	<a class="btn" id="uploadImage" href="javascript:;">上传图片</a>
-	<a class="btn" id="downloadImage" href="javascript:;">下载图片</a>
-	<a class="btn" id="closeWindow" href="javascript:;">关闭webview</a>
-	<a class="btn" id="pay" href="javascript:;">第三方支付</a>
-	<a class="btn" id="share" href="javascript:;">分享</a>
-	<a class="btn" id="sendSMS" href="javascript:;">发送短信</a>
+<div class="highlight highlight-javascript"><pre>DPApp.getUserInfo({
+  <span class="pl-en">success</span>: <span class="pl-st">function</span>(<span class="pl-vpf">e</span>){
+    <span class="pl-en">console</span><span class="pl-s3">.log</span>(e.dpid); <span class="pl-c">// 用户的dpid</span>
+    <span class="pl-en">console</span><span class="pl-s3">.log</span>(e.userId); <span class="pl-c">// 用户id</span>
+    <span class="pl-en">console</span><span class="pl-s3">.log</span>(e.token); <span class="pl-c">// 用户token</span>
+  }
+});</pre></div>
 
+<h3>
+<a id="获取地理位置" class="anchor" href="#%E8%8E%B7%E5%8F%96%E5%9C%B0%E7%90%86%E4%BD%8D%E7%BD%AE" aria-hidden="true"><span class="octicon octicon-link"></span></a>获取地理位置</h3>
 
-	<a class="btn" id="subscribe" href="javascript:;">订阅消息</a>
-	<a class="btn" id="unsubscribe" href="javascript:;">取消订阅</a>
+<div class="highlight highlight-javascript"><pre>DPApp.getUserInfo({
+  <span class="pl-en">success</span>: <span class="pl-st">function</span>(<span class="pl-vpf">e</span>){
+    <span class="pl-en">console</span><span class="pl-s3">.log</span>(e.lat); <span class="pl-c">// 纬度</span>
+    <span class="pl-en">console</span><span class="pl-s3">.log</span>(e.lng); <span class="pl-c">// 经度</span>
+    <span class="pl-en">console</span><span class="pl-s3">.log</span>(e.<span class="pl-sc">type</span>); <span class="pl-c">// 坐标系类型</span>
+  }
+});</pre></div>
 
+<h3>
+<a id="获取网络状态" class="anchor" href="#%E8%8E%B7%E5%8F%96%E7%BD%91%E7%BB%9C%E7%8A%B6%E6%80%81" aria-hidden="true"><span class="octicon octicon-link"></span></a>获取网络状态</h3>
 
-	<!-- <a class="btn" id="setTitle" href="javascript:;">设置标题</a>
-	<a class="btn" id="setLLBtn" href="javascript:;">设置LL按钮</a>
-	<a class="btn" id="setLRBtn" href="javascript:;">设置LR按钮</a>
-	<a class="btn" id="setRLBtn" href="javascript:;">设置RL按钮</a>
-	<a class="btn" id="setRRBtn" href="javascript:;">设置RR按钮</a>
- -->
+<div class="highlight highlight-javascript"><pre>DPApp.getUserInfo({
+  <span class="pl-en">success</span>: <span class="pl-st">function</span>(<span class="pl-vpf">e</span>){
+    <span class="pl-en">console</span><span class="pl-s3">.log</span>(e.networkType); <span class="pl-c">// 2g, 3g, 4g, wifi</span>
+  }
+});</pre></div>
 
-<script>
+<h3>
+<a id="获取联系人列表" class="anchor" href="#%E8%8E%B7%E5%8F%96%E8%81%94%E7%B3%BB%E4%BA%BA%E5%88%97%E8%A1%A8" aria-hidden="true"><span class="octicon octicon-link"></span></a>获取联系人列表</h3>
 
-// method `facade` will load a module
-// and try to execute the `init` method of the module exports.
-_use('dpapp', function(Efte){
-	var success = function(ret){
-		alert(JSON.stringify(ret));
-	};
-	var fail = function(ret){
-	}
-	var defaultConfig = {
-		success: success,
-		fail: fail
-	};
-	var args = {
-		getUserInfo: defaultConfig,
-		getLocation: defaultConfig,
-		getNetworkType: defaultConfig,
-		getContactList: defaultConfig,
-		getCX: defaultConfig,
-		ajax: {
-			success: success
-		},
-		ga: {
-			success: success
-		},
-		uploadImage: {
-			success: success
-		},
-		downloadImage: {
-			imageUrl: "http://www.dpfile.com/toevent/img/16d05c85a71b135edc39d197273746d6.png",
-			success: success
-		},
-		closeWindow: defaultConfig,
-		pay: {
-			success: success
-		},
-		share: {
-			title:"分享标题",
-			desc:"分享描述",
-			image:"http://www.dpfile.com/toevent/img/16d05c85a71b135edc39d197273746d6.png",
-			url:"http://m.dianping.com",
-			success: success
-		},
-		sendSMS: {
-			recipients: 13987654321,
-			content: "短信内容",
-			success: success
-		},
-		subscribe: {
-			action: "loginSuccess",
-			success: success
-		},
-		unsubscribe: {
-			action: "loginSuccess",
-			success: success
-		}
-	}
+<div class="highlight highlight-javascript"><pre>DPApp.getContactList({
+  <span class="pl-en">success</span>: <span class="pl-st">function</span>(<span class="pl-vpf">e</span>){
+    <span class="pl-en">console</span><span class="pl-s3">.log</span>(e.contactList); <span class="pl-c">// 联系人列表</span>
+    <span class="pl-en">console</span><span class="pl-s3">.log</span>(e.authorized); <span class="pl-c">// 用户是否授权</span>
+  }
+});</pre></div>
 
-	for(var id in args){
-		(function(id){
-			document.getElementById(id).onclick = function(){
-				Efte[id](args[id]);
-			};
-		})(id);
-	}
+<h3>
+<a id="ajax请求" class="anchor" href="#ajax%E8%AF%B7%E6%B1%82" aria-hidden="true"><span class="octicon octicon-link"></span></a>Ajax请求</h3>
 
-	var _logPanel = null;
-	Efte._log = function(tag, info){
-		if(!_logPanel){
-			_logPanel = document.createElement('div');
-			document.body.appendChild(_logPanel);
-			_logPanel.style.width = "100%";
-			_logPanel.style.position = "absolute";
-			_logPanel.style.top = 0;
-			_logPanel.style.left = 0;
-		}
-		var p = document.createElement('p');
-		p.innerHTML = tag + ":" + JSON.stringify(info);
-		_logPanel.appendChild(p);
-	}
-	document.getElementById('callMulti').onclick = function(){
-		Efte.getUserInfo({success:success});
-		Efte.getLocation({success:success});
-		Efte.getNetworkType({success:success});
-	}
+<div class="highlight highlight-javascript"><pre>DPApp.ajax({
+  url<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">"</span>http://m.dianping.com/...<span class="pl-pds">"</span></span>,
+  method<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">"</span>post<span class="pl-pds">"</span></span>, <span class="pl-c">// get 或 post</span>
+  data<span class="pl-k">:</span> {}, <span class="pl-c">// 请求数据</span>
+  cacheType<span class="pl-k">:</span> <span class="pl-c1">1</span>, <span class="pl-c">// </span>
+  <span class="pl-en">success</span>: <span class="pl-st">function</span>(<span class="pl-vpf">e</span>){
+    <span class="pl-en">console</span><span class="pl-s3">.log</span>(e.<span class="pl-sc">data</span>); <span class="pl-c">// 联系人列表</span>
+  }
+});</pre></div>
 
-});
+<h3>
+<a id="ga统计" class="anchor" href="#ga%E7%BB%9F%E8%AE%A1" aria-hidden="true"><span class="octicon octicon-link"></span></a>ga统计</h3>
 
-</script>
-</body>
+<div class="highlight highlight-javascript"><pre>DPApp.ga({
+  <span class="pl-en">success</span>: <span class="pl-st">function</span>(<span class="pl-vpf">e</span>){
+    <span class="pl-en">console</span><span class="pl-s3">.log</span>(e.contactList); <span class="pl-c">// 联系人列表</span>
+    <span class="pl-en">console</span><span class="pl-s3">.log</span>(e.authorized); <span class="pl-c">// 用户是否授权</span>
+  }
+});</pre></div>
 
+<h3>
+<a id="上传图片" class="anchor" href="#%E4%B8%8A%E4%BC%A0%E5%9B%BE%E7%89%87" aria-hidden="true"><span class="octicon octicon-link"></span></a>上传图片</h3>
+
+<div class="highlight highlight-javascript"><pre>DPApp.uploadImage({
+  uploadUrl<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">"</span><span class="pl-pds">"</span></span>, <span class="pl-c">// 上传图片调用的mapi接口的url</span>
+  extra<span class="pl-k">:</span> {}, <span class="pl-c">// 业务参数</span>
+  compressFactor<span class="pl-k">:</span> <span class="pl-c1">1024</span>, <span class="pl-c">// 上传图片压缩到多少尺寸以下，单位为K</span>
+  maxNum<span class="pl-k">:</span> <span class="pl-c1">5</span>,
+  <span class="pl-en">success</span>: <span class="pl-st">function</span>(<span class="pl-vpf">e</span>){
+    <span class="pl-en">console</span><span class="pl-s3">.log</span>(e.totalNum); <span class="pl-c">// 图片上传张数</span>
+    <span class="pl-en">console</span><span class="pl-s3">.log</span>(e.image); <span class="pl-c">// 原始图片结果</span>
+    <span class="pl-en">console</span><span class="pl-s3">.log</span>(e.progess); <span class="pl-c">// start 开始上传, uploading 上传中, end 上传结束</span>
+  }
+});</pre></div>
+
+<h3>
+<a id="下载图片" class="anchor" href="#%E4%B8%8B%E8%BD%BD%E5%9B%BE%E7%89%87" aria-hidden="true"><span class="octicon octicon-link"></span></a>下载图片</h3>
+
+<div class="highlight highlight-javascript"><pre>DPApp.downloadImage({
+  imageUrl<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">"</span>http://img5.douban.com/view/note/large/public/p22307117.jpg<span class="pl-pds">"</span></span>,
+  <span class="pl-en">success</span>: <span class="pl-st">function</span>(){
+  }
+});</pre></div>
+
+<h3>
+<a id="关闭webview" class="anchor" href="#%E5%85%B3%E9%97%ADwebview" aria-hidden="true"><span class="octicon octicon-link"></span></a>关闭webview</h3>
+
+<div class="highlight highlight-javascript"><pre>DPApp.closeWindow();</pre></div>
+
+<h3>
+<a id="第三方支付" class="anchor" href="#%E7%AC%AC%E4%B8%89%E6%96%B9%E6%94%AF%E4%BB%98" aria-hidden="true"><span class="octicon octicon-link"></span></a>第三方支付</h3>
+
+<p>待补充</p>
+
+<div class="highlight highlight-javascript"><pre>DPApp.pay({
+
+});</pre></div>
+
+<h3>
+<a id="分享" class="anchor" href="#%E5%88%86%E4%BA%AB" aria-hidden="true"><span class="octicon octicon-link"></span></a>分享</h3>
+
+<p>有些分享渠道包含标题和内容，有些只有内容。对于只有内容的渠道，默认会拼接 title 和 desc 参数。
+当设定了 content 参数时，则会直接使用该参数的取值。</p>
+
+<div class="highlight highlight-javascript"><pre>DPApp.share({
+  title<span class="pl-k">:</span><span class="pl-s1"><span class="pl-pds">"</span>分享标题<span class="pl-pds">"</span></span>,
+  desc<span class="pl-k">:</span><span class="pl-s1"><span class="pl-pds">"</span>分享描述<span class="pl-pds">"</span></span>,
+  content<span class="pl-k">:</span><span class="pl-s1"><span class="pl-pds">"</span>分享内容<span class="pl-pds">"</span></span>,
+  image<span class="pl-k">:</span><span class="pl-s1"><span class="pl-pds">"</span>http://www.dpfile.com/toevent/img/16d05c85a71b135edc39d197273746d6.png<span class="pl-pds">"</span></span>,
+  url<span class="pl-k">:</span><span class="pl-s1"><span class="pl-pds">"</span>http://m.dianping.com<span class="pl-pds">"</span></span>,
+  <span class="pl-en">success</span>: <span class="pl-st">function</span>(){
+    <span class="pl-s3">alert</span>(<span class="pl-s1"><span class="pl-pds">'</span>分享成功<span class="pl-pds">'</span></span>);
+  }
+});</pre></div>
+
+<h3>
+<a id="发送短信" class="anchor" href="#%E5%8F%91%E9%80%81%E7%9F%AD%E4%BF%A1" aria-hidden="true"><span class="octicon octicon-link"></span></a>发送短信</h3>
+
+<div class="highlight highlight-javascript"><pre>DPApp.sendSMS({
+  recipients<span class="pl-k">:</span> <span class="pl-c1">13581887557</span>,
+  content<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">"</span>短信内容<span class="pl-pds">"</span></span>,
+  <span class="pl-en">success</span>: <span class="pl-st">function</span>(<span class="pl-vpf">e</span>){
+  }
+});</pre></div>
+
+<h3>
+<a id="订阅消息" class="anchor" href="#%E8%AE%A2%E9%98%85%E6%B6%88%E6%81%AF" aria-hidden="true"><span class="octicon octicon-link"></span></a>订阅消息</h3>
+
+<div class="highlight highlight-javascript"><pre>DPApp.subscribe({
+  action<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">'</span>loginSuccess<span class="pl-pds">'</span></span>,
+  <span class="pl-en">success</span>: <span class="pl-st">function</span>(<span class="pl-vpf">e</span>){
+  }
+});</pre></div>
+
+<p>可选广播类型包括 
+loginSuccess: 登录成功
+switchCity: 切换城市
+background: 应用切换到后台
+foreground: 应用切换回前台</p>
+
+<h3>
+<a id="取消订阅" class="anchor" href="#%E5%8F%96%E6%B6%88%E8%AE%A2%E9%98%85" aria-hidden="true"><span class="octicon octicon-link"></span></a>取消订阅</h3>
+
+<div class="highlight highlight-javascript"><pre>DPApp.unsubscribe({
+  action<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">'</span>loginSuccess<span class="pl-pds">'</span></span>,
+  <span class="pl-en">success</span>: <span class="pl-st">function</span>(<span class="pl-vpf">e</span>){
+  }
+});</pre></div>
+
+<h3>
+<a id="设置标题" class="anchor" href="#%E8%AE%BE%E7%BD%AE%E6%A0%87%E9%A2%98" aria-hidden="true"><span class="octicon octicon-link"></span></a>设置标题</h3>
+
+<div class="highlight highlight-javascript"><pre>DPApp.setTitle({
+  title<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">"</span>标题<span class="pl-pds">"</span></span>
+});</pre></div>
+
+<h3>
+<a id="设置导航栏按钮" class="anchor" href="#%E8%AE%BE%E7%BD%AE%E5%AF%BC%E8%88%AA%E6%A0%8F%E6%8C%89%E9%92%AE" aria-hidden="true"><span class="octicon octicon-link"></span></a>设置导航栏按钮</h3>
+
+<p>左侧第一个</p>
+
+<div class="highlight highlight-javascript"><pre>DPApp.setLLButton({
+  text<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">"</span>文字<span class="pl-pds">"</span></span>,
+  icon<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">"</span>http://...<span class="pl-pds">"</span></span>    
+});</pre></div>
+
+<p>左侧第二个</p>
+
+<div class="highlight highlight-javascript"><pre>DPApp.setLRButton({
+  text<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">"</span>文字<span class="pl-pds">"</span></span>,
+  icon<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">"</span>http://...<span class="pl-pds">"</span></span>    
+});</pre></div>
+
+<p>右侧第一个</p>
+
+<div class="highlight highlight-javascript"><pre>DPApp.setRLButton({
+  text<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">"</span>文字<span class="pl-pds">"</span></span>,
+  icon<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">"</span>http://...<span class="pl-pds">"</span></span>    
+});</pre></div>
+
+<p>右侧第二个</p>
+
+<div class="highlight highlight-javascript"><pre>DPApp.setRRButton({
+  text<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">"</span>文字<span class="pl-pds">"</span></span>,
+  icon<span class="pl-k">:</span> <span class="pl-s1"><span class="pl-pds">"</span>http://...<span class="pl-pds">"</span></span>    
+});</pre></div>
+      </section>
+    </div>
+    <footer>
+      <p>Project maintained by <a href="https://github.com/efte">efte</a></p>
+      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
+    </footer>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-60162191-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
 </html>
