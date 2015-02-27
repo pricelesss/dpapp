@@ -4,6 +4,9 @@
 <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
 <meta charset="UTF-8">
 <style>
+	body{
+		overflow: scroll;
+	}
 	.btn{
 		display: block;
 		background-color: #f63;
@@ -15,6 +18,35 @@
 		margin: 10px 5px;
 		border-radius: 5px
 	}
+	.log-panel{
+		width: 100%;
+		position: fixed;
+		top: 0px;
+		left: 0px;
+		background: #6CD786;
+		color: #fff;
+		z-index: 1;
+	}
+	.log-panel .content{
+		overflow: hidden;
+		-webkit-transition: height .2s linear;
+	}
+	.log-panel p{
+		padding: 10px;
+		margin: 0;
+	}
+
+	.shadow-content{
+		position: absolute;
+		visibility: hidden;
+		width: 100%;
+	}
+
+	.shadow-content p{
+		padding: 10px;
+		margin: 0
+	}
+
 </style>
 <!-- cortex build will generate the two files below. -->
 <script src="./neurons/neuron.js"></script>
@@ -50,12 +82,13 @@
 	<a class="btn" id="unsubscribe" href="javascript:;">取消订阅</a>
 
 
-	<!-- <a class="btn" id="setTitle" href="javascript:;">设置标题</a>
+	<a class="btn" id="setTitle" href="javascript:;">设置标题</a>
 	<a class="btn" id="setLLBtn" href="javascript:;">设置LL按钮</a>
 	<a class="btn" id="setLRBtn" href="javascript:;">设置LR按钮</a>
 	<a class="btn" id="setRLBtn" href="javascript:;">设置RL按钮</a>
 	<a class="btn" id="setRRBtn" href="javascript:;">设置RR按钮</a>
- -->
+
+	<a class="btn" href="dianping://login">登录</a>
 
 <script>
 
@@ -78,12 +111,19 @@ _use('dpapp', function(Efte){
 		getContactList: defaultConfig,
 		getCX: defaultConfig,
 		ajax: {
+			url: "http://10.128.120.195:8000/data.json",
+			method: "get",
+			data: {a:1},
 			success: success
 		},
 		ga: {
 			success: success
 		},
 		uploadImage: {
+		  uploadUrl: "", // 上传图片调用的mapi接口的url
+		  compressFactor: 1024, // 可选，上传图片压缩到多少尺寸以下，单位为K
+		  maxNum: 5, // 需填写，默认为0
+		  extra: {}, // 业务参数
 			success: success
 		},
 		downloadImage: {
@@ -97,6 +137,8 @@ _use('dpapp', function(Efte){
 		share: {
 			title:"分享标题",
 			desc:"分享描述",
+			content: "覆盖内容",
+			feed: 0x17,
 			image:"http://www.dpfile.com/toevent/img/16d05c85a71b135edc39d197273746d6.png",
 			url:"http://m.dianping.com",
 			success: success
@@ -113,6 +155,26 @@ _use('dpapp', function(Efte){
 		unsubscribe: {
 			action: "loginSuccess",
 			success: success
+		},
+		setTitle: {
+			title: "新标题",
+			success: success
+		},
+		setLLBtn: {
+			text: "文字",
+			success: success
+		},
+		setLRBtn: {
+			text: "文字",
+			success: success
+		},
+		setRLBtn: {
+			text: "文字",
+			success: success
+		},
+		setRRBtn: {
+			text: "文字",
+			success: success
 		}
 	}
 
@@ -124,20 +186,54 @@ _use('dpapp', function(Efte){
 		})(id);
 	}
 
-	var _logPanel = null;
-	Efte._log = function(tag, info){
-		if(!_logPanel){
-			_logPanel = document.createElement('div');
-			document.body.appendChild(_logPanel);
-			_logPanel.style.width = "100%";
-			_logPanel.style.position = "absolute";
-			_logPanel.style.top = 0;
-			_logPanel.style.left = 0;
-		}
-		var p = document.createElement('p');
-		p.innerHTML = tag + ":" + JSON.stringify(info);
-		_logPanel.appendChild(p);
-	}
+	// (function(){
+	// 	var _logPanel = null;
+	// 	var contents = null;
+	// 	var shadowContents = null;
+	// 	var packup = null;
+	// 	var packed = false;
+
+	// 	function createPanel(){
+	// 		if(!_logPanel){
+	// 			_logPanel = document.createElement('div');
+	// 			_logPanel.classList.add('log-panel');
+	// 			document.body.appendChild(_logPanel);
+	// 			contents = document.createElement('div');
+	// 			contents.classList.add('content');
+	// 			shadowContents = document.createElement('div');
+	// 			shadowContents.classList.add('shadow-content');
+	// 			_logPanel.appendChild(contents);
+	// 			packup = document.createElement('div');
+	// 			packup.innerHTML = "打开log面板";
+	// 			packup.style.padding = "10px";
+	// 			packup.style.textAlign = "center";
+	// 			_logPanel.appendChild(packup);
+	// 			contents.style.height = 0;
+	// 			document.body.appendChild(shadowContents);
+	// 			packup.addEventListener('touchend', function(){
+	// 				if(packed){
+	// 					packup.innerHTML = "打开log面板";
+	// 					contents.style.height = 0;
+	// 				}else{
+	// 					packup.innerHTML = "收起";
+	// 					contents.style.height = shadowContents.offsetHeight + "px";
+	// 				}
+	// 				packed = !packed;
+	// 			});
+	// 		}
+	// 	}
+	// 	Efte._log = function(tag, info){
+	// 		var p = document.createElement('p');
+	// 		p.innerHTML = tag + ":" + JSON.stringify(info);
+
+	// 		var shadowP = p.cloneNode();
+	// 		shadowP.innerHTML = p.innerHTML;
+	// 		shadowContents.appendChild(shadowP);
+	// 		contents.appendChild(p);
+	// 	}
+	// 	createPanel();
+	// })();
+
 	document.getElementById('callMulti').onclick = function(){
 		Efte.getUserInfo({success:success});
 		Efte.getLocation({success:success});
