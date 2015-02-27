@@ -1,8 +1,21 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
 <meta charset="UTF-8">
-
+<style>
+	.btn{
+		display: block;
+		background-color: #f63;
+		color:#fff;
+		text-decoration: none;
+		text-align: center;
+		font-size: 16px;
+		padding: 10px 5px;
+		margin: 10px 5px;
+		border-radius: 5px
+	}
+</style>
 <!-- cortex build will generate the two files below. -->
 <script src="./neurons/neuron.js"></script>
 <script src="./neurons/config.js"></script>
@@ -15,12 +28,122 @@
 </head>
 
 <body>
+
+	<a class="btn" id="callMulti" href="javascript:;">连续方法调用</a>
+	<a class="btn" id="getUserInfo" href="javascript:;">获取用户信息</a>
+	<a class="btn" id="getLocation" href="javascript:;">获取地理位置</a>
+	<a class="btn" id="getNetworkType" href="javascript:;">获取网络状态</a>
+	<a class="btn" id="getContactList" href="javascript:;">获取联系人列表</a>
+	<a class="btn" id="getCX" href="javascript:;">获取诚信数据</a>
+	<a class="btn" id="ajax" href="javascript:;">Ajax</a>
+	<a class="btn" id="ga" href="javascript:;">ga</a>
+
+	<a class="btn" id="uploadImage" href="javascript:;">上传图片</a>
+	<a class="btn" id="downloadImage" href="javascript:;">下载图片</a>
+	<a class="btn" id="closeWindow" href="javascript:;">关闭webview</a>
+	<a class="btn" id="pay" href="javascript:;">第三方支付</a>
+	<a class="btn" id="share" href="javascript:;">分享</a>
+	<a class="btn" id="sendSMS" href="javascript:;">发送短信</a>
+
+
+	<a class="btn" id="subscribe" href="javascript:;">订阅消息</a>
+	<a class="btn" id="unsubscribe" href="javascript:;">取消订阅</a>
+
+
+	<!-- <a class="btn" id="setTitle" href="javascript:;">设置标题</a>
+	<a class="btn" id="setLLBtn" href="javascript:;">设置LL按钮</a>
+	<a class="btn" id="setLRBtn" href="javascript:;">设置LR按钮</a>
+	<a class="btn" id="setRLBtn" href="javascript:;">设置RL按钮</a>
+	<a class="btn" id="setRRBtn" href="javascript:;">设置RR按钮</a>
+ -->
+
 <script>
 
 // method `facade` will load a module
 // and try to execute the `init` method of the module exports.
-facade({
-  entry: 'dpapp'
+_use('dpapp', function(Efte){
+	var success = function(ret){
+		alert(JSON.stringify(ret));
+	};
+	var fail = function(ret){
+	}
+	var defaultConfig = {
+		success: success,
+		fail: fail
+	};
+	var args = {
+		getUserInfo: defaultConfig,
+		getLocation: defaultConfig,
+		getNetworkType: defaultConfig,
+		getContactList: defaultConfig,
+		getCX: defaultConfig,
+		ajax: {
+			success: success
+		},
+		ga: {
+			success: success
+		},
+		uploadImage: {
+			success: success
+		},
+		downloadImage: {
+			imageUrl: "http://www.dpfile.com/toevent/img/16d05c85a71b135edc39d197273746d6.png",
+			success: success
+		},
+		closeWindow: defaultConfig,
+		pay: {
+			success: success
+		},
+		share: {
+			title:"分享标题",
+			desc:"分享描述",
+			image:"http://www.dpfile.com/toevent/img/16d05c85a71b135edc39d197273746d6.png",
+			url:"http://m.dianping.com",
+			success: success
+		},
+		sendSMS: {
+			recipients: 13987654321,
+			content: "短信内容",
+			success: success
+		},
+		subscribe: {
+			action: "loginSuccess",
+			success: success
+		},
+		unsubscribe: {
+			action: "loginSuccess",
+			success: success
+		}
+	}
+
+	for(var id in args){
+		(function(id){
+			document.getElementById(id).onclick = function(){
+				Efte[id](args[id]);
+			};
+		})(id);
+	}
+
+	var _logPanel = null;
+	Efte._log = function(tag, info){
+		if(!_logPanel){
+			_logPanel = document.createElement('div');
+			document.body.appendChild(_logPanel);
+			_logPanel.style.width = "100%";
+			_logPanel.style.position = "absolute";
+			_logPanel.style.top = 0;
+			_logPanel.style.left = 0;
+		}
+		var p = document.createElement('p');
+		p.innerHTML = tag + ":" + JSON.stringify(info);
+		_logPanel.appendChild(p);
+	}
+	document.getElementById('callMulti').onclick = function(){
+		Efte.getUserInfo({success:success});
+		Efte.getLocation({success:success});
+		Efte.getNetworkType({success:success});
+	}
+
 });
 
 </script>
