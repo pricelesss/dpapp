@@ -90,11 +90,10 @@
 
 	<a class="btn" href="dianping://login">登录</a>
 
+<script src="./dest/standalone.js"></script>
+
 <script>
 
-// method `facade` will load a module
-// and try to execute the `init` method of the module exports.
-_use('dpapp', function(Efte){
 	var success = function(ret){
 		alert(JSON.stringify(ret));
 	};
@@ -111,7 +110,7 @@ _use('dpapp', function(Efte){
 		getContactList: defaultConfig,
 		getCX: defaultConfig,
 		ajax: {
-			url: "http://10.128.120.195:8000/data.json",
+			url: "http://m.api.dianping.com/indextabicon.bin?cityid=1&version=7.0.1",
 			method: "get",
 			data: {a:1},
 			success: success
@@ -178,7 +177,7 @@ _use('dpapp', function(Efte){
 		}
 	}
 
-	Efte.config({
+	DPApp.config({
 		debug: true
 	});
 
@@ -190,93 +189,11 @@ _use('dpapp', function(Efte){
 		})(id);
 	}
 
-	// (function(){
-	// 	var _logPanel = null;
-	// 	var contents = null;
-	// 	var shadowContents = null;
-	// 	var packup = null;
-	// 	var packed = false;
-
-	// 	function createPanel(){
-	// 		if(!_logPanel){
-	// 			_logPanel = document.createElement('div');
-	// 			_logPanel.classList.add('log-panel');
-	// 			document.body.appendChild(_logPanel);
-	// 			contents = document.createElement('div');
-	// 			contents.classList.add('content');
-	// 			shadowContents = document.createElement('div');
-	// 			shadowContents.classList.add('shadow-content');
-	// 			_logPanel.appendChild(contents);
-	// 			packup = document.createElement('div');
-	// 			packup.innerHTML = "打开log面板";
-	// 			packup.style.padding = "10px";
-	// 			packup.style.textAlign = "center";
-	// 			_logPanel.appendChild(packup);
-	// 			contents.style.height = 0;
-	// 			document.body.appendChild(shadowContents);
-	// 			packup.addEventListener('touchend', function(){
-	// 				if(packed){
-	// 					packup.innerHTML = "打开log面板";
-	// 					contents.style.height = 0;
-	// 				}else{
-	// 					packup.innerHTML = "收起";
-	// 					contents.style.height = shadowContents.offsetHeight + "px";
-	// 				}
-	// 				packed = !packed;
-	// 			});
-	// 		}
-	// 	}
-	// 	Efte._log = function(tag, info){
-	// 		var p = document.createElement('p');
-	// 		p.innerHTML = tag + ":" + JSON.stringify(info);
-
-	// 		var shadowP = p.cloneNode();
-	// 		shadowP.innerHTML = p.innerHTML;
-	// 		shadowContents.appendChild(shadowP);
-	// 		contents.appendChild(p);
-	// 	}
-	// 	createPanel();
-	// })();
-	// 连续方法调用
-	//
-	//
-	// 获取用户信息 done
-	// 获取地理位置 done
-	// 获取网络状态 done
-	// 获取联系人列表 done
-	// 获取诚信数据 done
-	// Ajax
-	// ga
-	// 上传图片
-	// 下载图片 done
-	// 关闭webview done
-	// 第三方支付
-	// 分享 done
-	// 发送短信 done
-	// 订阅消息
-	// 取消订阅
-	// 设置标题 done
-	// 设置LL按钮
-	// 设置LR按钮
-	// 设置RL按钮
-	// 设置RR按钮
-
-	// 登录 // dianping://login
-
-	// issues:
-	// 1. 联系人信息电话号码会分段
-	// 2. compressFactor默认值？
-	// 3. UI相关方法没有dequeue
-	// 4. 分享取消没进取消回调
-
-
 	document.getElementById('callMulti').onclick = function(){
-		Efte.getUserInfo({success:success});
-		Efte.getLocation({success:success});
-		Efte.getNetworkType({success:success});
+		DPApp.getUserInfo({success:success});
+		DPApp.getLocation({success:success});
+		DPApp.getNetworkType({success:success});
 	}
-
-});
 
 </script>
 </body>
