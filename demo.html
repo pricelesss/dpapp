@@ -160,20 +160,23 @@
 			success: success
 		},
 		setLLButton: {
-			text: "文字",
+			text: "左一文字",
 			success: success
 		},
 		setLRButton: {
-			text: "文字",
+			text: "带icon",
+			icon: "share",
 			success: success
 		},
 		setRLButton: {
-			text: "文字",
-			success: success
+			text: "自定义方法",
+			success: success,
+			action: function(){
+				alert('事件触发');
+			}
 		},
 		setRRButton: {
-			text: "文字",
-			success: success
+			text: "默认"
 		}
 	}
 
