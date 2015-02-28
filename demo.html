@@ -83,10 +83,10 @@
 
 
 	<a class="btn" id="setTitle" href="javascript:;">设置标题</a>
-	<a class="btn" id="setLLBtn" href="javascript:;">设置LL按钮</a>
-	<a class="btn" id="setLRBtn" href="javascript:;">设置LR按钮</a>
-	<a class="btn" id="setRLBtn" href="javascript:;">设置RL按钮</a>
-	<a class="btn" id="setRRBtn" href="javascript:;">设置RR按钮</a>
+	<a class="btn" id="setLLButton" href="javascript:;">设置LL按钮</a>
+	<a class="btn" id="setLRButton" href="javascript:;">设置LR按钮</a>
+	<a class="btn" id="setRLButton" href="javascript:;">设置RL按钮</a>
+	<a class="btn" id="setRRButton" href="javascript:;">设置RR按钮</a>
 
 	<a class="btn" href="dianping://login">登录</a>
 
@@ -160,23 +160,27 @@ _use('dpapp', function(Efte){
 			title: "新标题",
 			success: success
 		},
-		setLLBtn: {
+		setLLButton: {
 			text: "文字",
 			success: success
 		},
-		setLRBtn: {
+		setLRButton: {
 			text: "文字",
 			success: success
 		},
-		setRLBtn: {
+		setRLButton: {
 			text: "文字",
 			success: success
 		},
-		setRRBtn: {
+		setRRButton: {
 			text: "文字",
 			success: success
 		}
 	}
+
+	Efte.config({
+		debug: true
+	});
 
 	for(var id in args){
 		(function(id){
@@ -233,6 +237,38 @@ _use('dpapp', function(Efte){
 	// 	}
 	// 	createPanel();
 	// })();
+	// 连续方法调用
+	//
+	//
+	// 获取用户信息 done
+	// 获取地理位置 done
+	// 获取网络状态 done
+	// 获取联系人列表 done
+	// 获取诚信数据 done
+	// Ajax
+	// ga
+	// 上传图片
+	// 下载图片 done
+	// 关闭webview done
+	// 第三方支付
+	// 分享 done
+	// 发送短信 done
+	// 订阅消息
+	// 取消订阅
+	// 设置标题 done
+	// 设置LL按钮
+	// 设置LR按钮
+	// 设置RL按钮
+	// 设置RR按钮
+
+	// 登录 // dianping://login
+
+	// issues:
+	// 1. 联系人信息电话号码会分段
+	// 2. compressFactor默认值？
+	// 3. UI相关方法没有dequeue
+	// 4. 分享取消没进取消回调
+
 
 	document.getElementById('callMulti').onclick = function(){
 		Efte.getUserInfo({success:success});
