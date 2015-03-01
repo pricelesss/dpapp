@@ -8,4 +8,6 @@ if [ "$?" = "1" ]; then
 	echo "npm install cortex-bundle -g"
 	npm install cortex-bundle -g
 fi
-cortex bundle -o $CORTEX_DEST/$CORTEX_PACKAGE_NAME/$CORTEX_PACKAGE_VERSION/standalone.js
+
+echo "cortex bundle --built-root $CORTEX_DEST --prerelease $ENV -o $CORTEX_DEST/$CORTEX_PACKAGE_NAME/$CORTEX_PACKAGE_VERSION/standalone.js"
+cortex bundle --built-root $CORTEX_DEST --prerelease $ENV -o $CORTEX_DEST/$CORTEX_PACKAGE_NAME/$CORTEX_PACKAGE_VERSION/standalone.js
