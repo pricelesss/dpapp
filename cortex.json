@@ -24,14 +24,7 @@
   "scripts": {
     // `scripts.prebuild` runs at the beginning of the `cortex build` process.
     // If you wanna use gulp, remember to `npm install gulp --save-dev`
-    "prebuild": "cortex bundle -o dest/standalone.js"
-  },
-  "directories": {
-    // By default, only `cortex.main`, `cortex.css`, `cortex.entries` are treated as
-    // the resources of the package.
-    // To include more files,
-    // they should be put into a folder named the value of `directories.src`
-    "src": "dest"
+    "postbuild": "sh ./standalone.sh"
   },
   "repository": "git://github.com/Maxwin/dpapp.git",
   "keywords": [
