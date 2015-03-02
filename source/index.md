@@ -5,7 +5,6 @@ language_tabs:
   - javascript
 
 toc_footers:
-  - <a href='#'>Sign Up for a Developer Key</a>
   - <a href='http://github.com/tripit/slate'>Documentation Powered by Slate</a>
 
 includes:
@@ -60,7 +59,7 @@ DPApp.ready(function(){
 所有方法皆只接受一个javascript对象作为参数，其中success，fail分别为成功与失败后的回调。
 回调函数接受一个json对象作为参数。对象中的字段含义如下：
 
-- status: 代表业务执行结果，其值为 success（成功），fail（失败）或 cancel（主动取消）
+- status: 代表业务执行结果，其值为 success（成功），fail（失败），action（被动回调）或 cancel（主动取消）
 - result: 回调函数的执行结果，其值为 next（需要多次回调，执行后不销毁方法），error（执行错误），complete（执行成功）
 - errMsg: 业务执行为fail时的错误信息
 
@@ -252,7 +251,8 @@ DPApp.setTitle({
 ```javascript
 DPApp.setLLButton({
   text: "文字",
-  icon: "http://..."
+  icon: "http://...",
+  action: function(){}
 });
 ```
 
@@ -262,7 +262,8 @@ DPApp.setLLButton({
 ```javascript
 DPApp.setLRButton({
   text: "文字",
-  icon: "http://..."
+  icon: "http://...",
+  action: function(){}
 });
 ```
 
@@ -271,7 +272,8 @@ DPApp.setLRButton({
 ```javascript
 DPApp.setRLButton({
   text: "文字",
-  icon: "http://..."
+  icon: "http://...",
+  action: function(){}
 });
 ```
 
@@ -281,7 +283,8 @@ DPApp.setRLButton({
 ```javascript
 DPApp.setRRButton({
   text: "文字",
-  icon: "http://..."
+  icon: "http://...",
+  action: function(){}
 });
 ```
 
