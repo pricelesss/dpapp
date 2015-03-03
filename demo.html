@@ -48,15 +48,6 @@
 	}
 
 </style>
-<!-- cortex build will generate the two files below. -->
-<script src="./neurons/neuron.js"></script>
-<script src="./neurons/config.js"></script>
-<script>
-  neuron.config({
-    // cortex build will generate a folder named `'neurons'` as well as the `'node_modules'` of node.js
-    path: './neurons'
-  });
-</script>
 </head>
 
 <body>
@@ -83,8 +74,6 @@
 
 
 	<a class="btn" id="setTitle" href="javascript:;">设置标题</a>
-	<a class="btn" id="setLLButton" href="javascript:;">设置LL按钮</a>
-	<a class="btn" id="setLRButton" href="javascript:;">设置LR按钮</a>
 	<a class="btn" id="setRLButton" href="javascript:;">设置RL按钮</a>
 	<a class="btn" id="setRRButton" href="javascript:;">设置RR按钮</a>
 
@@ -149,30 +138,31 @@
 		},
 		subscribe: {
 			action: "loginSuccess",
-			success: success
+			handle: function(){
+				alert('用户已登录');
+			}
 		},
 		unsubscribe: {
-			action: "loginSuccess",
-			success: success
+			action: "loginSuccess"
 		},
 		setTitle: {
 			title: "新标题",
 			success: success
 		},
-		setLLButton: {
-			text: "左一文字",
-			success: success
-		},
-		setLRButton: {
-			text: "带icon",
-			icon: "share",
-			success: success
-		},
 		setRLButton: {
-			text: "自定义方法",
+			text: "分享",
+			icon: "H5_Share",
 			success: success,
-			action: function(){
-				alert('事件触发');
+			handle: function(){
+				Efte.share({
+					title: document.title,
+					desc: document.title,
+					image: document.querySelector('img') && document.querySelector('img').src,
+					url: location.href,
+					success: function(){
+						alert('分享成功');
+					}
+				});
 			}
 		},
 		setRRButton: {

@@ -1,5 +1,6 @@
 if [ -z "$ENV" ]; then
-	echo "ENV not export, just exit."
+	echo "cortex bundle -o ./dest/standalone.js"
+	cortex bundle -o ./dest/standalone.js
 	exit 0
 fi
 
