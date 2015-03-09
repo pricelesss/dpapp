@@ -4,189 +4,260 @@
 <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
 <meta charset="UTF-8">
 <style>
-	body{
-		overflow: scroll;
-	}
-	.btn{
-		display: block;
-		background-color: #f63;
-		color:#fff;
-		text-decoration: none;
-		text-align: center;
-		font-size: 16px;
-		padding: 10px 5px;
-		margin: 10px 5px;
-		border-radius: 5px
-	}
-	.log-panel{
-		width: 100%;
-		position: fixed;
-		top: 0px;
-		left: 0px;
-		background: #6CD786;
-		color: #fff;
-		z-index: 1;
-	}
-	.log-panel .content{
-		overflow: hidden;
-		-webkit-transition: height .2s linear;
-	}
-	.log-panel p{
-		padding: 10px;
-		margin: 0;
-	}
+  body{
+    overflow: scroll;
+  }
+  .btn{
+    display: block;
+    background-color: #f63;
+    color:#fff;
+    text-decoration: none;
+    text-align: center;
+    font-size: 16px;
+    padding: 10px 5px;
+    margin: 10px 5px;
+    border-radius: 5px
+  }
+  .log-panel{
+    width: 100%;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    background: #6CD786;
+    color: #fff;
+    z-index: 1;
+  }
+  .log-panel .content{
+    overflow: hidden;
+    -webkit-transition: height .2s linear;
+  }
+  .log-panel p{
+    padding: 10px;
+    margin: 0;
+  }
 
-	.shadow-content{
-		position: absolute;
-		visibility: hidden;
-		width: 100%;
-	}
+  .shadow-content{
+    position: absolute;
+    visibility: hidden;
+    width: 100%;
+  }
 
-	.shadow-content p{
-		padding: 10px;
-		margin: 0
-	}
+  .shadow-content p{
+    padding: 10px;
+    margin: 0
+  }
 
 </style>
 </head>
 
 <body>
 
-	<a class="btn" id="callMulti" href="javascript:;">连续方法调用</a>
-	<a class="btn" id="getUserInfo" href="javascript:;">获取用户信息</a>
-	<a class="btn" id="getLocation" href="javascript:;">获取地理位置</a>
-	<a class="btn" id="getNetworkType" href="javascript:;">获取网络状态</a>
-	<a class="btn" id="getContactList" href="javascript:;">获取联系人列表</a>
-	<a class="btn" id="getCX" href="javascript:;">获取诚信数据</a>
-	<a class="btn" id="ajax" href="javascript:;">Ajax</a>
-	<a class="btn" id="ga" href="javascript:;">ga</a>
+  <a class="btn" href="javascript:location.reload()">刷新</a>
+  <a class="btn" id="callMulti" href="javascript:;">连续方法调用</a>
+  <a class="btn" id="getUserInfo" href="javascript:;">获取用户信息</a>
+  <a class="btn" id="getLocation" href="javascript:;">获取地理位置</a>
+  <a class="btn" id="getNetworkType" href="javascript:;">获取网络状态</a>
+  <a class="btn" id="getContactList" href="javascript:;">获取联系人列表</a>
+  <!-- <a class="btn" id="getCX" href="javascript:;">获取诚信数据</a> -->
+  <a class="btn" id="ajax" href="javascript:;">Ajax</a>
+  <a class="btn" id="ga" href="javascript:;">ga</a>
 
-	<a class="btn" id="uploadImage" href="javascript:;">上传图片</a>
-	<a class="btn" id="downloadImage" href="javascript:;">下载图片</a>
-	<a class="btn" id="closeWindow" href="javascript:;">关闭webview</a>
-	<a class="btn" id="pay" href="javascript:;">第三方支付</a>
-	<a class="btn" id="share" href="javascript:;">分享</a>
-	<a class="btn" id="sendSMS" href="javascript:;">发送短信</a>
-
-
-	<a class="btn" id="subscribe" href="javascript:;">订阅消息</a>
-	<a class="btn" id="unsubscribe" href="javascript:;">取消订阅</a>
+  <a class="btn" id="uploadImage" href="javascript:;">上传图片</a>
+  <a class="btn" id="downloadImage" href="javascript:;">下载图片</a>
+  <a class="btn" id="closeWindow" href="javascript:;">关闭webview</a>
+  <a class="btn" id="pay" href="javascript:;">第三方支付</a>
+  <a class="btn" id="share" href="javascript:;">分享</a>
+  <a class="btn" id="sendSMS" href="javascript:;">发送短信</a>
 
 
-	<a class="btn" id="setTitle" href="javascript:;">设置标题</a>
-	<a class="btn" id="setRLButton" href="javascript:;">设置RL按钮</a>
-	<a class="btn" id="setRRButton" href="javascript:;">设置RR按钮</a>
+  <a class="btn" id="subscribe" href="javascript:;">订阅消息</a>
+  <a class="btn" id="unsubscribe" href="javascript:;">取消订阅</a>
+  <a class="btn" id="publish" href="javascript:;">广播消息</a>
 
-	<a class="btn" href="dianping://login">登录</a>
 
-<script src="./dest/standalone.js"></script>
+  <a class="btn" id="setTitle" href="javascript:;">设置标题</a>
+  <a class="btn" id="setRLButton" href="javascript:;">设置RL按钮</a>
+  <a class="btn" id="setRRButton" href="javascript:;">设置RR按钮</a>
+
+  <a class="btn" id="login" href="javascript:;">登录</a>
+
+<script src="./dest/standalone.js?t=918317289317293112"></script>
 
 <script>
 
-	var success = function(ret){
-		alert(JSON.stringify(ret));
-	};
-	var fail = function(ret){
-	}
-	var defaultConfig = {
-		success: success,
-		fail: fail
-	};
-	var args = {
-		getUserInfo: defaultConfig,
-		getLocation: defaultConfig,
-		getNetworkType: defaultConfig,
-		getContactList: defaultConfig,
-		getCX: defaultConfig,
-		ajax: {
-			url: "http://m.api.dianping.com/indextabicon.bin?cityid=1&version=7.0.1",
-			method: "get",
-			data: {a:1},
-			success: success
-		},
-		ga: {
-			success: success
-		},
-		uploadImage: {
-		  uploadUrl: "", // 上传图片调用的mapi接口的url
-		  compressFactor: 1024, // 可选，上传图片压缩到多少尺寸以下，单位为K
-		  maxNum: 5, // 需填写，默认为0
-		  extra: {}, // 业务参数
-			success: success
-		},
-		downloadImage: {
-			imageUrl: "http://www.dpfile.com/toevent/img/16d05c85a71b135edc39d197273746d6.png",
-			success: success
-		},
-		closeWindow: defaultConfig,
-		pay: {
-			success: success
-		},
-		share: {
-			title:"分享标题",
-			desc:"分享描述",
-			content: "覆盖内容",
-			feed: 0x17,
-			image:"http://www.dpfile.com/toevent/img/16d05c85a71b135edc39d197273746d6.png",
-			url:"http://m.dianping.com",
-			success: success
-		},
-		sendSMS: {
-			recipients: 13987654321,
-			content: "短信内容",
-			success: success
-		},
-		subscribe: {
-			action: "loginSuccess",
-			handle: function(){
-				alert('用户已登录');
-			}
-		},
-		unsubscribe: {
-			action: "loginSuccess"
-		},
-		setTitle: {
-			title: "新标题",
-			success: success
-		},
-		setRLButton: {
-			text: "分享",
-			icon: "H5_Share",
-			success: success,
-			handle: function(){
-				Efte.share({
-					title: document.title,
-					desc: document.title,
-					image: document.querySelector('img') && document.querySelector('img').src,
-					url: location.href,
-					success: function(){
-						alert('分享成功');
-					}
-				});
-			}
-		},
-		setRRButton: {
-			text: "默认"
-		}
-	}
+  var success = function(ret){
+    alert(JSON.stringify(ret));
+  };
+  var fail = function(ret){
+  }
+  var defaultConfig = {
+    success: success,
+    fail: fail
+  };
+  var args = {
+    getUserInfo: defaultConfig,
+    getLocation: defaultConfig,
+    getNetworkType: defaultConfig,
+    getContactList: defaultConfig,
+    // getCX: defaultConfig,
+    ajax: {
+      url: "http://m.api.dianping.com/indextabicon.bin?cityid=1&version=7.0.1",
+      method: "get",
+      data: {a:1},
+      success: success
+    },
+    ga: {
+      success: success
+    },
+    uploadImage: {
+      uploadUrl: "", // 上传图片调用的mapi接口的url
+      compressFactor: 1024, // 可选，上传图片压缩到多少尺寸以下，单位为K
+      maxNum: 5, // 需填写，默认为0
+      extra: {}, // 业务参数
+      success: success
+    },
+    downloadImage: {
+      imageUrl: "http://www.dpfile.com/toevent/img/16d05c85a71b135edc39d197273746d6.png",
+      success: success
+    },
+    closeWindow: defaultConfig,
+    // pay: {
+    //  success: success
+    // },
+    share: {
+      title:"分享标题",
+      desc:"分享描述",
+      content: "覆盖内容",
+      feed: [DPApp.Share.WECHAT_FRIENDS, DPApp.Share.WECHAT_TIMELINE, DPApp.Share.WEIBO],
+      image:"http://www.dpfile.com/toevent/img/16d05c85a71b135edc39d197273746d6.png",
+      url:"http://m.dianping.com",
+      success: success
+    },
+    sendSMS: {
+      recipients: 13987654321,
+      content: "短信内容",
+      success: success
+    },
+    subscribe: {
+      action: "loginSuccess",
+      handle: function(){
+        alert('用户已登录');
+      }
+    },
+    unsubscribe: {
+      action: "loginSuccess"
+    },
+    publish: {
+      action: "loginSuccess"
+    },
+    setTitle: {
+      title: "新标题",
+      success: success
+    },
+    setRLButton: {
+      text: "分享",
+      icon: "H5_Share",
+      success: success,
+      handle: function(){
+        Efte.share({
+          title: document.title,
+          desc: document.title,
+          image: document.querySelector('img') && document.querySelector('img').src,
+          url: location.href,
+          success: function(){
+            alert('分享成功');
+          }
+        });
+      }
+    },
+    setRRButton: {
+      text: "默认"
+    }
+  }
 
-	DPApp.config({
-		debug: true
-	});
+  DPApp.config({
+    debug: true
+  });
 
-	for(var id in args){
-		(function(id){
-			document.getElementById(id).onclick = function(){
-				Efte[id](args[id]);
-			};
-		})(id);
-	}
+  $('login').onclick = function(){
+    try{
+      location.href = "dianping://login";
+    }catch(e){}
+  }
 
-	document.getElementById('callMulti').onclick = function(){
-		DPApp.getUserInfo({success:success});
-		DPApp.getLocation({success:success});
-		DPApp.getNetworkType({success:success});
-	}
+  function $(id){return document.getElementById(id);}
+
+
+
+  DPApp.ajax({
+    url: 'http://app.t.dianping.com/dealgn.bin?id=123456&cityid=1&token=',
+    data: {
+      "id": 123456,
+      "cityid": 1,
+      "token": ""
+    },
+    success: function(deal) {
+      alert(deal);
+    },
+    fail: function (error) {
+      alert(error);
+    }
+  });
+
+  for(var id in args){
+    (function(id){
+      $(id).onclick = function(){
+        Efte[id](args[id]);
+      };
+
+      $('pay').onclick = function(){
+        location.href = "dianping://login"
+        return;
+        DPApp.getCX({
+          business:"payorder",
+          success: function(result){
+            // alert(JSON.stringify(result));
+            // alert(result);
+            var cx = result.cx;
+            DPApp.getUserInfo({
+              success: function(user){
+                DPApp.ajax({
+                  url: 'http://app.t.dianping.com/dealgn.bin',
+                  data: {
+                    "id": 123456,
+                    "cityid": user.cityid || 1,
+                    "token": user.token
+                  },
+                  success: function(deal) {
+                    alert(deal);
+                  },
+                  fail: function (error) {
+                    alert(error);
+                  }
+                });
+              }
+            });
+          }
+        });
+
+
+      }
+    })(id);
+  }
+
+  window.onerror = function(a,b){
+    alert(a);
+    alert(b);
+  }
+
+  document.getElementById('callMulti').onclick = function(){
+    DPApp.getUserInfo({success:success});
+    DPApp.getLocation({success:success});
+    DPApp.getNetworkType({success:success});
+  }
+
+
+  DPApp.did_handle_callback = DPApp.dequeue;
 
 </script>
 </body>
