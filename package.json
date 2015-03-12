@@ -18,6 +18,9 @@
   },
   "homepage": "http://github.com/Maxwin/dpapp",
   "dependencies": {
-    "dpciconfig": "^1.0.1"
+    "dpciconfig": "^1.0.1",
+    "gulp": "^3.8.11",
+    "gulp-ftp": "^1.0.3",
+    "gulp-util": "^3.0.4"
   }
 }
