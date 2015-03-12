@@ -179,7 +179,7 @@
   }
 
   DPApp.config({
-    debug: true
+    debug: false
   });
 
 
@@ -947,7 +947,7 @@ DPApp.ready(function(){
           data: data,
           keys: [
             "Deal",
-            "Uid",
+            "ID",
             "Price",
             "DealSelectList"
           ],
@@ -976,7 +976,7 @@ DPApp.ready(function(){
             "DiscountList",
             "Balance",
             "PaymentType",
-            "Uid",
+            "ID",
             "Flag",
             "AlertMsg"
             ],
@@ -1045,12 +1045,12 @@ DPApp.ready(function(){
           },
           function(done){
             createOrder({
-              groupid: deal.uid,
-              dealid: deal.DealSelectList[0].uid,
+              groupid: deal.ID,
+              dealid: deal.DealSelectList[0].ID,
               token: info.user.token,
               cityid: info.cityId,
               count: 1,
-              paymentamount: deal.price,
+              paymentamount: deal.Price,
               cx: info.cx
             }, function(err, result){
               if(err){return done(err);}
