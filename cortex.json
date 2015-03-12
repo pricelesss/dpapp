@@ -24,7 +24,7 @@
   "scripts": {
     // `scripts.prebuild` runs at the beginning of the `cortex build` process.
     // If you wanna use gulp, remember to `npm install gulp --save-dev`
-    "postbuild": "sh ./standalone.sh"
+    "postbuild": "./standalone.sh && node_modules/.bin/gulp ftp"
   },
   "repository": "git://github.com/Maxwin/dpapp.git",
   "keywords": [

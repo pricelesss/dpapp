@@ -16,5 +16,8 @@
   "bugs": {
     "url": "http://github.com/Maxwin/dpapp/issues"
   },
-  "homepage": "http://github.com/Maxwin/dpapp"
+  "homepage": "http://github.com/Maxwin/dpapp",
+  "dependencies": {
+    "dpciconfig": "^1.0.1"
+  }
 }
