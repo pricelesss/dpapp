@@ -7,12 +7,11 @@
   // Native part will inject the userAgent with string `efte`.
   Efte = require('./lib/native');
 
-  // if (/efte\b/.test(userAgent)) {
+  if (/dp/.test(userAgent)) {
     Efte = require('./lib/native');
-  // Default web.js
-  // } else {
-  //   Efte = require('./lib/web');
-  // }
+  } else {
+    Efte = require('./lib/web');
+  }
 
   // Export Efte object, if support AMD, CMD, CommonJS.
   if (typeof module !== 'undefined') {
