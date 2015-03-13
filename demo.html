@@ -3,6 +3,7 @@
 <head>
 <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
 <meta charset="UTF-8">
+<title>DPApp JSBridge Demo</title>
 <style>
   body{
     background-color: #000;
@@ -56,6 +57,7 @@
   <a class="btn" href="javascript:location.reload()">刷新</a>
   <a class="btn" id="getUA" href="javascript:;">获取客户端环境信息</a>
   <a class="btn" id="callMulti" href="javascript:;">连续方法调用</a>
+  <a class="btn" id="getCityId" href="javascript:;">获取城市信息</a>
   <a class="btn" id="getUserInfo" href="javascript:;">获取用户信息</a>
   <a class="btn" id="getLocation" href="javascript:;">获取地理位置</a>
   <a class="btn" id="getNetworkType" href="javascript:;">获取网络状态</a>
@@ -103,6 +105,7 @@
     getLocation: defaultConfig,
     getNetworkType: defaultConfig,
     getContactList: defaultConfig,
+    getCityId: defaultConfig,
     // getCX: defaultConfig,
     ajax: {
       url: "http://m.api.dianping.com/indextabicon.bin?cityid=1&version=7.0.1",
@@ -847,7 +850,7 @@
   };
 
 
-DPApp.ready(function(){
+// DPApp.ready(function(){
   for(var id in args){
     (function(id){
       $(id).onclick = function(){
@@ -960,8 +963,36 @@ DPApp.ready(function(){
         });
       }
 
-      function loopQuery(data, callback){
-        callback("fail loop query");
+      function loopQuery(paymentinfo, callback){
+
+        var count = paymentinfo.RetryCount;
+
+        function takeATry(){
+            DPApp.ajax({
+                url:"http://app.t.dianping.com/getsubmitorderresult.pay",
+                data:{
+                    advanceorderid: paymentinfo.AdvanceOrderId
+                },
+                keys:["OrderId","Status","ErrorMsg"],
+                success: function(data){
+                    if(data.Status == 1){
+                        callback(null, {
+                            ID: data.OrderId
+                        });
+                    }else if(data.Status == 0){
+                        callback(data.ErrorMsg);
+                    }else{
+                        count--;
+                        if(count == 0){
+                            callback("fail loop query");
+                        }else{
+                            setTimeout(takeATry, paymentinfo.IntervalTime);
+                        }
+                    }
+                }
+            });
+        }
+        takeATry();
       }
 
       function createOrder(data, callback){
@@ -981,9 +1012,9 @@ DPApp.ready(function(){
             "AlertMsg"
             ],
           success: function (paymentinfo) {
-            if(paymentinfo.uid == 0){
+            if(paymentinfo.ID == 0){
               // 轮训
-              loopQuery({}, callback);
+              loopQuery(paymentinfo, callback);
             }else{
               callback(null, paymentinfo);
             }
@@ -998,6 +1029,7 @@ DPApp.ready(function(){
         DPApp.ajax({
           url: 'http://api.p.dianping.com/payorder.pay',
           data: data,
+          keys: ["Content"],
           success: function (paymsg) {
             callback(null, paymsg);
           },
@@ -1061,7 +1093,7 @@ DPApp.ready(function(){
           function(done){
             payOrder({
               token: info.user.token,
-              orderid: order.uid,
+              orderid: order.ID,
               paymenttool: getPaymentTool(payType),
               cx: info.cx
             }, function(err, result){
@@ -1076,7 +1108,7 @@ DPApp.ready(function(){
           }else{
             DPApp.pay({
               paytype: payType,
-              paycontent: paymsg.content,
+              paycontent: paymsg.Content,
               success: function(data) {
                 alert(JSON.stringify(data));
               },
@@ -1153,7 +1185,7 @@ DPApp.ready(function(){
     })(id);
   }
 
-});
+// });
 
   window.onerror = function(a,b){
     // alert(a);
