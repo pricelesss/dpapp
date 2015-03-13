@@ -5,7 +5,6 @@
 
   // Require different platform js base on userAgent.
   // Native part will inject the userAgent with string `efte`.
-  Efte = require('./lib/native');
 
   if (/dp/.test(userAgent)) {
     Efte = require('./lib/native');
