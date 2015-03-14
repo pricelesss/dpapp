@@ -87,8 +87,9 @@
 
   <a class="btn" id="login" href="javascript:;">登录</a>
 
-<script src="./dest/standalone.js?t=918317289317293112"></script>
+  <div id="loginContainer"></div>
 
+<script src="./dest/standalone.js"></script>
 <script>
 
   var success = function(ret){
@@ -153,6 +154,9 @@
     },
     subscribe: {
       action: "loginSuccess",
+      success: function(){
+        alert("绑定成功");
+      },
       handle: function(){
         alert('用户已登录');
       },
@@ -197,56 +201,20 @@
     debug: false
   });
 
-
   $('login').onclick = function(){
-    try{
-      location.href = "dianping://login";
-    }catch(e){}
+    DPApp.login({
+      success: success,
+      fail: fail
+    });
   }
 
   function $(id){return document.getElementById(id);}
 
-// DPApp.ready(function(){
   for(var id in args){
     (function(id){
       $(id).onclick = function(){
         Efte[id](args[id]);
       };
-
-      // 外部参数：
-      // token, 用户token
-      // cityId, 城市
-      // phoneno 用户电话号码（绑定手机的服务出问题了）
-
-      // price 单价
-      // count 份数
-      // cx
-
-      // 可选
-      // deliveryid 配送地址id
-      // deliverytype 配送时间
-      // orderid 修改订单
-      // memo 备注
-
-      // discountid 渠道立减(立减id),
-      // eventchannel 支付宝（）,
-      // producttype 团购还是预订（团购是0，非团购是（业务会自己申请））,
-      // usebalance 是否使用余额 1|0,
-      // usehongbao 是否使用红包 1|0,
-      // usepoint 是否使用积分 1|0
-
-
-
-      // "token": user.token,
-      // "cityid": cityId,
-      // "count": 1,
-      // "paymentamount": deal.price,
-      // "deliveryid": "0",
-      // "deliverytype": "1",
-      // "orderid": "0",
-      // "memo": "",
-      // "cx": cx,
-      // "ismembercard": "0"
 
       function series(steps, callback){
         var count = steps.length;
@@ -540,9 +508,23 @@
         DPApp.getNetworkType({success:success});
       }
     })(id);
+
+    DPApp.subscribe({
+      action: 'foreground',
+      handle: function(){
+        alert('happened!');
+      }
+    });
+
+
+    DPApp.subscribe({
+      action: 'foreground',
+      handle: function(){
+        alert('happened!2');
+      }
+    });
   }
 
-// });
 
   window.onerror = function(a,b){
     // alert(a);
