@@ -87,13 +87,14 @@
 
   <a class="btn" id="login" href="javascript:;">登录</a>
 
+  <!-- <img src="./sc.png" alt="" style="position:fixed;bottom:0;width:100%;z-index:10;opacity:0.5;point-event:none"> -->
   <div id="loginContainer"></div>
 
 <script src="./dest/standalone.js"></script>
 <script>
 
   var success = function(ret){
-    alert(JSON.stringify(ret));
+    console.log(JSON.stringify(ret));
   };
   var fail = function(ret){
     console.log(ret);
@@ -153,21 +154,21 @@
       fail: fail
     },
     subscribe: {
-      action: "loginSuccess",
+      action: "message",
       success: function(){
-        alert("绑定成功");
+        DPApp._log("消息绑定");
       },
       handle: function(){
-        alert('用户已登录');
+        DPApp._log('消息触发');
       },
       fail: fail
     },
     unsubscribe: {
-      action: "loginSuccess",
+      action: "message",
       fail: fail
     },
     publish: {
-      action: "loginSuccess",
+      action: "message",
       fail: fail
     },
     setTitle: {
@@ -190,7 +191,7 @@
           image: 'http://i2.s1.dpfile.com/pc/mc/b99de9c6e32d86ba2866380092f1f7f2(353c221)/thumb.jpg',
           url: location.href,
           success: function(){
-            alert('分享成功');
+            DPApp._log('分享成功');
           }
         });
       }
@@ -428,16 +429,16 @@
           }
         ], function(err){
           if(err){
-            return alert(err);
+            return DPApp._log(err);
           }else{
             DPApp.pay({
               paytype: payType,
               paycontent: paymsg.Content,
               success: function(data) {
-                alert(JSON.stringify(data));
+                DPApp._log(JSON.stringify(data));
               },
               fail: function(data) {
-                alert(JSON.stringify(data));
+                DPApp._log(JSON.stringify(data));
               }
             });
           }
@@ -472,16 +473,16 @@
             id:10713251
           },
           success: function(result){
-            alert(JSON.stringify(result));
+            DPApp._log(JSON.stringify(result));
           },
           fail: function(){
-            alert("调用失败");
+            DPApp._log("调用失败");
           }
         });
       };
 
       $('getUA').onclick = function(){
-        alert(JSON.stringify(DPApp.getUA()));
+        DPApp._log(JSON.stringify(DPApp.getUA()));
       };
 
       $('setSearchButton').onclick = function(){
@@ -508,27 +509,27 @@
         DPApp.getNetworkType({success:success});
       }
     })(id);
-
-    DPApp.subscribe({
-      action: 'foreground',
-      handle: function(){
-        alert('happened!');
-      }
-    });
-
-
-    DPApp.subscribe({
-      action: 'foreground',
-      handle: function(){
-        alert('happened!2');
-      }
-    });
   }
 
 
+    DPApp.subscribe({
+      action: 'foreground',
+      handle: function(){
+        console.log('happened!');
+      }
+    });
+
+
+    DPApp.subscribe({
+      action: 'foreground',
+      handle: function(){
+        console.log('happened!2');
+      }
+    });
+
   window.onerror = function(a,b){
-    // alert(a);
-    // alert(b);
+    // DPApp._log(a);
+    // DPApp._log(b);
   }
 
 

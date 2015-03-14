@@ -55,8 +55,11 @@ DPApp.ready(function(){
 });
 ```
 
+在开始之前，你可以选择配置DPApp，目前可选配置只有debug一个，表示是否开启调试模式。
+开启后会以alert的方式打印调试信息。默认为关闭。`DPApp.config({debug:true})`
 
 所有方法皆只接受一个javascript对象作为参数，其中success，fail分别为成功与失败后的回调。
+同时对于延时反馈的场景（如监听广播事件，按钮被点击的回调等），可以传入handle回调函数来处理。
 回调函数接受一个json对象作为参数。对象中的字段含义如下：
 
 - status: 代表业务执行结果，其值为 success（成功），fail（失败），action（被动回调）或 cancel（主动取消）
@@ -117,7 +120,11 @@ DPApp.getUserInfo({
 ```javascript
 DPApp.getContactList({
   success: function(e){
-    console.log(e.contactList); // 联系人列表
+    e.contactList.forEach(function(people){
+      console.log(e.lastName); // 姓
+      console.log(e.firstName); // 名
+      console.log(e.phone); // 号码
+    });
     console.log(e.authorized); // 用户是否授权
   }
 });
@@ -139,9 +146,8 @@ DPApp.ajax({
 ## ga统计
 ```javascript
 DPApp.ga({
+  data: {},
   success: function(e){
-    console.log(e.contactList); // 联系人列表
-    console.log(e.authorized); // 用户是否授权
   }
 });
 ```

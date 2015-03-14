@@ -41,6 +41,7 @@
   },
   "homepage": "http://github.com/Maxwin/dpapp",
   "asyncDependencies": {
-    "easy-login": "~0.1.3"
+    "easy-login": "~0.1.3",
+    "dpapp-share": "~0.1.0"
   }
 }
