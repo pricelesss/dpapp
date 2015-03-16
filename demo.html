@@ -62,7 +62,7 @@
   <a class="btn" id="getLocation" href="javascript:;">获取地理位置</a>
   <a class="btn" id="getNetworkType" href="javascript:;">获取网络状态</a>
   <a class="btn" id="getContactList" href="javascript:;">获取联系人列表</a>
-  <!-- <a class="btn" id="getCX" href="javascript:;">获取诚信数据</a> -->
+  <a class="btn" id="getCX" href="javascript:;">获取诚信数据</a>
   <a class="btn" id="ajax" href="javascript:;">Ajax(.bin)</a>
   <a class="btn" id="ajax-json" href="javascript:;">Ajax(.json)</a>
   <a class="btn" id="ga" href="javascript:;">ga</a>
@@ -87,7 +87,6 @@
 
   <a class="btn" id="login" href="javascript:;">登录</a>
 
-  <!-- <img src="./sc.png" alt="" style="position:fixed;bottom:0;width:100%;z-index:10;opacity:0.5;point-event:none"> -->
   <div id="loginContainer"></div>
 
 <script src="./dest/standalone.js"></script>
@@ -109,7 +108,7 @@
     getNetworkType: defaultConfig,
     getContactList: defaultConfig,
     getCityId: defaultConfig,
-    // getCX: defaultConfig,
+    getCX: defaultConfig,
     ajax: {
       url: "http://m.api.dianping.com/indextabicon.bin?cityid=1&version=7.0.1",
       method: "get",
@@ -259,12 +258,24 @@
                 done("fail get cityId");
               }
             });
+          },
+          function(done){
+            DPApp.getCX({
+              businessType: "payorder",
+              success: function(result){
+                done(null, result.cx);
+              },
+              fail: function(){
+                done("fail get cx");
+              }
+            });
           }
         ], function(err, result){
           if(err){return callback(err);}
           callback(null, {
             user: result[0],
-            cityId: result[1]
+            cityId: result[1],
+            cx: result[2]
           });
         });
       }
@@ -321,60 +332,42 @@
       }
 
       function createOrder(data, callback){
-        DPApp.ajax({
-          url: 'http://app.t.dianping.com/createordergn.bin',
-          data: data,
-          keys: [
-            "PaymentInfo",
-            "AdvanceOrderId",
-            "RetryCount",
-            "IntervalTime",
-            "DiscountList",
-            "Balance",
-            "PaymentType",
-            "ID",
-            "Flag",
-            "AlertMsg"
-            ],
-          success: function (paymentinfo) {
-            if(paymentinfo.ID == 0){
-              // 轮训
-              loopQuery(paymentinfo, callback);
-            }else{
-              callback(null, paymentinfo);
-            }
+        DPApp.getCX({
+          businessType: "createorder",
+          success: function(result){
+            data.cx = result.cx;
+            DPApp.ajax({
+              url: 'http://app.t.dianping.com/createordergn.bin',
+              data: data,
+              keys: [
+                "PaymentInfo",
+                "AdvanceOrderId",
+                "RetryCount",
+                "IntervalTime",
+                "DiscountList",
+                "Balance",
+                "PaymentType",
+                "ID",
+                "Flag",
+                "AlertMsg"
+                ],
+              success: function (paymentinfo) {
+                if(paymentinfo.ID == 0){
+                  // 轮训
+                  loopQuery(paymentinfo, callback);
+                }else{
+                  callback(null, paymentinfo);
+                }
+              },
+              fail: function (error) {
+                callback("fail create order");
+              }
+            });
           },
-          fail: function (error) {
+          fail: function(){
             callback("fail create order");
           }
         });
-      }
-
-      function payOrder(data, callback){
-        DPApp.ajax({
-          url: 'http://api.p.dianping.com/payorder.pay',
-          data: data,
-          keys: ["Content"],
-          success: function (paymsg) {
-            callback(null, paymsg);
-          },
-          fail: function(fail){
-            callback("fail payorder");
-          }
-        });
-      }
-
-      function getPaymentTool(payType){
-        var PAY_TYPE_MINIALIPAY = 1;
-        var PAY_TYPE_WEIXINPAY = 7;
-        var PAYMENTTOOL_ALIPAY = "5:1:null#219#0";
-        var PAYMENTTOOL_WEIXINPAY = "11:1:null#217#0";
-        if (payType == PAY_TYPE_WEIXINPAY) {
-          paymentTool = PAYMENTTOOL_WEIXINPAY;
-        }else{
-          paymentTool = PAYMENTTOOL_ALIPAY;
-        }
-        return paymentTool;
       }
 
       $('pay').onclick = function(){
@@ -407,23 +400,10 @@
               token: info.user.token,
               cityid: info.cityId,
               count: 1,
-              paymentamount: deal.Price,
-              cx: info.cx
+              paymentamount: deal.Price
             }, function(err, result){
               if(err){return done(err);}
               order = result;
-              done(null);
-            });
-          },
-          function(done){
-            payOrder({
-              token: info.user.token,
-              orderid: order.ID,
-              paymenttool: getPaymentTool(payType),
-              cx: info.cx
-            }, function(err, result){
-              if(err){return done(err);}
-              paymsg = result;
               done(null);
             });
           }
@@ -432,8 +412,10 @@
             return DPApp._log(err);
           }else{
             DPApp.pay({
-              paytype: payType,
-              paycontent: paymsg.Content,
+              token: info.user.token,
+              orderId: order.ID,
+              payType: payType,
+              cx: info.cx,
               success: function(data) {
                 DPApp._log(JSON.stringify(data));
               },
@@ -447,21 +429,25 @@
 
       $('uploadImage').onclick = function(){
 
-        var params = {
-          sign: data.picSignature,
-          nut: data.picToken
-        };
+        // var params = {
+        //   sign: data.picSignature,
+        //   nut: "84a8360a7ee8c94075c247d6745a665c2a8d55f0f5ccf5ccd045c793e7ae314a8884708751ec94f4cb3ec0895b93caa4de0b4237559c79d22ee20a94a5183d910eddff61d0b9e2af450828e7a6a3396c8e4221cc6ba061936ca2e55bdc098b293476525aee080c458c42f9ceaa5eeb1a8b244e153cd9d8838863eed6f0740312"
+        // };
 
+
+        // http://m.api.dianping.com/shop/uploadfile.bin
         window.DPApp.uploadImage({
-          uploadUrl: data.mapiUrl,
+          uploadUrl: "http://10.128.122.0:3000/",
           maxNum: 9,
+          success: function(e){
+            console.log(e);
+          },
           extra: {
-            uploadurl: data.groupPicUploadUrl,
-            businessType: 'community',
-            params: JSON.stringify(params)
+            uploadurl: "http://10.128.122.0:4000",
+            businessType: 'csc' // 客服
           },
           fail: fail
-        }, uploadImageCallback);
+        });
 
       }
 
