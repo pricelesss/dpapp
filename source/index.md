@@ -90,8 +90,15 @@ DPApp默认开启校验，目前的校验规则基于域名，即只有在点评
 ## 获取设备信息
 
 ```javascript
+// 同步调用
 var ua = DPApp.getUA();
 console.log(ua);
+// 异步调用（若需支持7.0之前的版本需要通过异步方法来得到ua）
+DPApp.getUA({
+  success: function(ua){
+    console.log(ua);
+  }
+});
 ```
 ua.platform 平台，dpapp|web
 ua.appName app名称 目前只支持主app，值为dianping，web中为null
@@ -212,7 +219,7 @@ DPApp.ga({
 
 ```javascript
 DPApp.uploadImage({
-  uploadUrl: "http://upload.url/path", // 上传图片调用的mapi接口的url
+  uploadUrl: "http://upload.url/path.bin", // 上传图片调用的mapi接口的url
   extra: {}, // 业务参数
   compressFactor: 1024, // 上传图片压缩到多少尺寸以下，单位为K
   maxNum: 5,

@@ -1,15 +1,43 @@
 (function (Host) {
   var Efte;
-
-  var userAgent = Host.navigator.userAgent.toLowerCase();
+  var patch;
+  var patchVersion;
+  var userAgent = Host.navigator.userAgent;
 
   // Require different platform js base on userAgent.
   // Native part will inject the userAgent with string `efte`.
 
-  if (/dp/.test(userAgent)) {
+  function getQuery(){
+    var query = location.search.slice(1);
+    var ret = {};
+    query.split("&").forEach(function(pair){
+      var splited = pair.split("=");
+      ret[splited[0]] = splited[1];
+    });
+    return ret;
+  }
+
+  if (/dp\/com\.dianping/.test(userAgent)) {
     Efte = require('./lib/native');
-  } else {
-    Efte = require('./lib/web');
+  } else if(/MApi/.test(userAgent)){
+    Efte = require('./lib/native');
+    patchVersion = navigator.userAgent.match(/MApi\s[\w\.]+\s\([\w\.\d]+\s([\d\.]+)/);
+    // 目前有修改UA，而api尚未对齐的仅7.0版本
+    patchVersion = patchVersion[1];
+    if(patchVersion.indexOf("7.0") == 0){
+      patch = require('./lib/patch-7.0');
+      patch(Efte);
+    }
+  } else{
+    // 认为是在web中
+    if(getQuery().product == "dpapp"){
+      Efte = require('./lib/native');
+      patch = require('./lib/patch-6.x');
+      patch(Efte);
+    }else{
+      // 7.0之前的古早版本，是否需要支持？
+      Efte = require('./lib/web');
+    }
   }
 
   // Export Efte object, if support AMD, CMD, CommonJS.
