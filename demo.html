@@ -121,10 +121,13 @@
       fail: fail
     },
     uploadImage: {
-      uploadUrl: "", // 上传图片调用的mapi接口的url
-      compressFactor: 1024, // 可选，上传图片压缩到多少尺寸以下，单位为K
-      maxNum: 5, // 需填写，默认为0
-      extra: {}, // 业务参数
+      uploadUrl: 'http://m.api.dianping.com/shop/uploadfile.bin',
+      compressFactor: 100,
+      maxNum: 1,
+      extra: {
+        "businessType": "csc",
+        "uploadurl": "http://kfonline.dianping.com/AndroidPhotoServlet"
+      },
       success: success,
       fail: fail
     },
