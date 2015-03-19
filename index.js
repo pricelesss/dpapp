@@ -1,7 +1,6 @@
 (function (Host) {
   var Efte;
-  var patch;
-  var patchVersion;
+  var version;
   var userAgent = Host.navigator.userAgent;
 
   // Require different platform js base on userAgent.
@@ -18,24 +17,24 @@
   }
 
   if (/dp\/com\.dianping/.test(userAgent)) {
-    Efte = require('./lib/native');
+    Efte = require('./lib/native-core');
+    require('./lib/patch-7.1')(Efte);
   } else if(/MApi/.test(userAgent)){
-    Efte = require('./lib/native');
-    patchVersion = navigator.userAgent.match(/MApi\s[\w\.]+\s\([\w\.\d]+\s([\d\.]+)/);
+    Efte = require('./lib/native-core');
+    version = navigator.userAgent.match(/MApi\s[\w\.]+\s\([\w\.\d]+\s([\d\.]+)/);
     // 目前有修改UA，而api尚未对齐的仅7.0版本
-    patchVersion = patchVersion[1];
-    if(patchVersion.indexOf("7.0") == 0){
-      patch = require('./lib/patch-7.0');
-      patch(Efte);
+    version = version[1];
+    if(version.indexOf("7.0") == 0){
+      require('./lib/patch-6.x')(Efte);
+      require('./lib/patch-7.0')(Efte);
     }
   } else{
-    // 认为是在web中
+    // 更早的7.0之前的古早版本
     if(getQuery().product == "dpapp"){
-      Efte = require('./lib/native');
-      patch = require('./lib/patch-6.x');
-      patch(Efte);
+      Efte = require('./lib/native-core');
+      require('./lib/patch-6.x')(Efte);
     }else{
-      // 7.0之前的古早版本，是否需要支持？
+    // 认为是在web中
       Efte = require('./lib/web');
     }
   }
@@ -50,7 +49,3 @@
     Host.Efte = Host.DPApp = Efte;
   }
 }(this));
-
-
-
-// 7.0 之前没有

@@ -76,6 +76,8 @@
   <a class="btn" id="sendSMS" href="javascript:;">发送短信</a>
 
 
+  <a class="btn" id="subscribe-foreground" href="javascript:;">订阅切换前台消息</a>
+  <a class="btn" id="subscribe-background" href="javascript:;">订阅切换后台消息</a>
   <a class="btn" id="subscribe" href="javascript:;">订阅消息</a>
   <a class="btn" id="unsubscribe" href="javascript:;">取消订阅</a>
   <a class="btn" id="publish" href="javascript:;">广播消息</a>
@@ -90,14 +92,14 @@
 
   <div id="loginContainer"></div>
 
-<script src="./dest/standalone.js"></script>
+<script src="./dest/standalone.js?t=123"></script>
 <script>
 
   var success = function(ret){
-    console.log(JSON.stringify(ret));
+    DPApp.log("业务调用成功", JSON.stringify(ret));
   };
   var fail = function(ret){
-    console.log(ret);
+    DPApp.log("业务调用失败", ret);
   }
   var defaultConfig = {
     success: success,
@@ -159,10 +161,10 @@
     subscribe: {
       action: "message",
       success: function(){
-        DPApp._log("消息绑定");
+        DPApp.log("消息绑定");
       },
       handle: function(){
-        DPApp._log('消息触发');
+        DPApp.log('消息触发');
       },
       fail: fail
     },
@@ -197,7 +199,7 @@
           image: 'http://i2.s1.dpfile.com/pc/mc/b99de9c6e32d86ba2866380092f1f7f2(353c221)/thumb.jpg',
           url: location.href,
           success: function(){
-            DPApp._log('分享成功');
+            DPApp.log('分享成功');
           }
         });
       }
@@ -205,7 +207,7 @@
   }
 
   DPApp.config({
-    debug: false
+    debug: true
   });
 
   $('login').onclick = function(){
@@ -416,7 +418,7 @@
           }
         ], function(err){
           if(err){
-            return DPApp._log(err);
+            return DPApp.log(err);
           }else{
             DPApp.pay({
               token: info.user.token,
@@ -424,10 +426,10 @@
               payType: payType,
               cx: info.cx,
               success: function(data) {
-                DPApp._log(JSON.stringify(data));
+                DPApp.log(JSON.stringify(data));
               },
               fail: function(data) {
-                DPApp._log(JSON.stringify(data));
+                DPApp.log(JSON.stringify(data));
               }
             });
           }
@@ -466,16 +468,18 @@
             id:10713251
           },
           success: function(result){
-            DPApp._log(JSON.stringify(result));
+            DPApp.log(JSON.stringify(result));
           },
           fail: function(){
-            DPApp._log("调用失败");
+            DPApp.log("调用失败");
           }
         });
       };
 
       $('getUA').onclick = function(){
-        DPApp._log(JSON.stringify(DPApp.getUA()));
+        DPApp.getUA({
+          success: success
+        });
       };
 
       $('setSearchButton').onclick = function(){
@@ -494,9 +498,37 @@
         });
       };
 
+      $("subscribe-foreground").onclick = function(){
+        DPApp.subscribe({
+          action: 'foreground',
+          success: function(){
+            DPApp.log('订阅foreground成功');
+          },
+          handle: function(){
+            DPApp.log('切换到前台');
+          }
+        });
+      }
 
 
-      document.getElementById('callMulti').onclick = function(){
+      $("subscribe-background").onclick = function(){
+        DPApp.subscribe({
+          action: 'background',
+          handle: function(){
+            DPApp.subscribe({
+              action: 'background',
+              success: function(){
+                DPApp.log('订阅background成功');
+              },
+              handle: function(){
+                DPApp.log('切换到后台');
+              }
+            });
+          }
+        });
+      }
+
+      $('callMulti').onclick = function(){
         DPApp.getUserInfo({success:success});
         DPApp.getLocation({success:success});
         DPApp.getNetworkType({success:success});
@@ -504,29 +536,9 @@
     })(id);
   }
 
-
-    DPApp.subscribe({
-      action: 'foreground',
-      handle: function(){
-        console.log('happened!');
-      }
-    });
-
-
-    DPApp.subscribe({
-      action: 'foreground',
-      handle: function(){
-        console.log('happened!2');
-      }
-    });
-
-  window.onerror = function(a,b){
-    // DPApp._log(a);
-    // DPApp._log(b);
+  window.onerror = function(e,l){
+    DPApp.log("onerror:" + e + ",line:" + l);
   }
-
-  DPApp.did_handle_callback = DPApp.dequeue;
-
 </script>
 </body>
 

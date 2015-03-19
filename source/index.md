@@ -103,15 +103,15 @@ DPApp.getUA({
 ua.platform 平台，dpapp|web
 ua.appName app名称 目前只支持主app，值为dianping，web中为null
 ua.appVersion app版本号，如：7.0.1
-ua.deviceName 设备名 android|iphone
-ua.deviceVersion 设备版本号 4.4.2|8.0.2
+ua.osName 设备系统名 android|iphone
+ua.osVersion 设备系统版本号 4.4.2|8.0.2
 
 ## 获取用户信息
 ```javascript
 DPApp.getUserInfo({
   success: function(e){
     console.log(e.dpid); // 用户的dpid
-    console.log(e.userId); // 用户id
+    console.log(e.userId); // 用户id 6.9.x 版本无法获得
     console.log(e.token); // 用户token
   }
 });
@@ -348,6 +348,7 @@ DPApp.setTitle({
   title: "标题"
 });
 ```
+6.9.x存在bug，刷新或进入下一个界面后才会更新标题。
 
 ## 设置导航栏按钮
 
