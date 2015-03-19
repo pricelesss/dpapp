@@ -20,6 +20,9 @@
     margin: 10px 5px;
     border-radius: 5px
   }
+  .btn.disabled{
+    background: #ccc;
+  }
   .log-panel{
     width: 100%;
     position: fixed;
@@ -55,13 +58,19 @@
     color: #000;
   }
 
+  #baseInfos div{
+    margin-bottom: 10px;
+    font-size: 24px;
+  }
+
 </style>
 </head>
 
 <body>
 
+  <h1 id="baseInfos"></h1>
   <a class="btn" href="javascript:location.reload()">刷新</a>
-  <a class="btn" id="callMulti" href="javascript:;">连续方法调用</a>
+  <a class="btn" href="javascript:;">连续方法调用</a>
   <h2>获取信息</h2>
   <a class="btn" id="getUserInfo" href="javascript:;">获取用户信息</a>
   <a class="btn" id="getLocation" href="javascript:;">获取地理位置</a>
@@ -74,7 +83,7 @@
 
   <h2>功能模块</h2>
   <a class="btn" id="ajax" href="javascript:;">Ajax(.bin)</a>
-  <a class="btn" id="ajax-json" href="javascript:;">Ajax(.json)</a>
+  <a class="btn" data-api="ajax" id="ajax-json" href="javascript:;">Ajax(.json)</a>
 
   <a class="btn" id="uploadImage" href="javascript:;">上传图片</a>
   <a class="btn" id="downloadImage" href="javascript:;">下载图片</a>
@@ -83,11 +92,10 @@
   <a class="btn" id="share" href="javascript:;">分享</a>
   <a class="btn" id="sendSMS" href="javascript:;">发送短信</a>
 
-
-  <a class="btn" id="subscribe-foreground" href="javascript:;">订阅切换前台消息</a>
-  <a class="btn" id="subscribe-background" href="javascript:;">订阅切换后台消息</a>
   <a class="btn" id="subscribe" href="javascript:;">订阅消息</a>
   <a class="btn" id="unsubscribe" href="javascript:;">取消订阅</a>
+  <a class="btn" data-api="subscribe" id="subscribe-foreground" href="javascript:;">订阅切换前台消息</a>
+  <a class="btn" data-api="subscribe" id="subscribe-background" href="javascript:;">订阅切换后台消息</a>
   <a class="btn" id="publish" href="javascript:;">广播消息</a>
 
 
@@ -100,7 +108,11 @@
 
   <div id="loginContainer"></div>
 
+<script>
+  function $(id){return document.getElementById(id);}
+</script>
 <script src="./dest/standalone.js?t=1231412"></script>
+<script src="./demo/pay.js"></script>
 <script>
 
   var success = function(ret){
@@ -121,6 +133,7 @@
     getCityId: defaultConfig,
     getRequestId: defaultConfig,
     getCX: defaultConfig,
+    getUA: defaultConfig,
     ajax: {
       url: "http://m.api.dianping.com/indextabicon.bin?cityid=1&version=7.0.1",
       method: "get",
@@ -136,6 +149,19 @@
       success: success,
       fail: fail
     },
+    "ajax-json":{
+      url:"http://app.t.51ping.com/ajax/tuan/dealgn.json",
+      data:{
+        cityid:1,
+        id:10713251
+      },
+      success: function(result){
+        DPApp.log(JSON.stringify(result));
+      },
+      fail: function(){
+        DPApp.log("调用失败");
+      }
+    },
     uploadImage: {
       uploadUrl: 'http://m.api.dianping.com/shop/uploadfile.bin',
       compressFactor: 100,
@@ -144,7 +170,9 @@
         "businessType": "csc",
         "uploadurl": "http://kfonline.dianping.com/AndroidPhotoServlet"
       },
-      success: success,
+      handle: function(result){
+        DPApp.log("图片上传处理:" + result);
+      },
       fail: fail
     },
     downloadImage: {
@@ -182,6 +210,34 @@
       },
       fail: fail
     },
+    "subscribe-foreground":{
+      action: 'background',
+      handle: function(){
+        DPApp.subscribe({
+          action: 'background',
+          success: function(){
+            DPApp.log('订阅foreground成功');
+          },
+          handle: function(){
+            DPApp.log('切换到前台');
+          }
+        });
+      }
+    },
+    "subscribe-background":{
+      action: 'background',
+      handle: function(){
+        DPApp.subscribe({
+          action: 'background',
+          success: function(){
+            DPApp.log('订阅background成功');
+          },
+          handle: function(){
+            DPApp.log('切换到后台');
+          }
+        });
+      }
+    },
     unsubscribe: {
       action: "message",
       fail: fail
@@ -217,338 +273,71 @@
           }
         });
       }
-    }
+    },
+    setSearchButton:{
+      icon:"H5_Search",
+      fail: fail,
+      handle: function(){
+        DPApp.openScheme({
+            url: "dianping://websearch",
+            extra: {
+                "hotsuggesturl":"http://m.api.dianping.com/advancedsuggest.bin?cityid=1&mylat=31.215870&mylng=121.419100&myacc=0.000000",
+                "keywordurl":"http://m.api.dianping.com/advancedsuggest.bin?cityid=1&mylat=31.215870&mylng=121.419100&myacc=0.000000"
+            }
+        });
+      }
+    },
+    login: defaultConfig
   }
 
   DPApp.config({
     debug: true
   });
 
-  $('login').onclick = function(){
-    DPApp.login({
-      success: success,
-      fail: fail
-    });
-  }
+  DPApp.ready(function(){
+    DPApp.log("ready");
+  });
 
-  function $(id){return document.getElementById(id);}
 
   for(var id in args){
     (function(id){
       $(id).onclick = function(){
         DPApp[id](args[id]);
       };
-
-      function series(steps, callback){
-        var count = steps.length;
-        var results = [];
-        function done(err, result){
-          if(err){
-            return callback(err);
-          }else{
-            results.push(result);
-            steps.count--;
-            steps.shift();
-            if(steps.length){
-              steps[0](done);
-            }else{
-              callback(null, results);
-            }
-          }
-        }
-        steps[0](done);
-      }
-
-      function getBaseInfo(callback){
-        var info = {};
-        series([
-          function(done){
-            DPApp.getUserInfo({
-              success: function(user){
-                done(null, user);
-              },
-              fail: function(){
-                done("fail get user");
-              }
-            });
-          },
-          function(done){
-            DPApp.getCityId({
-              success: function(result){
-                done(null, result.cityId);
-              },
-              fail: function(){
-                done("fail get cityId");
-              }
-            });
-          },
-          function(done){
-            DPApp.getCX({
-              businessType: "payorder",
-              success: function(result){
-                done(null, result.cx);
-              },
-              fail: function(){
-                done("fail get cx");
-              }
-            });
-          }
-        ], function(err, result){
-          if(err){return callback(err);}
-          callback(null, {
-            user: result[0],
-            cityId: result[1],
-            cx: result[2]
-          });
-        });
-      }
-
-      function getTuangouDeal(data, callback){
-        DPApp.ajax({
-          url: 'http://app.t.dianping.com/dealgn.bin',
-          data: data,
-          keys: [
-            "Deal",
-            "ID",
-            "Price",
-            "DealSelectList"
-          ],
-          success: function(deal) {
-            callback(null , deal);
-          },
-          fail: function(){
-            callback("fail get tuangou deal");
-          }
-        });
-      }
-
-      function loopQuery(paymentinfo, callback){
-
-        var count = paymentinfo.RetryCount;
-
-        function takeATry(){
-            DPApp.ajax({
-                url:"http://api.p.dianping.com/getsubmitorderresult.pay",
-                data:{
-                    advanceorderid: paymentinfo.AdvanceOrderId
-                },
-                keys:["OrderId","Status","ErrorMsg"],
-                success: function(data){
-                    if(data.Status == 1){
-                        callback(null, {
-                            ID: data.OrderId
-                        });
-                    }else if(data.Status == 0){
-                        callback(data.ErrorMsg);
-                    }else{
-                        count--;
-                        if(count == 0){
-                            callback("fail loop query");
-                        }else{
-                            setTimeout(takeATry, paymentinfo.IntervalTime);
-                        }
-                    }
-                }
-            });
-        }
-        takeATry();
-      }
-
-      function createOrder(data, callback){
-        DPApp.getCX({
-          businessType: "createorder",
-          success: function(result){
-            data.cx = result.cx;
-            DPApp.ajax({
-              url: 'http://app.t.dianping.com/createordergn.bin',
-              data: data,
-              keys: [
-                "PaymentInfo",
-                "AdvanceOrderId",
-                "RetryCount",
-                "IntervalTime",
-                "DiscountList",
-                "Balance",
-                "PaymentType",
-                "ID",
-                "Flag",
-                "AlertMsg"
-                ],
-              success: function (paymentinfo) {
-                if(paymentinfo.ID == 0){
-                  // 轮训
-                  loopQuery(paymentinfo, callback);
-                }else{
-                  callback(null, paymentinfo);
-                }
-              },
-              fail: function (error) {
-                callback("fail create order");
-              }
-            });
-          },
-          fail: function(){
-            callback("fail create order");
-          }
-        });
-      }
-
-      $('pay').onclick = function(){
-        var payType = 7;
-        var info, deal, order;
-        var paymsg;
-        series([
-          function(done){
-            getBaseInfo(function(err, result){
-              if(err){return done(err);}
-              info = result;
-              done(null);
-            });
-          },
-          function(done){
-            getTuangouDeal({
-              id: 6191069,
-              cityid: info.cityId,
-              token: info.user.token
-            },function(err, result){
-              if(err){return done(err);}
-              deal = result;
-              done(null);
-            });
-          },
-          function(done){
-            createOrder({
-              groupid: deal.ID,
-              dealid: deal.DealSelectList[0].ID,
-              token: info.user.token,
-              cityid: info.cityId,
-              count: 1,
-              paymentamount: deal.Price
-            }, function(err, result){
-              if(err){return done(err);}
-              order = result;
-              done(null);
-            });
-          }
-        ], function(err){
-          if(err){
-            return DPApp.log(err);
-          }else{
-            DPApp.pay({
-              token: info.user.token,
-              orderId: order.ID,
-              payType: payType,
-              cx: info.cx,
-              success: function(data) {
-                DPApp.log(JSON.stringify(data));
-              },
-              fail: function(data) {
-                DPApp.log(JSON.stringify(data));
-              }
-            });
-          }
-        });
-      }
-
-      $('uploadImage').onclick = function(){
-
-        // var params = {
-        //   sign: data.picSignature,
-        //   nut: "84a8360a7ee8c94075c247d6745a665c2a8d55f0f5ccf5ccd045c793e7ae314a8884708751ec94f4cb3ec0895b93caa4de0b4237559c79d22ee20a94a5183d910eddff61d0b9e2af450828e7a6a3396c8e4221cc6ba061936ca2e55bdc098b293476525aee080c458c42f9ceaa5eeb1a8b244e153cd9d8838863eed6f0740312"
-        // };
-
-
-        // http://m.api.dianping.com/shop/uploadfile.bin
-        window.DPApp.uploadImage({
-          uploadUrl: "http://10.128.122.0:3000/",
-          maxNum: 9,
-          success: function(e){
-            console.log(e);
-          },
-          extra: {
-            uploadurl: "http://10.128.122.0:4000",
-            businessType: 'csc' // 客服
-          },
-          fail: fail
-        });
-
-      }
-
-      $('ajax-json').onclick = function(){
-        DPApp.ajax({
-          url:"http://app.t.51ping.com/ajax/tuan/dealgn.json",
-          data:{
-            cityid:1,
-            id:10713251
-          },
-          success: function(result){
-            DPApp.log(JSON.stringify(result));
-          },
-          fail: function(){
-            DPApp.log("调用失败");
-          }
-        });
-      };
-
-      $('getUA').onclick = function(){
-        DPApp.getUA({
-          success: success
-        });
-      };
-
-      $('setSearchButton').onclick = function(){
-        DPApp.setRRButton({
-          icon:"H5_Search",
-          fail: fail,
-          handle: function(){
-            DPApp.openScheme({
-                url: "dianping://websearch",
-                extra: {
-                    "hotsuggesturl":"http://m.api.dianping.com/advancedsuggest.bin?cityid=1&mylat=31.215870&mylng=121.419100&myacc=0.000000",
-                    "keywordurl":"http://m.api.dianping.com/advancedsuggest.bin?cityid=1&mylat=31.215870&mylng=121.419100&myacc=0.000000"
-                }
-            });
-          }
-        });
-      };
-
-      $("subscribe-foreground").onclick = function(){
-        DPApp.subscribe({
-          action: 'foreground',
-          success: function(){
-            DPApp.log('订阅foreground成功');
-          },
-          handle: function(){
-            DPApp.log('切换到前台');
-          }
-        });
-      }
-
-
-      $("subscribe-background").onclick = function(){
-        DPApp.subscribe({
-          action: 'background',
-          handle: function(){
-            DPApp.subscribe({
-              action: 'background',
-              success: function(){
-                DPApp.log('订阅background成功');
-              },
-              handle: function(){
-                DPApp.log('切换到后台');
-              }
-            });
-          }
-        });
-      }
-
-      $('callMulti').onclick = function(){
-        DPApp.getUserInfo({success:success});
-        DPApp.getLocation({success:success});
-        DPApp.getNetworkType({success:success});
-      }
     })(id);
   }
+
+  function callMulti(){
+    DPApp.getUserInfo({success:success});
+    DPApp.getLocation({success:success});
+    DPApp.getNetworkType({success:success});
+  }
+
+  (function(){
+    var buttons = document.querySelectorAll('.btn');
+    for(var i = 0; i < buttons.length; i++){
+      var button = buttons[i];
+      var funcName = button.getAttribute('data-api')
+       || button.getAttribute("id");
+
+      if(funcName && !DPApp.isSupport(funcName)){
+        button.classList.add("disabled");
+      }
+    }
+  })();
+
+
+  DPApp.getUA({
+    success: function(ua){
+      baseInfos.innerHTML = [
+        "平台: " + ua.platform,
+        "系统: " + ua.osName + " " + ua.osVersion,
+        "应用版本: " + ua.appVersion
+      ].map(function(text){
+        return "<div>" + text + "</div>";
+      }).join("");
+    }
+  });
 
   window.onerror = function(e,l){
     DPApp.log("onerror:" + e + ",line:" + l);
