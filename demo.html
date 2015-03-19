@@ -7,7 +7,6 @@
 <title>DPApp JSBridge Demo</title>
 <style>
   body{
-    background-color: #000;
     overflow: scroll;
   }
   .btn{
@@ -50,23 +49,32 @@
     margin: 0
   }
 
+  h2{
+    text-align: center;
+    padding: 0 10px;
+    color: #000;
+  }
+
 </style>
 </head>
 
 <body>
 
   <a class="btn" href="javascript:location.reload()">刷新</a>
-  <a class="btn" id="getUA" href="javascript:;">获取客户端环境信息</a>
   <a class="btn" id="callMulti" href="javascript:;">连续方法调用</a>
-  <a class="btn" id="getCityId" href="javascript:;">获取城市信息</a>
+  <h2>获取信息</h2>
   <a class="btn" id="getUserInfo" href="javascript:;">获取用户信息</a>
   <a class="btn" id="getLocation" href="javascript:;">获取地理位置</a>
   <a class="btn" id="getNetworkType" href="javascript:;">获取网络状态</a>
+  <a class="btn" id="getUA" href="javascript:;">获取客户端环境信息</a>
+  <a class="btn" id="getCityId" href="javascript:;">获取城市信息</a>
   <a class="btn" id="getContactList" href="javascript:;">获取联系人列表</a>
   <a class="btn" id="getCX" href="javascript:;">获取诚信数据</a>
+  <a class="btn" id="getRequestId" href="javascript:;">获取RequestID</a>
+
+  <h2>功能模块</h2>
   <a class="btn" id="ajax" href="javascript:;">Ajax(.bin)</a>
   <a class="btn" id="ajax-json" href="javascript:;">Ajax(.json)</a>
-  <a class="btn" id="ga" href="javascript:;">ga</a>
 
   <a class="btn" id="uploadImage" href="javascript:;">上传图片</a>
   <a class="btn" id="downloadImage" href="javascript:;">下载图片</a>
@@ -92,7 +100,7 @@
 
   <div id="loginContainer"></div>
 
-<script src="./dest/standalone.js?t=123"></script>
+<script src="./dest/standalone.js?t=1231412"></script>
 <script>
 
   var success = function(ret){
@@ -111,14 +119,20 @@
     getNetworkType: defaultConfig,
     getContactList: defaultConfig,
     getCityId: defaultConfig,
+    getRequestId: defaultConfig,
     getCX: defaultConfig,
     ajax: {
       url: "http://m.api.dianping.com/indextabicon.bin?cityid=1&version=7.0.1",
       method: "get",
-      success: success,
-      fail: fail
-    },
-    ga: {
+      keys:[
+        "List",
+        "HotName",
+        "Id",
+        "Icon",
+        "Title",
+        "Url",
+        "Type"
+      ],
       success: success,
       fail: fail
     },
