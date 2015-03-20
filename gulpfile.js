@@ -5,7 +5,7 @@ var isDev = !process.env.ENV || process.env.ENV == "dev";
 var ciconfig = require('dpciconfig');
 
 gulp.task('ftp', function () {
-  if(isDev)return;
+  if(process.env.ENV!="beta")return;
 
   var ftpConfig = ciconfig('.ftppass');
 
@@ -24,6 +24,15 @@ gulp.task('ftp', function () {
         "user": ftpConfig.user,
         "pass": ftpConfig.pass,
         "remotePath": "s/res/dpapp/dest"
+    }))
+    .pipe(gutil.noop());
+
+  gulp.src(['demo/**/*'])
+    .pipe(ftp({
+        "host": ftpConfig.host,
+        "user": ftpConfig.user,
+        "pass": ftpConfig.pass,
+        "remotePath": "s/res/dpapp/demo"
     }))
     .pipe(gutil.noop());
 });
