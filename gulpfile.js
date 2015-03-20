@@ -1,31 +1,12 @@
 var gulp = require('gulp');
 var ftp = require('gulp-ftp');
 var gutil = require('gulp-util');
-var isDev = !process.env.ENV || process.env.ENV == "dev";
 var ciconfig = require('dpciconfig');
-
+// standalone.sh 会把./dest/standalone.js build到ci正确的构建目录下，
+// 这里只做demo上传
 gulp.task('ftp', function () {
-  if(process.env.ENV!="beta")return;
 
   var ftpConfig = ciconfig('.ftppass');
-
-  gulp.src(['demo.html'])
-      .pipe(ftp({
-          "host": ftpConfig.host,
-          "user": ftpConfig.user,
-          "pass": ftpConfig.pass,
-          "remotePath": "s/res/dpapp/"
-      }))
-      .pipe(gutil.noop());
-
-  gulp.src(['dest/**/*'])
-    .pipe(ftp({
-        "host": ftpConfig.host,
-        "user": ftpConfig.user,
-        "pass": ftpConfig.pass,
-        "remotePath": "s/res/dpapp/dest"
-    }))
-    .pipe(gutil.noop());
 
   gulp.src(['demo/**/*'])
     .pipe(ftp({
