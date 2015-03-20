@@ -39,6 +39,8 @@
     }
   }
 
+  Efte.getQuery = getQuery;
+
   // Export Efte object, if support AMD, CMD, CommonJS.
   if (typeof module !== 'undefined') {
     module.exports = Efte;

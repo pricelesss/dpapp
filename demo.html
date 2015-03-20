@@ -92,6 +92,7 @@
   <a class="btn" id="share" href="javascript:;">分享</a>
   <a class="btn" id="sendSMS" href="javascript:;">发送短信</a>
 
+  <h2>收发消息</h2>
   <a class="btn" id="subscribe" href="javascript:;">订阅消息</a>
   <a class="btn" id="unsubscribe" href="javascript:;">取消订阅</a>
   <a class="btn" data-api="subscribe" id="subscribe-foreground" href="javascript:;">订阅切换前台消息</a>
@@ -99,10 +100,11 @@
   <a class="btn" id="publish" href="javascript:;">广播消息</a>
 
 
+  <h2>调整界面</h2>
   <a class="btn" id="setTitle" href="javascript:;">设置标题</a>
   <a class="btn" id="setRLButton" href="javascript:;">设置RL按钮</a>
   <a class="btn" id="setRRButton" href="javascript:;">设置RR按钮</a>
-  <a class="btn" id="setSearchButton" href="javascript:;">设置RR搜索按钮</a>
+  <a class="btn" data-api="setRRButton" id="setSearchButton" href="javascript:;">设置RR搜索按钮</a>
 
   <a class="btn" id="login" href="javascript:;">登录</a>
 
@@ -116,11 +118,11 @@
 <script>
 
   var success = function(ret){
-    DPApp.log("业务调用成功", JSON.stringify(ret));
+    DPApp.log("业务调用成功", ret);
   };
   var fail = function(ret){
     DPApp.log("业务调用失败", ret);
-  }
+  };
   var defaultConfig = {
     success: success,
     fail: fail
@@ -171,7 +173,7 @@
         "uploadurl": "http://kfonline.dianping.com/AndroidPhotoServlet"
       },
       handle: function(result){
-        DPApp.log("图片上传处理:" + result);
+        DPApp.log("图片上传处理", JSON.stringify(result));
       },
       fail: fail
     },
@@ -181,9 +183,6 @@
       fail: fail
     },
     closeWindow: defaultConfig,
-    // pay: {
-    //  success: success
-    // },
     share: {
       title:"分享标题",
       desc:"分享描述",
@@ -205,37 +204,27 @@
       success: function(){
         DPApp.log("消息绑定");
       },
-      handle: function(){
-        DPApp.log('消息触发');
+      handle: function(data){
+        DPApp.log('消息触发', data);
       },
       fail: fail
     },
     "subscribe-foreground":{
-      action: 'background',
+      action: 'foreground',
+      success: function(){
+        DPApp.log('订阅foreground成功');
+      },
       handle: function(){
-        DPApp.subscribe({
-          action: 'background',
-          success: function(){
-            DPApp.log('订阅foreground成功');
-          },
-          handle: function(){
-            DPApp.log('切换到前台');
-          }
-        });
+        DPApp.log('切换到前台');
       }
     },
     "subscribe-background":{
       action: 'background',
+      success: function(){
+        DPApp.log('订阅background成功');
+      },
       handle: function(){
-        DPApp.subscribe({
-          action: 'background',
-          success: function(){
-            DPApp.log('订阅background成功');
-          },
-          handle: function(){
-            DPApp.log('切换到后台');
-          }
-        });
+        DPApp.log('切换到后台');
       }
     },
     unsubscribe: {
@@ -291,18 +280,16 @@
   }
 
   DPApp.config({
-    debug: true
-  });
-
-  DPApp.ready(function(){
-    DPApp.log("ready");
+    debug: DPApp.getQuery().debug == "true"
   });
 
 
   for(var id in args){
     (function(id){
       $(id).onclick = function(){
-        DPApp[id](args[id]);
+        var funcName = this.getAttribute('data-api')
+         || id;
+        DPApp[funcName](args[id]);
       };
     })(id);
   }
@@ -327,16 +314,15 @@
   })();
 
 
-  DPApp.getUA({
-    success: function(ua){
-      baseInfos.innerHTML = [
-        "平台: " + ua.platform,
-        "系统: " + ua.osName + " " + ua.osVersion,
-        "应用版本: " + ua.appVersion
-      ].map(function(text){
-        return "<div>" + text + "</div>";
-      }).join("");
-    }
+  DPApp.ready(function(){
+    var ua = DPApp.getUA();
+    baseInfos.innerHTML = [
+      "平台: " + ua.platform,
+      "系统: " + ua.osName + " " + ua.osVersion,
+      "应用版本: " + ua.appVersion
+    ].map(function(text){
+      return "<div>" + text + "</div>";
+    }).join("");
   });
 
   window.onerror = function(e,l){
