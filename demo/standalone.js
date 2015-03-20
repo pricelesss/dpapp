@@ -1733,7 +1733,7 @@ Efte.extend({
     map:mix({"./core":_7,"./queue":_8},globalMap)
 });
 
-define(_3, [], function(require, exports, module, __filename, __dirname) {
+define(_3, [_4], function(require, exports, module, __filename, __dirname) {
 var apis = [
   /**
    * Infos
@@ -1759,7 +1759,7 @@ var apis = [
 
 
 var _events = {};
-
+var patch7 = require('./patch-7.0');
 var Patch = module.exports = {
 
 ready : function(callback) {
@@ -1956,62 +1956,7 @@ unsubscribe : function(opts) {
   }
 },
 
-pay : function(args) {
-  var self = this;
-  var payType = args.payType;
-  var success = args.success;
-  var fail = args.fail;
-  var cx = args.cx;
-
-  function payOrder(data, callback) {
-    DPApp.ajax({
-      url: 'http://api.p.dianping.com/payorder.pay',
-      data: data,
-      keys: ["Content"],
-      success: function(paymsg) {
-        callback(null, paymsg);
-      },
-      fail: function(fail) {
-        callback("fail payorder");
-      }
-    });
-  }
-
-  function getPaymentTool(payType) {
-    var PAY_TYPE_MINIALIPAY = 1;
-    var PAY_TYPE_WEIXINPAY = 7;
-    var PAYMENTTOOL_ALIPAY = "5:1:null#219#0";
-    var PAYMENTTOOL_WEIXINPAY = "11:1:null#217#0";
-    if (payType == PAY_TYPE_WEIXINPAY) {
-      paymentTool = PAYMENTTOOL_WEIXINPAY;
-    } else {
-      paymentTool = PAYMENTTOOL_ALIPAY;
-    }
-    return paymentTool;
-  }
-
-  payOrder({
-    token: args.token,
-    orderid: args.orderId,
-    paymenttool: getPaymentTool(payType),
-    cx: cx
-  }, function(err, paymsg) {
-    if (err) {
-      return fail && fail(err);
-    }
-
-    self._send("pay", {
-      paytype: payType,
-      paycontent: paymsg.Content,
-      success: function(data) {
-        DPApp.log(data);
-      },
-      fail: function(data) {
-        DPApp.log(data);
-      }
-    });
-  });
-},
+pay : patch7.pay,
 
 ajax : function(args) {
   args = this._sanitizeAjaxOpts(args);
@@ -2106,10 +2051,10 @@ apis.forEach(function(name) {
 })();
 }, {
     asyncDeps:asyncDeps,
-    map:globalMap
+    map:mix({"./patch-7.0":_4},globalMap)
 });
 
-define(_4, [_5,_7], function(require, exports, module, __filename, __dirname) {
+define(_4, [_7,_5], function(require, exports, module, __filename, __dirname) {
 var core = require('./core');
 var patch6 = require('./patch-6.x');
 var Patch = module.exports = core._mixin(patch6, {
@@ -2128,6 +2073,63 @@ var Patch = module.exports = core._mixin(patch6, {
     return ua;
 	},
 
+  pay: function(args){
+    var self = this;
+    var payType = args.payType;
+    var success = args.success;
+    var fail = args.fail;
+    var cx = args.cx;
+
+    function payOrder(data, callback) {
+      DPApp.ajax({
+        url: 'http://api.p.dianping.com/payorder.pay',
+        data: data,
+        keys: ["Content"],
+        success: function(paymsg) {
+          callback(null, paymsg);
+        },
+        fail: function(fail) {
+          callback("fail payorder");
+        }
+      });
+    }
+
+    function getPaymentTool(payType) {
+      var PAY_TYPE_MINIALIPAY = 1;
+      var PAY_TYPE_WEIXINPAY = 7;
+      var PAYMENTTOOL_ALIPAY = "5:1:null#219#0";
+      var PAYMENTTOOL_WEIXINPAY = "11:1:null#217#0";
+      if (payType == PAY_TYPE_WEIXINPAY) {
+        paymentTool = PAYMENTTOOL_WEIXINPAY;
+      } else {
+        paymentTool = PAYMENTTOOL_ALIPAY;
+      }
+      return paymentTool;
+    }
+
+    payOrder({
+      token: args.token,
+      orderid: args.orderId,
+      paymenttool: getPaymentTool(payType),
+      cx: cx
+    }, function(err, paymsg) {
+      if (err) {
+        return fail && fail(err);
+      }
+
+
+      self._sendMessage('pay', {
+        paytype: payType,
+        paycontent: paymsg.Content
+      }, function(data) {
+        if (data.payresult) {
+          success && success(data);
+        } else {
+          fail && fail(data);
+        }
+      });
+    });
+  },
   uploadImage : function(opts){
     var success = opts.success;
     var fail = opts.fail;
@@ -2150,7 +2152,7 @@ var Patch = module.exports = core._mixin(patch6, {
 });
 }, {
     asyncDeps:asyncDeps,
-    map:mix({"./patch-6.x":_5,"./core":_7},globalMap)
+    map:mix({"./core":_7,"./patch-6.x":_5},globalMap)
 });
 
 define(_5, [_7], function(require, exports, module, __filename, __dirname) {

@@ -1,6 +1,6 @@
 if [ -z "$ENV" ]; then
-	echo "cortex bundle -o ./dest/standalone.js --path http://s1.i{n}.dpfile.com/mod/"
-	cortex bundle -o ./dest/standalone.js --path http://i{n}.dpfile.com/mod/
+	echo "cortex bundle -o ./demo/standalone.js --path http://s1.i{n}.dpfile.com/mod/"
+	cortex bundle -o ./demo/standalone.js --path http://i{n}.dpfile.com/mod/
 	exit 0
 fi
 
