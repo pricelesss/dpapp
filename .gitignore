@@ -1,5 +1,7 @@
 # Cortex
+.cortex
 neurons
+dest/standalone.js
 
 # Numerous always-ignore extensions
 *.bak

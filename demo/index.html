@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+<meta charset="UTF-8">
+<meta name="pagestatus" content="200">
+<title>DPApp JSBridge Demo</title>
+<script src="./standalone.js"></script>
+<style>
+  body{
+    overflow: scroll;
+  }
+  .btn{
+    display: block;
+    background-color: #f63;
+    color:#fff;
+    text-decoration: none;
+    text-align: center;
+    font-size: 16px;
+    padding: 10px 5px;
+    margin: 10px 5px;
+    border-radius: 5px
+  }
+  .btn.disabled{
+    background: #ccc;
+  }
+  .log-panel{
+    width: 100%;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    background: #6CD786;
+    color: #fff;
+    z-index: 1;
+  }
+  .log-panel .content{
+    overflow: hidden;
+    -webkit-transition: height .2s linear;
+  }
+  .log-panel p{
+    padding: 10px;
+    margin: 0;
+  }
+
+  .shadow-content{
+    position: absolute;
+    visibility: hidden;
+    width: 100%;
+  }
+
+  .shadow-content p{
+    padding: 10px;
+    margin: 0
+  }
+
+  h2{
+    text-align: center;
+    padding: 0 10px;
+    color: #000;
+  }
+
+  #baseInfos div{
+    margin-bottom: 10px;
+    font-size: 24px;
+  }
+
+</style>
+</head>
+
+<body>
+
+  <h1 id="baseInfos"></h1>
+  <a class="btn" href="javascript:location.reload()">刷新</a>
+  <a class="btn" href="javascript:;">连续方法调用</a>
+  <h2>获取信息</h2>
+  <a class="btn" id="getUserInfo" href="javascript:;">获取用户信息</a>
+  <a class="btn" id="getLocation" href="javascript:;">获取地理位置</a>
+  <a class="btn" id="getNetworkType" href="javascript:;">获取网络状态</a>
+  <a class="btn" id="getUA" href="javascript:;">获取客户端环境信息</a>
+  <a class="btn" id="getCityId" href="javascript:;">获取城市信息</a>
+  <a class="btn" id="getContactList" href="javascript:;">获取联系人列表</a>
+  <a class="btn" id="getCX" href="javascript:;">获取诚信数据</a>
+  <a class="btn" id="getRequestId" href="javascript:;">获取RequestID</a>
+
+  <h2>功能模块</h2>
+  <a class="btn" id="ajax" href="javascript:;">Ajax(.bin)</a>
+  <a class="btn" data-api="ajax" id="ajax-json" href="javascript:;">Ajax(.json)</a>
+
+  <a class="btn" id="uploadImage" href="javascript:;">上传图片</a>
+  <a class="btn" id="downloadImage" href="javascript:;">下载图片</a>
+  <a class="btn" id="closeWindow" href="javascript:;">关闭webview</a>
+  <a class="btn" id="pay" href="javascript:;">第三方支付</a>
+  <a class="btn" id="share" href="javascript:;">分享</a>
+  <a class="btn" id="sendSMS" href="javascript:;">发送短信</a>
+
+  <h2>收发消息</h2>
+  <a class="btn" id="subscribe" href="javascript:;">订阅消息</a>
+  <a class="btn" id="unsubscribe" href="javascript:;">取消订阅</a>
+  <a class="btn" data-api="subscribe" id="subscribe-foreground" href="javascript:;">订阅切换前台消息</a>
+  <a class="btn" data-api="subscribe" id="subscribe-background" href="javascript:;">订阅切换后台消息</a>
+  <a class="btn" id="publish" href="javascript:;">广播消息</a>
+
+
+  <h2>调整界面</h2>
+  <a class="btn" id="setTitle" href="javascript:;">设置标题</a>
+  <a class="btn" id="setRLButton" href="javascript:;">设置RL按钮</a>
+  <a class="btn" id="setRRButton" href="javascript:;">设置RR按钮</a>
+  <a class="btn" data-api="setRRButton" id="setSearchButton" href="javascript:;">设置RR搜索按钮</a>
+
+  <a class="btn" id="login" href="javascript:;">登录</a>
+
+  <div id="loginContainer"></div>
+
+<script>
+  function $(id){return document.getElementById(id);}
+  window.onerror = function(e,f,l){
+    DPApp.log("onerror:" + e + ",file:" + f + ",line:" + l);
+  }
+
+</script>
+<script src="./pay.js"></script>
+<script>
+
+  var success = function(ret){
+    DPApp.log("业务调用成功", ret);
+  };
+  var fail = function(ret){
+    DPApp.log("业务调用失败", ret);
+  };
+  var defaultConfig = {
+    success: success,
+    fail: fail
+  };
+  var args = {
+    getUserInfo: defaultConfig,
+    getLocation: defaultConfig,
+    getNetworkType: defaultConfig,
+    getContactList: defaultConfig,
+    getCityId: defaultConfig,
+    getRequestId: defaultConfig,
+    getCX: defaultConfig,
+    getUA: defaultConfig,
+    ajax: {
+      url: "http://m.api.dianping.com/indextabicon.bin?cityid=1&version=7.0.1",
+      method: "get",
+      keys:[
+        "List",
+        "HotName",
+        "Id",
+        "Icon",
+        "Title",
+        "Url",
+        "Type"
+      ],
+      success: success,
+      fail: fail
+    },
+    "ajax-json":{
+      url:"http://app.t.51ping.com/ajax/tuan/dealgn.json",
+      data:{
+        cityid:1,
+        id:10713251
+      },
+      success: function(result){
+        DPApp.log(JSON.stringify(result));
+      },
+      fail: function(){
+        DPApp.log("调用失败");
+      }
+    },
+    uploadImage: {
+      uploadUrl: 'http://m.api.dianping.com/shop/uploadfile.bin',
+      compressFactor: 100,
+      maxNum: 1,
+      extra: {
+        "businessType": "csc",
+        "uploadurl": "http://kfonline.dianping.com/AndroidPhotoServlet"
+      },
+      handle: function(result){
+        DPApp.log("图片上传处理", JSON.stringify(result));
+      },
+      fail: fail
+    },
+    downloadImage: {
+      imageUrl: "http://www.dpfile.com/toevent/img/16d05c85a71b135edc39d197273746d6.png",
+      success: success,
+      fail: fail
+    },
+    closeWindow: defaultConfig,
+    share: {
+      title:"分享标题",
+      desc:"分享描述",
+      content: "覆盖内容",
+      feed: [DPApp.Share.WECHAT_FRIENDS, DPApp.Share.WECHAT_TIMELINE, DPApp.Share.WEIBO],
+      image:"http://www.dpfile.com/toevent/img/16d05c85a71b135edc39d197273746d6.png",
+      url:"http://m.dianping.com",
+      success: success,
+      fail: fail
+    },
+    sendSMS: {
+      recipients: 13987654321,
+      content: "短信内容",
+      success: success,
+      fail: fail
+    },
+    subscribe: {
+      action: "message",
+      success: function(){
+        DPApp.log("消息绑定");
+      },
+      handle: function(data){
+        DPApp.log('消息触发', data);
+      },
+      fail: fail
+    },
+    "subscribe-foreground":{
+      action: 'foreground',
+      success: function(){
+        DPApp.log('订阅foreground成功');
+      },
+      handle: function(){
+        DPApp.log('切换到前台');
+      }
+    },
+    "subscribe-background":{
+      action: 'background',
+      success: function(){
+        DPApp.log('订阅background成功');
+      },
+      handle: function(){
+        DPApp.log('切换到后台');
+      }
+    },
+    unsubscribe: {
+      action: "message",
+      fail: fail
+    },
+    publish: {
+      action: "message",
+      data: {
+        "info": "secret"
+      },
+      fail: fail
+    },
+    setTitle: {
+      title: "新标题",
+      success: success
+    },
+    setRLButton: {
+      text: "默认",
+      fail: fail
+    },
+    setRRButton: {
+      text: "分享",
+      icon: "H5_Share",
+      success: success,
+      fail: fail,
+      handle: function(){
+        DPApp.share({
+          title: document.title,
+          desc: document.title,
+          image: 'http://i2.s1.dpfile.com/pc/mc/b99de9c6e32d86ba2866380092f1f7f2(353c221)/thumb.jpg',
+          url: location.href,
+          success: function(){
+            DPApp.log('分享成功');
+          }
+        });
+      }
+    },
+    setSearchButton:{
+      icon:"H5_Search",
+      fail: fail,
+      handle: function(){
+        DPApp.openScheme({
+            url: "dianping://websearch",
+            extra: {
+                "hotsuggesturl":"http://m.api.dianping.com/advancedsuggest.bin?cityid=1&mylat=31.215870&mylng=121.419100&myacc=0.000000",
+                "keywordurl":"http://m.api.dianping.com/advancedsuggest.bin?cityid=1&mylat=31.215870&mylng=121.419100&myacc=0.000000"
+            }
+        });
+      }
+    },
+    login: defaultConfig
+  }
+
+  DPApp.config({
+    debug: DPApp.getQuery().debug == "true"
+  });
+
+
+  for(var id in args){
+    (function(id){
+      $(id).onclick = function(){
+        var funcName = this.getAttribute('data-api')
+         || id;
+        DPApp[funcName](args[id]);
+      };
+    })(id);
+  }
+
+  function callMulti(){
+    DPApp.getUserInfo({success:success});
+    DPApp.getLocation({success:success});
+    DPApp.getNetworkType({success:success});
+  }
+
+  (function(){
+    var buttons = document.querySelectorAll('.btn');
+    for(var i = 0; i < buttons.length; i++){
+      var button = buttons[i];
+      var funcName = button.getAttribute('data-api')
+       || button.getAttribute("id");
+
+      if(funcName && !DPApp.isSupport(funcName)){
+        button.classList.add("disabled");
+      }
+    }
+  })();
+
+
+  DPApp.ready(function(){
+    var ua = DPApp.getUA();
+    baseInfos.innerHTML = [
+      "平台: " + ua.platform,
+      "系统: " + ua.osName + " " + ua.osVersion,
+      "应用版本: " + ua.appVersion
+    ].map(function(text){
+      return "<div>" + text + "</div>";
+    }).join("");
+  });
+
+</script>
+</body>
+
+</html>
