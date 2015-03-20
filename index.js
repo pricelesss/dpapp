@@ -16,23 +16,16 @@
     return ret;
   }
 
-  if (/dp\/com\.dianping/.test(userAgent)) {
-    Efte = require('./lib/native-core');
-    require('./lib/patch-7.1')(Efte);
-  } else if(/MApi/.test(userAgent)){
-    Efte = require('./lib/native-core');
-    version = navigator.userAgent.match(/MApi\s[\w\.]+\s\([\w\.\d]+\s([\d\.]+)/);
+  var EfteNativeCore = require('./lib/native-core');
+  if (EfteNativeCore._uaVersion == "7.1.x") {
+    Efte = EfteNativeCore.extend(require('./lib/patch-7.1'));
+  } else if(EfteNativeCore._uaVersion == "7.0.x"){
     // 目前有修改UA，而api尚未对齐的仅7.0版本
-    version = version[1];
-    if(version.indexOf("7.0") == 0){
-      require('./lib/patch-6.x')(Efte);
-      require('./lib/patch-7.0')(Efte);
-    }
+    Efte = EfteNativeCore.extend(require('./lib/patch-7.0'));
   } else{
     // 更早的7.0之前的古早版本
     if(getQuery().product == "dpapp"){
-      Efte = require('./lib/native-core');
-      require('./lib/patch-6.x')(Efte);
+      Efte = EfteNativeCore.extend(require('./lib/patch-6.x'));
     }else{
     // 认为是在web中
       Efte = require('./lib/web');

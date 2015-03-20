@@ -112,6 +112,10 @@
 
 <script>
   function $(id){return document.getElementById(id);}
+  window.onerror = function(e,f,l){
+    DPApp.log("onerror:" + e + ",file:" + f + ",line:" + l);
+  }
+
 </script>
 <script src="./dest/standalone.js?t=1231412"></script>
 <script src="./demo/pay.js"></script>
@@ -325,9 +329,6 @@
     }).join("");
   });
 
-  window.onerror = function(e,l){
-    DPApp.log("onerror:" + e + ",line:" + l);
-  }
 </script>
 </body>
 
