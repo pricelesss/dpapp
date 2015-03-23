@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="pagestatus" content="200">
 <title>DPApp JSBridge Demo</title>
-<script src="http://i3.dpfile.com/mod/dpapp/1.0.0/standalone.js"></script>
+<script src="./standalone.js"></script>
 <style>
   body{
     overflow: scroll;
@@ -274,6 +274,7 @@
         DPApp.openScheme({
             url: "dianping://websearch",
             extra: {
+                "searchurl": "dianping://searchshoplist",
                 "hotsuggesturl":"http://m.api.dianping.com/advancedsuggest.bin?cityid=1&mylat=31.215870&mylng=121.419100&myacc=0.000000",
                 "keywordurl":"http://m.api.dianping.com/advancedsuggest.bin?cityid=1&mylat=31.215870&mylng=121.419100&myacc=0.000000"
             }
