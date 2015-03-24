@@ -1420,39 +1420,26 @@ var mods = neuron.mods = {};
 neuron.config({
   "graph": {
     "0": [
-      "0.1.5",
-      {
-        "underscore@^1.5.3": 1,
-        "zepto@^1.1.5": 2
-      }
-    ],
-    "1": [
-      "1.5.3"
-    ],
-    "2": [
-      "1.2.1"
+      "1.0.1"
     ],
     "_": {
-      "dpapp@0.1.5": 0,
+      "dpapp@1.0.1": 0,
       "dpapp@*": 0
     }
   }
 });neuron.config({path:"http://i{n}.dpfile.com/mod/"});(function(){
 function mix(a,b){for(var k in b){a[k]=b[k];}return a;}
-var _0 = "easy-login@~0.1.3";
-var _1 = "dpapp-share@~0.1.0";
-var _2 = "dpapp@1.0.0/lib/native-core.js";
-var _3 = "dpapp@1.0.0/lib/patch-7.1.js";
-var _4 = "dpapp@1.0.0/lib/patch-7.0.js";
-var _5 = "dpapp@1.0.0/lib/patch-6.x.js";
-var _6 = "dpapp@1.0.0/lib/web.js";
-var _7 = "dpapp@1.0.0/lib/core.js";
-var _8 = "dpapp@1.0.0/lib/queue.js";
-var _9 = "dpapp@1.0.0/index.js";
-var asyncDeps = [_0,_1];
-var asyncDepsToMix = {"easy-login":_0,"dpapp-share":_1};
+var _0 = "dpapp@1.0.1/lib/native-core.js";
+var _1 = "dpapp@1.0.1/lib/patch-7.1.js";
+var _2 = "dpapp@1.0.1/lib/patch-7.0.js";
+var _3 = "dpapp@1.0.1/lib/patch-6.x.js";
+var _4 = "dpapp@1.0.1/lib/web.js";
+var _5 = "dpapp@1.0.1/lib/core.js";
+var _6 = "dpapp@1.0.1/lib/queue.js";
+var _7 = "dpapp@1.0.1/index.js";
+var asyncDepsToMix = {};
 var globalMap = asyncDepsToMix;
-define(_9, [_2,_3,_4,_5,_6], function(require, exports, module, __filename, __dirname) {
+define(_7, [_0,_1,_2,_3,_4], function(require, exports, module, __filename, __dirname) {
 (function (Host) {
   var Efte;
   var version;
@@ -1500,12 +1487,11 @@ define(_9, [_2,_3,_4,_5,_6], function(require, exports, module, __filename, __di
   }
 }(this));
 }, {
-    asyncDeps:asyncDeps,
     main:true,
-    map:mix({"./lib/native-core":_2,"./lib/patch-7.1":_3,"./lib/patch-7.0":_4,"./lib/patch-6.x":_5,"./lib/web":_6},globalMap)
+    map:mix({"./lib/native-core":_0,"./lib/patch-7.1":_1,"./lib/patch-7.0":_2,"./lib/patch-6.x":_3,"./lib/web":_4},globalMap)
 });
 
-define(_2, [_7,_8], function(require, exports, module, __filename, __dirname) {
+define(_0, [_5,_6], function(require, exports, module, __filename, __dirname) {
 var Efte = module.exports = require('./core');
 /**
  * count from 1
@@ -1729,11 +1715,10 @@ Efte.extend({
   },
 });
 }, {
-    asyncDeps:asyncDeps,
-    map:mix({"./core":_7,"./queue":_8},globalMap)
+    map:mix({"./core":_5,"./queue":_6},globalMap)
 });
 
-define(_3, [_4], function(require, exports, module, __filename, __dirname) {
+define(_1, [_2], function(require, exports, module, __filename, __dirname) {
 var apis = [
   /**
    * Infos
@@ -1884,7 +1869,7 @@ getNetworkType : function(opts) {
       var networkType;
       switch (ua.osName) {
         case "iphone":
-          networkType = iOSNetworkType(result.networkType);
+          networkType = iOSNetworkType(result);
           break;
         case "android":
           networkType = androidNetworkType(result);
@@ -2050,11 +2035,10 @@ apis.forEach(function(name) {
   };
 })();
 }, {
-    asyncDeps:asyncDeps,
-    map:mix({"./patch-7.0":_4},globalMap)
+    map:mix({"./patch-7.0":_2},globalMap)
 });
 
-define(_4, [_7,_5], function(require, exports, module, __filename, __dirname) {
+define(_2, [_5,_3], function(require, exports, module, __filename, __dirname) {
 var core = require('./core');
 var patch6 = require('./patch-6.x');
 var Patch = module.exports = core._mixin(patch6, {
@@ -2151,11 +2135,10 @@ var Patch = module.exports = core._mixin(patch6, {
   }
 });
 }, {
-    asyncDeps:asyncDeps,
-    map:mix({"./core":_7,"./patch-6.x":_5},globalMap)
+    map:mix({"./core":_5,"./patch-6.x":_3},globalMap)
 });
 
-define(_5, [_7], function(require, exports, module, __filename, __dirname) {
+define(_3, [_5], function(require, exports, module, __filename, __dirname) {
 var core = require('./core');
 var NOOP = function() {};
 var cachedEnv = {};
@@ -2318,11 +2301,10 @@ var Patch = module.exports = {
   Patch[name] = core.notImplemented;
 });
 }, {
-    asyncDeps:asyncDeps,
-    map:mix({"./core":_7},globalMap)
+    map:mix({"./core":_5},globalMap)
 });
 
-define(_6, [_7], function(require, exports, module, __filename, __dirname) {
+define(_4, [_5], function(require, exports, module, __filename, __dirname) {
 var Efte = require('./core');
 var notImplemented = Efte._notImplemented;
 
@@ -2576,11 +2558,10 @@ Efte.extend({
 
 module.exports = Efte;
 }, {
-    asyncDeps:asyncDeps,
-    map:mix({"./core":_7},globalMap)
+    map:mix({"./core":_5},globalMap)
 });
 
-define(_7, [], function(require, exports, module, __filename, __dirname) {
+define(_5, [], function(require, exports, module, __filename, __dirname) {
 var Efte = module.exports = {
   _cfg: {
     debug: false
@@ -2693,11 +2674,10 @@ var Efte = module.exports = {
   }
 };
 }, {
-    asyncDeps:asyncDeps,
     map:globalMap
 });
 
-define(_8, [], function(require, exports, module, __filename, __dirname) {
+define(_6, [], function(require, exports, module, __filename, __dirname) {
 var queue = module.exports = function(worker){
 	var currentData = null;
 	var currentCallback = null;
@@ -2735,7 +2715,6 @@ var queue = module.exports = function(worker){
 	return q;
 };
 }, {
-    asyncDeps:asyncDeps,
     map:globalMap
 });
-})();_use("dpapp@1.0.0",function(){});
+})();_use("dpapp@1.0.1",function(){});
