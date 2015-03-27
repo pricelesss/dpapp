@@ -29,7 +29,7 @@ var DPApp = require('dpapp');
 在html代码中引入
 
 ```html
-<script src="http://i2.dpfile.com/mod/dpapp/1.0.0/dpapp.js"></script>
+<script src="http://i2.dpfile.com/mod/dpapp/1.0.0/standalone.js"></script>
 ```
 
 dpapp模块支持通过Cortex通过CommonJS标准的方式引入，或者通过传统的script标签引入。
