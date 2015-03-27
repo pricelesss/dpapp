@@ -76,7 +76,7 @@ DPApp默认开启校验，目前的校验规则基于域名，即只有在点评
 在下方输入测试页面，使用app的扫码功能登录测试。
 
 <p style="text-align:center">
-<input id="test-url" style="width:300px;padding:5px" value="http://s2.51ping.com/s/res/dpapp/demo.html" />
+<input id="test-url" style="width:300px;padding:5px" value="http://s2.51ping.com/s/res/dpapp/demo/" />
 <p>
 
 <p id="test-canvas" style="text-align:center"></p>
@@ -92,11 +92,11 @@ DPApp默认开启校验，目前的校验规则基于域名，即只有在点评
 ```javascript
 // 同步调用
 var ua = DPApp.getUA();
-console.log(ua);
+alert(ua);
 // 异步调用（若需支持7.0之前的版本需要通过异步方法来得到ua）
 DPApp.getUA({
   success: function(ua){
-    console.log(ua);
+    alert(ua);
   }
 });
 ```
@@ -110,9 +110,9 @@ ua.osVersion 设备系统版本号 4.4.2|8.0.2
 ```javascript
 DPApp.getUserInfo({
   success: function(e){
-    console.log(e.dpid); // 用户的dpid
-    console.log(e.userId); // 用户id 6.9.x 版本无法获得
-    console.log(e.token); // 用户token
+    alert(e.dpid); // 用户的dpid
+    alert(e.userId); // 用户id 6.9.x 版本无法获得
+    alert(e.token); // 用户token
   }
 });
 ```
@@ -123,7 +123,7 @@ DPApp.getUserInfo({
 DPApp.getCX({
   business: "payorder", // 业务名
   success: function(e){
-    console.log(e.cx);
+    alert(e.cx);
   }
 });
 ```
@@ -137,8 +137,8 @@ open，login，loginsuccess，cx，signup，payorder，createorder
 ```javascript
 DPApp.getCityId({
   success: function(e){
-    console.log(e.cityId); // 切换城市
-    console.log(e.locCityId); // 定位城市
+    alert(e.cityId); // 切换城市
+    alert(e.locCityId); // 定位城市
   }
 });
 ```
@@ -147,9 +147,9 @@ DPApp.getCityId({
 ```javascript
 DPApp.getLocation({
   success: function(e){
-    console.log(e.lat); // 纬度
-    console.log(e.lng); // 经度
-    console.log(e.type); // 坐标系类型
+    alert(e.lat); // 纬度
+    alert(e.lng); // 经度
+    alert(e.type); // 坐标系类型
   }
 });
 ```
@@ -158,7 +158,7 @@ DPApp.getLocation({
 ```javascript
 DPApp.getNetworkType({
   success: function(e){
-    console.log(e.networkType); // 2g, 3g, 4g, wifi
+    alert(e.networkType); // 2g, 3g, 4g, wifi
   }
 });
 ```
@@ -168,11 +168,11 @@ DPApp.getNetworkType({
 DPApp.getContactList({
   success: function(e){
     e.contactList.forEach(function(people){
-      console.log(e.lastName); // 姓
-      console.log(e.firstName); // 名
-      console.log(e.phone); // 号码
+      alert(e.lastName); // 姓
+      alert(e.firstName); // 名
+      alert(e.phone); // 号码
     });
-    console.log(e.authorized); // 用户是否授权
+    alert(e.authorized); // 用户是否授权
   }
 });
 ```
@@ -181,17 +181,20 @@ DPApp.getContactList({
 
 ```javascript
 DPApp.ajax({
-  url: "http://m.dianping.com/...bin",
-  method: "post", // get 或 post，默认为get
-  data: {}, // 请求数据
-  keys: [
-    "Deal",
-    "ID",
-    "Price"
+  url: "http://m.api.dianping.com/indextabicon.bin?cityid=1&version=7.0.1",
+  method: "get",
+  keys:[
+    "List",
+    "HotName",
+    "Id",
+    "Icon",
+    "Title",
+    "Url",
+    "Type"
   ], // 字段映射表
   success: function(data){
-    console.log(data.Deal.ID);
-    console.log(data.Deal.Price);
+    alert(data.Deal.ID);
+    alert(data.Deal.Price);
   }
 });
 ```
@@ -202,31 +205,34 @@ DPApp.ajax({
 
 在web中，业务方需要自行通过后端开放CORS等方式解决跨域问题。
 
-## ga统计
+## 获取requestId
 
 ```javascript
-DPApp.ga({
+DPApp.getRequestId({
   data: {},
   success: function(e){
+    alert(e.getRequestId);
   }
 });
 ```
 
-在web与native中都会将事件发送到hippo中。
-
+获取hippo打点中需要使用的requestId
 
 ## 上传图片
 
 ```javascript
 DPApp.uploadImage({
-  uploadUrl: "http://upload.url/path.bin", // 上传图片调用的mapi接口的url
-  extra: {}, // 业务参数
+  uploadUrl: 'http://m.api.dianping.com/shop/uploadfile.bin', // 上传图片调用的mapi接口的url
   compressFactor: 1024, // 上传图片压缩到多少尺寸以下，单位为K
-  maxNum: 5,
-  success: function(e){
-    console.log(e.totalNum); // 图片上传张数
-    console.log(e.image); // 原始图片结果
-    console.log(e.progess); // start 开始上传, uploading 上传中, end 上传结束
+  maxNum: 1, // 选择图片数
+  extra: { // 业务参数
+    "businessType": "csc",
+    "uploadurl": "http://kfonline.dianping.com/AndroidPhotoServlet"
+  },
+  handle: function(result){
+    alert(e.totalNum); // 图片上传张数
+    alert(e.image); // 服务器返回的数据结果
+    alert(e.progess); // start 开始上传, uploading 上传中, end 上传结束
   }
 });
 ```
@@ -304,10 +310,10 @@ DPApp.sendSMS({
 DPApp.subscribe({
   action: 'loginSuccess',
   success: function(e){
-    console.log("订阅成功");
+    alert("订阅成功");
   },
   handle: function(e){
-    console.log("事件触发");
+    alert("事件触发");
   }
 });
 ```
@@ -323,7 +329,7 @@ DPApp.unsubscribe({
   action: 'loginSuccess',
   handle: func, // 取消特定订阅回调，不传则取消所有回调
   success: function(e){
-    console.log("取消绑定")
+    alert("取消绑定")
   }
 });
 ```
@@ -334,7 +340,7 @@ DPApp.unsubscribe({
 DPApp.publish({
   action: 'myMessage',
   success: function(){
-    console.log("发送成功");
+    alert("发送成功");
   }
 });
 ```
@@ -352,6 +358,36 @@ DPApp.setTitle({
 
 ## 设置导航栏按钮
 
+
+> 左侧第一个
+
+```javascript
+DPApp.setLLButton({
+  text: "文字",
+  icon: "H5_Search",
+  success: function(){
+    alert("设置成功");
+  },
+  handle: function(){
+    alert("按钮被点击");
+  }
+});
+
+
+> 左侧第二个
+
+```javascript
+DPApp.setLRButton({
+  text: "文字",
+  icon: "H5_Search",
+  success: function(){
+    alert("设置成功");
+  },
+  handle: function(){
+    alert("按钮被点击");
+  }
+});
+
 > 右侧第一个
 
 ```javascript
@@ -359,10 +395,10 @@ DPApp.setRLButton({
   text: "文字",
   icon: "H5_Search",
   success: function(){
-    console.log("设置成功");
+    alert("设置成功");
   },
   handle: function(){
-    console.log("按钮被点击");
+    alert("按钮被点击");
   }
 });
 ```
@@ -375,10 +411,10 @@ DPApp.setRRButton({
   text: "文字",
   icon: "H5_Share",
   success: function(){
-    console.log("设置成功");
+    alert("设置成功");
   },
   handle: function(){
-    console.log("按钮被点击");
+    alert("按钮被点击");
   }
 });
 ```
