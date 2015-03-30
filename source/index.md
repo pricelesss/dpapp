@@ -34,8 +34,9 @@ var DPApp = require('dpapp');
 
 dpapp模块支持通过Cortex通过CommonJS标准的方式引入，或者通过传统的script标签引入。
 
-# 调用协议
+# 基础方法
 
+## 调用协议
 
 ```javascript
 // 示例：调出分享界面
@@ -71,6 +72,17 @@ DPApp默认开启校验，目前的校验规则基于域名，即只有在点评
 所有方法调用之前，需要使用DPApp.ready确保native已就绪。
 
 支持版本：> 6.9.8
+
+## 版本比对
+```javascript
+DPApp.Semver.gt(versionA,versionB); // 是否大于
+DPApp.Semver.gte(versionA,versionB); // 是否大于等于
+DPApp.Semver.lt(versionA,versionB); // 是否小于
+DPApp.Semver.lte(versionA,versionB); // 是否小于等于
+DPApp.Semver.eq(versionA,versionB); // 是否相同
+```
+使用字符串比对并不严谨，比如 "6.2.1" < "6.10.1" 会返回 false。
+虽然通常app版本号第二位不会上两位数，不过推荐使用该api来比对版本。
 
 #测试
 
@@ -336,6 +348,25 @@ feed | 分享到的渠道
 
 feed包括需要展示的渠道，默认为所有渠道。
 web中由于无法分享到微信，短信等，故只支持部分渠道。
+
+## 初始化右上角分享按钮
+
+DPApp.initShare({
+  title:"分享标题",
+  desc:"分享描述",
+  content:"分享内容", // 7.1.0 支持
+  image:"http://www.dpfile.com/toevent/img/16d05c85a71b135edc39d197273746d6.png",
+  url:"http://m.dianping.com",
+  success: function(){
+    alert('分享成功');
+  },
+  fail: function(){
+    alert('分享失败');
+  }
+});
+```
+
+支持版本：> 6.9.8
 
 
 ## 发送短信

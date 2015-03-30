@@ -1547,25 +1547,6 @@ Efte.extend({
       }
 
       /**
-       * create iframe，
-       * and native will intercept and handle the process
-       */
-      var ifr = document.createElement('iframe');
-      ifr.style.display = 'none';
-      document.body.appendChild(ifr);
-
-      function removeIframe(){
-        ifr.onload = ifr.onerror = null;
-        ifr.parentNode && ifr.parentNode.removeChild(ifr);
-      }
-      /**
-       * remove iframe after loaded
-       */
-      ifr.onload = ifr.onerror = removeIframe;
-      setTimeout(removeIframe,5000);
-
-
-      /**
        * check type for args
        */
       if(!args || typeof args !== 'object'){
@@ -1579,7 +1560,27 @@ Efte.extend({
 
       args = JSON.stringify(args);
 
-      ifr.src =  'js://_?method=' + method + '&args=' + encodeURIComponent(args) + (oldProto ? '' : ('&callbackId=' + callbackId));
+      this._createIframe('js://_?method=' + method + '&args=' + encodeURIComponent(args) + (oldProto ? '' : ('&callbackId=' + callbackId)));
+  },
+  _createIframe: function(src){
+    /**
+     * create iframe，
+     * and native will intercept and handle the process
+     */
+    var ifr = document.createElement('iframe');
+    ifr.style.display = 'none';
+    document.body.appendChild(ifr);
+
+    function removeIframe(){
+      ifr.onload = ifr.onerror = null;
+      ifr.parentNode && ifr.parentNode.removeChild(ifr);
+    }
+    /**
+     * remove iframe after loaded
+     */
+    ifr.onload = ifr.onerror = removeIframe;
+    setTimeout(removeIframe,5000);
+    ifr.src = src;
   },
   _send: function(method, args){
     var self = this;
@@ -1902,6 +1903,23 @@ share : function(opts) {
   this._send("share", opts);
 },
 
+initShare: function(opt){
+  var self = this;
+  this.setRRButton({
+    icon:"H5_Share",
+    handle: function(){
+      self.share({
+        title: opt.title,
+        desc: opt.desc,
+        image: opt.image,
+        url: opt.url,
+        success: opt.success,
+        fail: opt.fail
+      });
+    }
+  });
+},
+
 subscribe : function(opts) {
   var name = opts.action;
   var success = opts.success;
@@ -2181,6 +2199,27 @@ var Patch = module.exports = {
     return ua;
   },
 
+  initShare: function(opt){
+    var success = opt.success;
+    var fail = opt.fail;
+    var src = "dpshare://_?content=";
+    src += encodeURIComponent(JSON.stringify({
+      title: opt.title,
+      desc: opt.desc,
+      image: opt.image,
+      url: opt.url
+    }));
+    this.shareCallback = function(result){
+      if(result.status == "success"){
+        success && success(result);
+      }else{
+        fail && fail(result);
+      }
+    };
+    this._createIframe(src);
+  },
+  shareCallback: function(){
+  },
   getCityId : function(opt) {
     var success = opt.success;
     this._getEnv(function(result) {
