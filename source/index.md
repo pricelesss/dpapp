@@ -351,6 +351,7 @@ web中由于无法分享到微信，短信等，故只支持部分渠道。
 
 ## 初始化右上角分享按钮
 
+```javascript
 DPApp.initShare({
   title:"分享标题",
   desc:"分享描述",
