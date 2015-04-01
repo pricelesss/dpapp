@@ -71,7 +71,8 @@
 
   <h1 id="baseInfos"></h1>
   <a class="btn" href="javascript:location.reload()">刷新</a>
-  <a class="btn" href="javascript:;">连续方法调用</a>
+  <a class="btn" onclick="toggleDebug()" href="javascript:;">切换调试模式</a>
+  <a class="btn" onclick="callMulti()" href="javascript:;">连续方法调用</a>
   <h2>获取信息</h2>
   <a class="btn" id="getUserInfo" href="javascript:;">获取用户信息</a>
   <a class="btn" id="getLocation" href="javascript:;">获取地理位置</a>
@@ -297,8 +298,9 @@
     login: defaultConfig
   }
 
+  var isDebug = DPApp.getQuery().debug == "true";
   DPApp.config({
-    debug: DPApp.getQuery().debug == "true"
+    debug: isDebug
   });
 
 
@@ -310,6 +312,13 @@
         DPApp[funcName](args[id]);
       };
     })(id);
+  }
+
+  function toggleDebug(){
+    isDebug = !isDebug
+    DPApp.config({
+      debug: isDebug
+    });
   }
 
   function callMulti(){
