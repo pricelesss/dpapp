@@ -1509,7 +1509,7 @@ var q = queue(function(data){
 });
 
 Efte.extend({
-  _callbacks: [],
+  _callbacks: Efte._callbacks || {},
 	_dequeueTimeout: null,
   dequeue: function(){
     clearTimeout(this._dequeueTimeout);
@@ -1583,6 +1583,7 @@ Efte.extend({
     ifr.src = src;
   },
   _send: function(method, args){
+    args = args || {};
     var self = this;
     var _success = args.success;
     var _fail = args.fail;
@@ -1753,116 +1754,110 @@ ready : function(callback) {
     success: callback
   });
 },
-
-getNetworkType : function(opts) {
-  var _success = opts.success;
-
-  function iOSNetworkType(result) {
-    var networkType;
-    var types = {
-      kSCNetworkReachabilityFlagsTransientConnection: 1 << 0,
-      kSCNetworkReachabilityFlagsReachable: 1 << 1,
-      kSCNetworkReachabilityFlagsConnectionRequired: 1 << 2,
-      kSCNetworkReachabilityFlagsConnectionOnTraffic: 1 << 3,
-      kSCNetworkReachabilityFlagsInterventionRequired: 1 << 4,
-      kSCNetworkReachabilityFlagsConnectionOnDemand: 1 << 5,
-      kSCNetworkReachabilityFlagsIsLocalAddress: 1 << 16,
-      kSCNetworkReachabilityFlagsIsDirect: 1 << 17,
-      kSCNetworkReachabilityFlagsIsWWAN: 1 << 18
-    };
-    var type = result.type;
-    var subType = result.subType;
-
-    // 2g, 3g, 4g
-    function getMobileType(subType) {
-      switch (subType) {
-        case "CTRadioAccessTechnologyGPRS":
-          ;
-        case "CTRadioAccessTechnologyEdge":
-          ;
-        case "CTRadioAccessTechnologyCDMA1x":
-          ;
-          return "2g";
-        case "CTRadioAccessTechnologyLTE":
-          return "4g";
-          // case "CTRadioAccessTechnologyWCDMA"
-          // case "CTRadioAccessTechnologyHSDPA"
-          // case "CTRadioAccessTechnologyHSUPA"
-          // case "CTRadioAccessTechnologyCDMA1x"
-          // case "CTRadioAccessTechnologyCDMAEVDORev0"
-          // case "CTRadioAccessTechnologyCDMAEVDORevA"
-          // case "CTRadioAccessTechnologyCDMAEVDORevB"
-          // case "CTRadioAccessTechnologyeHRPD"
-          return "3g";
-      }
+_iOSNetworkType: function (result) {
+  var networkType;
+  var types = {
+    kSCNetworkReachabilityFlagsTransientConnection: 1 << 0,
+    kSCNetworkReachabilityFlagsReachable: 1 << 1,
+    kSCNetworkReachabilityFlagsConnectionRequired: 1 << 2,
+    kSCNetworkReachabilityFlagsConnectionOnTraffic: 1 << 3,
+    kSCNetworkReachabilityFlagsInterventionRequired: 1 << 4,
+    kSCNetworkReachabilityFlagsConnectionOnDemand: 1 << 5,
+    kSCNetworkReachabilityFlagsIsLocalAddress: 1 << 16,
+    kSCNetworkReachabilityFlagsIsDirect: 1 << 17,
+    kSCNetworkReachabilityFlagsIsWWAN: 1 << 18
+  };
+  var type = result.type;
+  var subType = result.subType;
+  var returnValue;
+  // 2g, 3g, 4g
+  function getMobileType(subType) {
+    switch (subType) {
+      case "CTRadioAccessTechnologyGPRS":
+      case "CTRadioAccessTechnologyEdge":
+      case "CTRadioAccessTechnologyCDMA1x":
+        return "2g";
+      case "CTRadioAccessTechnologyLTE":
+        return "4g";
+      case "CTRadioAccessTechnologyWCDMA":
+      case "CTRadioAccessTechnologyHSDPA":
+      case "CTRadioAccessTechnologyHSUPA":
+      case "CTRadioAccessTechnologyCDMA1x":
+      case "CTRadioAccessTechnologyCDMAEVDORev0":
+      case "CTRadioAccessTechnologyCDMAEVDORevA":
+      case "CTRadioAccessTechnologyCDMAEVDORevB":
+      case "CTRadioAccessTechnologyeHRPD":
+        return "3g";
     }
+  }
 
-    if ((type & types.kSCNetworkReachabilityFlagsReachable) == 0) {
-      return "none";
+  if ((type & types.kSCNetworkReachabilityFlagsReachable) == 0) {
+    returnValue = "none";
+  }
+
+  if ((type & types.kSCNetworkReachabilityFlagsConnectionRequired) == 0) {
+    // if target host is reachable and no connection is required
+    //  then we'll assume (for now) that your on Wi-Fi
+    returnValue = "wifi";
+  }
+
+
+  if (
+    (type & types.kSCNetworkReachabilityFlagsConnectionOnDemand) != 0
+    ||
+    (type & types.kSCNetworkReachabilityFlagsConnectionOnTraffic) != 0
+  ) {
+    // ... and the connection is on-demand (or on-traffic) if the
+    //     calling application is using the CFSocketStream or higher APIs
+    if ((type & types.kSCNetworkReachabilityFlagsInterventionRequired) == 0) {
+      // ... and no [user] intervention is needed
+      returnValue = "wifi";
     }
+  }
 
-    if ((type & types.kSCNetworkReachabilityFlagsConnectionRequired) == 0) {
-      // if target host is reachable and no connection is required
-      //  then we'll assume (for now) that your on Wi-Fi
-      return "wifi";
+  if ((type & types.kSCNetworkReachabilityFlagsIsWWAN) == types.kSCNetworkReachabilityFlagsIsWWAN) {
+    // ... but WWAN connections are OK if the calling application
+    //     is using the CFNetwork (CFSocketStream?) APIs.
+    returnValue = getMobileType(subType);
+  }
+
+  return returnValue;
+},
+_androidNetworkType: function (result) {
+  var type = result.type;
+  var subType = result.subType;
+
+  if (type == 0) {
+    switch (subType) {
+      case 1:
+      case 2:
+      case 4:
+      case 7:
+      case 11:
+        return "2g";
+      case 3:
+      case 5:
+      case 6:
+      case 8:
+      case 9:
+      case 10:
+      case 12:
+      case 14:
+      case 15:
+        return "3g";
+      case 13:
+        return "4g";
     }
+  }
 
-
-    if (
-      (type & types.kSCNetworkReachabilityFlagsConnectionOnDemand) != 0
-      ||
-      (type & types.kSCNetworkReachabilityFlagsConnectionOnTraffic) != 0
-    ) {
-      // ... and the connection is on-demand (or on-traffic) if the
-      //     calling application is using the CFSocketStream or higher APIs
-      if ((type & types.kSCNetworkReachabilityFlagsInterventionRequired) == 0) {
-        // ... and no [user] intervention is needed
-        return "wifi";
-      }
-    }
-
-    if ((type & types.kSCNetworkReachabilityFlagsIsWWAN) == types.kSCNetworkReachabilityFlagsIsWWAN) {
-      // ... but WWAN connections are OK if the calling application
-      //     is using the CFNetwork (CFSocketStream?) APIs.
-      return getMobileType(type);
-    }
-
+  if (type == 1) {
+    return "wifi";
+  } else {
     return "none";
   }
-
-  function androidNetworkType(result) {
-    var type = result.type;
-    var subType = result.subType;
-
-    if (type == 0) {
-      switch (subType) {
-        case 1:
-        case 2:
-        case 4:
-        case 7:
-        case 11:
-          return "2g";
-        case 3:
-        case 5:
-        case 6:
-        case 8:
-        case 9:
-        case 10:
-        case 12:
-        case 14:
-        case 15:
-          return "3g";
-        case 13:
-          return "4g";
-      }
-    }
-
-    if (type == 1) {
-      return "wifi";
-    } else {
-      return "none";
-    }
-  }
+},
+getNetworkType : function(opts) {
+  var _success = opts.success;
 
   this._send("getNetworkType", {
     success: function(result) {
@@ -1870,10 +1865,10 @@ getNetworkType : function(opts) {
       var networkType;
       switch (ua.osName) {
         case "iphone":
-          networkType = iOSNetworkType(result);
+          networkType = this._iOSNetworkType(result);
           break;
         case "android":
-          networkType = androidNetworkType(result);
+          networkType = this._androidNetworkType(result);
           break;
       }
 
@@ -1911,6 +1906,7 @@ initShare: function(opt){
       self.share({
         title: opt.title,
         desc: opt.desc,
+        content: opt.content,
         image: opt.image,
         url: opt.url,
         success: opt.success,
@@ -2601,6 +2597,12 @@ module.exports = Efte;
 });
 
 define(_5, [], function(require, exports, module, __filename, __dirname) {
+function mixin(to, from) {
+  for (var key in from) {
+    to[key] = from[key];
+  }
+  return to;
+}
 var Efte = module.exports = {
   _cfg: {
     debug: false
@@ -2693,12 +2695,7 @@ var Efte = module.exports = {
       console.log(message);
     }
   },
-  _mixin: function(to, from) {
-    for (var key in from) {
-      to[key] = from[key];
-    }
-    return to;
-  },
+  _mixin: mixin,
   extend: function(args) {
     return this._mixin(this, args);
   },
@@ -2712,6 +2709,10 @@ var Efte = module.exports = {
     return api && typeof api == "function" && api != Efte._notImplemented
   }
 };
+
+if(window.DPApp){
+  Efte = mixin(window.DPApp, Efte);
+}
 }, {
     map:globalMap
 });
