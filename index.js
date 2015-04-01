@@ -41,6 +41,6 @@
 
   // Export Efte object to Host
   if (typeof Host !== 'undefined') {
-    Host.Efte = Host.DPApp = Efte;
+    Host.DPApp = Efte;
   }
 }(this));
