@@ -1483,7 +1483,7 @@ define(_7, [_0,_1,_2,_3,_4], function(require, exports, module, __filename, __di
 
   // Export Efte object to Host
   if (typeof Host !== 'undefined') {
-    Host.Efte = Host.DPApp = Efte;
+    Host.DPApp = Efte;
   }
 }(this));
 }, {
@@ -1767,7 +1767,7 @@ _iOSNetworkType: function (result) {
     kSCNetworkReachabilityFlagsIsDirect: 1 << 17,
     kSCNetworkReachabilityFlagsIsWWAN: 1 << 18
   };
-  var type = result.type;
+  var type = +result.type;
   var subType = result.subType;
   var returnValue;
   // 2g, 3g, 4g
