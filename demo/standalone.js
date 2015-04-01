@@ -1538,7 +1538,7 @@ Efte.extend({
       /**
        * pass 0 as callbackId
        * thus _callbacks[callbackId] is undefined
-       * nothing will happend
+       * nothing will happen
        * @type {Number}
        */
       var callbackId = hasCallback ? callbacksCount++ : 0;
@@ -1628,7 +1628,7 @@ Efte.extend({
     if (args.method == "get") {
       var params = [];
       for (var p in data) {
-        if (data[p]) {
+        if (data.hasOwnProperty(p) && (data[p] || data[p] === 0)) {  // allow `something=0' param
           params.push(p + '=' + encodeURIComponent(data[p]));
         }
       }
@@ -1647,7 +1647,7 @@ Efte.extend({
     var keymap = {};
 
     function getHash(str) {
-      hashCode = function(str) {
+      var hashCode = function(str) {
         var hash = 0,
           i, chr, len;
         if (str.length == 0) return hash;
@@ -1665,7 +1665,7 @@ Efte.extend({
 
     function generateKeys(keys) {
       keys.forEach(function(key) {
-        keyMap[getHash(key)] = key;
+        keymap[getHash(key)] = key;
       });
     }
 
@@ -1714,7 +1714,7 @@ Efte.extend({
       this._callbacks[callbackId] = null;
       delete this._callbacks[callbackId];
     }
-  },
+  }
 });
 }, {
     map:mix({"./core":_5,"./queue":_6},globalMap)
@@ -1792,7 +1792,7 @@ _iOSNetworkType: function (result) {
   }
 
   if ((type & types.kSCNetworkReachabilityFlagsReachable) == 0) {
-    returnValue = "none";
+    return "none";
   }
 
   if ((type & types.kSCNetworkReachabilityFlagsConnectionRequired) == 0) {
@@ -2032,7 +2032,7 @@ apis.forEach(function(name) {
 (function() {
   var uastr = navigator.userAgent;
   var appVersionMatch = uastr.match(/dp\/[\w\.\d]+\/([\d\.]+)/);
-  appVersion = appVersionMatch && appVersionMatch[1];
+  var appVersion = appVersionMatch && appVersionMatch[1];
 
   Patch.getUA = function(opt) {
     var result = {};
@@ -2071,6 +2071,7 @@ var Patch = module.exports = core._mixin(patch6, {
     return ua;
 	},
 
+  Share: core.Share,
   pay: function(args){
     var self = this;
     var payType = args.payType;
@@ -2180,6 +2181,17 @@ var Patch = module.exports = {
       cachedEnv = env;
       callback.call(this, env);
     });
+  },
+
+  Share: {
+    WECHAT_FRIENDS: 7,
+    WECHAT_TIMELINE: 6,
+    QQ: 5,
+    SMS: 4,
+    WEIBO: 3,
+    QZONE: 2,
+    EMAIL: 1,
+    COPY: 0
   },
 
   getUA : function(opt) {
@@ -2375,7 +2387,7 @@ Efte.extend({
     var success = opts.success;
     var fail = opts.fail;
 
-    xhr = new XMLHttpRequest();
+    var xhr = new XMLHttpRequest();
 
     if(!url){
       url = location.href.split("?")[0];
