@@ -2373,11 +2373,7 @@ Efte.extend({
     success && success(ua);
     return ua;
   },
-  ready: function(callback) {
-    document.addEventListener("DOMContentLoaded", function(event) {
-      callback();
-    });
-  },
+  ready: Efte._bindDOMReady,
   ajax: function(opts) {
     var METHOD_GET = "GET";
     var url = opts.url;
@@ -2621,6 +2617,23 @@ var Efte = module.exports = {
   },
   config: function(config) {
     this._cfg = config;
+  },
+  _bindDOMReady: function(fn){
+    var doc = document;
+    // Catch cases where ready() is called after the
+    // browser event has already occurred.
+    if (doc.readyState === 'complete') {
+      return fn();
+    }
+
+    var evt = 'DOMContentLoaded';
+
+    var ready = function() {
+      doc.removeEventListener(evt, ready);
+      fn();
+    };
+
+    doc.addEventListener(evt, ready);
   },
   Semver: {
     eq: function(a, b) {
