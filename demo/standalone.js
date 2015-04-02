@@ -1642,6 +1642,18 @@ Efte.extend({
     }
     return args;
   },
+  _parseFeed: function(f){
+    var feed;
+    if (!f) {
+      return 0xff;
+    } else if (f.constructor.toString().indexOf("Array") >= 0) {
+      feed = [0, 0, 0, 0, 0, 0, 0, 0];
+      f.forEach(function(pos) {
+        feed[7 - pos] = 1;
+      });
+      return parseInt(feed.join(""), 2);
+    }
+  },
   _transModel: function(keys, obj){
     if(!keys){return obj;}
     var keymap = {};
@@ -1885,16 +1897,7 @@ getNetworkType : function(opts) {
 },
 
 share : function(opts) {
-  if (!opts.feed) {
-    opts.feed = 0xff;
-  } else if (opts.feed.constructor.toString().indexOf("Array") >= 0) {
-    var feed = [0, 0, 0, 0, 0, 0, 0, 0];
-    opts.feed.forEach(function(pos) {
-      feed[7 - pos] = 1;
-    });
-    opts.feed = parseInt(feed.join(""), 2);
-  }
-
+  opts.feed = this._parseFeed(opts.feed);
   this._send("share", opts);
 },
 
@@ -1908,6 +1911,7 @@ initShare: function(opt){
         desc: opt.desc,
         content: opt.content,
         image: opt.image,
+        feed: opt.feed,
         url: opt.url,
         success: opt.success,
         fail: opt.fail
@@ -2215,6 +2219,7 @@ var Patch = module.exports = {
       title: opt.title,
       desc: opt.desc,
       image: opt.image,
+      feed: this._parseFeed(opt.feed),
       url: opt.url
     }));
     this.shareCallback = function(result){
