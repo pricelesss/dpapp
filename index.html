@@ -59,12 +59,14 @@
 </blockquote>
 
 <p>在html代码中引入</p>
-<pre class="highlight html"><code><span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"http://i2.dpfile.com/mod/dpapp/1.0.0/dpapp.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
+<pre class="highlight html"><code><span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"http://i2.dpfile.com/mod/dpapp/1.0.0/standalone.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
 </code></pre>
 
 <p>dpapp模块支持通过Cortex通过CommonJS标准的方式引入，或者通过传统的script标签引入。</p>
 
-<h1 id="调用协议">调用协议</h1>
+<h1 id="基础方法">基础方法</h1>
+
+<h2 id="调用协议">调用协议</h2>
 <pre class="highlight javascript"><code><span class="c1">// 示例：调出分享界面</span>
 <span class="nx">DPApp</span><span class="p">.</span><span class="nx">ready</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
   <span class="nx">DPApp</span><span class="p">.</span><span class="nx">share</span><span class="p">({</span>
@@ -99,110 +101,186 @@
 
 <p>所有方法调用之前，需要使用DPApp.ready确保native已就绪。</p>
 
+<p>支持版本：≥ 6.9.8</p>
+
+<h2 id="版本比对">版本比对</h2>
+<pre class="highlight javascript"><code><span class="nx">DPApp</span><span class="p">.</span><span class="nx">Semver</span><span class="p">.</span><span class="nx">gt</span><span class="p">(</span><span class="nx">versionA</span><span class="p">,</span><span class="nx">versionB</span><span class="p">);</span> <span class="c1">// 是否大于</span>
+<span class="nx">DPApp</span><span class="p">.</span><span class="nx">Semver</span><span class="p">.</span><span class="nx">gte</span><span class="p">(</span><span class="nx">versionA</span><span class="p">,</span><span class="nx">versionB</span><span class="p">);</span> <span class="c1">// 是否大于等于</span>
+<span class="nx">DPApp</span><span class="p">.</span><span class="nx">Semver</span><span class="p">.</span><span class="nx">lt</span><span class="p">(</span><span class="nx">versionA</span><span class="p">,</span><span class="nx">versionB</span><span class="p">);</span> <span class="c1">// 是否小于</span>
+<span class="nx">DPApp</span><span class="p">.</span><span class="nx">Semver</span><span class="p">.</span><span class="nx">lte</span><span class="p">(</span><span class="nx">versionA</span><span class="p">,</span><span class="nx">versionB</span><span class="p">);</span> <span class="c1">// 是否小于等于</span>
+<span class="nx">DPApp</span><span class="p">.</span><span class="nx">Semver</span><span class="p">.</span><span class="nx">eq</span><span class="p">(</span><span class="nx">versionA</span><span class="p">,</span><span class="nx">versionB</span><span class="p">);</span> <span class="c1">// 是否相同</span>
+</code></pre>
+
+<p>使用字符串比对并不严谨，比如 &ldquo;6.2.1&rdquo; &lt; &ldquo;6.10.1&rdquo; 会返回 false。
+虽然通常app版本号第二位不会上两位数，不过推荐使用该api来比对版本。</p>
+
 <h1 id="测试">测试</h1>
 
 <p>手机连上内网wifi，前往http://app.dp/ 下载对应的app（需v7.0.1及以上）
 在下方输入测试页面，使用app的扫码功能登录测试。</p>
 
 <p style="text-align:center">
-<input id="test-url" style="width:300px;padding:5px" value="http://s2.51ping.com/s/res/dpapp/demo.html" />
+<input id="test-url" style="width:300px;padding:5px" value="http://s2.51ping.com/s/res/dpapp/demo/" />
 <p>
 
 <p id="test-canvas" style="text-align:center"></p>
 
 <p>如果使用模拟器调试，也可以通过进入<code class="prettyprint">dianping://web?url=&lt;your-test-url&gt;</code>来测试webview</p>
 
-<h1 id="接口说明">接口说明</h1>
-
-<h2 id="获取设备信息">获取设备信息</h2>
-<pre class="highlight javascript"><code><span class="kd">var</span> <span class="nx">ua</span> <span class="o">=</span> <span class="nx">DPApp</span><span class="p">.</span><span class="nx">getUA</span><span class="p">();</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">ua</span><span class="p">);</span>
-</code></pre>
-
-<p>ua.platform 平台，dpapp|web
-ua.appName app名称 目前只支持主app，值为dianping，web中为null
-ua.appVersion app版本号，如：7.0.1
-ua.deviceName 设备名 android|iphone
-ua.deviceVersion 设备版本号 4.4.2|8.0.2</p>
+<h1 id="获取信息">获取信息</h1>
 
 <h2 id="获取用户信息">获取用户信息</h2>
 <pre class="highlight javascript"><code><span class="nx">DPApp</span><span class="p">.</span><span class="nx">getUserInfo</span><span class="p">({</span>
   <span class="na">success</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">){</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">dpid</span><span class="p">);</span> <span class="c1">// 用户的dpid</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">userId</span><span class="p">);</span> <span class="c1">// 用户id</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">token</span><span class="p">);</span> <span class="c1">// 用户token</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">dpid</span><span class="p">);</span> <span class="c1">// 用户的dpid</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">userId</span><span class="p">);</span> <span class="c1">// 用户id 6.9.x 版本无法获得</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">token</span><span class="p">);</span> <span class="c1">// 用户token</span>
   <span class="p">}</span>
 <span class="p">});</span>
 </code></pre>
 
-<h2 id="获取诚信信息">获取诚信信息</h2>
-<pre class="highlight javascript"><code><span class="nx">DPApp</span><span class="p">.</span><span class="nx">getCX</span><span class="p">({</span>
-  <span class="na">business</span><span class="p">:</span> <span class="s2">"payorder"</span><span class="p">,</span> <span class="c1">// 业务名</span>
-  <span class="na">success</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">){</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">cx</span><span class="p">);</span>
+<p>支持版本：≥ 6.9.8</p>
+
+<h2 id="获取客户端环境信息">获取客户端环境信息</h2>
+<pre class="highlight javascript"><code><span class="c1">// 同步调用</span>
+<span class="kd">var</span> <span class="nx">ua</span> <span class="o">=</span> <span class="nx">DPApp</span><span class="p">.</span><span class="nx">getUA</span><span class="p">();</span>
+<span class="nx">alert</span><span class="p">(</span><span class="nx">ua</span><span class="p">);</span>
+<span class="c1">// 异步调用（若需支持7.0之前的版本需要通过异步方法来得到ua）</span>
+<span class="nx">DPApp</span><span class="p">.</span><span class="nx">getUA</span><span class="p">({</span>
+  <span class="na">success</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">ua</span><span class="p">){</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="nx">ua</span><span class="p">);</span>
   <span class="p">}</span>
 <span class="p">});</span>
 </code></pre>
 
-<p>用于用户登录，支付等校验。目前可用的业务类型包括：
-open，login，loginsuccess，cx，signup，payorder，createorder</p>
+<p>支持版本：≥ 6.9.8</p>
 
-<h2 id="获取城市信息">获取城市信息</h2>
-<pre class="highlight javascript"><code><span class="nx">DPApp</span><span class="p">.</span><span class="nx">getCityId</span><span class="p">({</span>
-  <span class="na">success</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">){</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">cityId</span><span class="p">);</span> <span class="c1">// 切换城市</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">locCityId</span><span class="p">);</span> <span class="c1">// 定位城市</span>
-  <span class="p">}</span>
-<span class="p">});</span>
-</code></pre>
+<table><thead>
+<tr>
+<th>值</th>
+<th>描述</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>ua.platform</td>
+<td>平台 dpapp</td>
+</tr>
+<tr>
+<td>ua.appName</td>
+<td>app名称 目前只支持主app，值为dianping，web中为null</td>
+</tr>
+<tr>
+<td>ua.appVersion</td>
+<td>app版本号，如：7.0.1</td>
+</tr>
+<tr>
+<td>ua.osName</td>
+<td>设备系统名 android</td>
+</tr>
+<tr>
+<td>ua.osVersion</td>
+<td>设备系统版本号 4.4.2</td>
+</tr>
+</tbody></table>
 
 <h2 id="获取地理位置">获取地理位置</h2>
 <pre class="highlight javascript"><code><span class="nx">DPApp</span><span class="p">.</span><span class="nx">getLocation</span><span class="p">({</span>
   <span class="na">success</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">){</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">lat</span><span class="p">);</span> <span class="c1">// 纬度</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">lng</span><span class="p">);</span> <span class="c1">// 经度</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">type</span><span class="p">);</span> <span class="c1">// 坐标系类型</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">lat</span><span class="p">);</span> <span class="c1">// 纬度</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">lng</span><span class="p">);</span> <span class="c1">// 经度</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">type</span><span class="p">);</span> <span class="c1">// 坐标系类型 7.1.0 开始支持</span>
   <span class="p">}</span>
 <span class="p">});</span>
 </code></pre>
 
+<p>支持版本：≥ 6.9.8</p>
+
 <h2 id="获取网络状态">获取网络状态</h2>
 <pre class="highlight javascript"><code><span class="nx">DPApp</span><span class="p">.</span><span class="nx">getNetworkType</span><span class="p">({</span>
   <span class="na">success</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">){</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">networkType</span><span class="p">);</span> <span class="c1">// 2g, 3g, 4g, wifi</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">networkType</span><span class="p">);</span> <span class="c1">// 2g, 3g, 4g, wifi</span>
   <span class="p">}</span>
 <span class="p">});</span>
 </code></pre>
+
+<p>支持版本：≥ 6.9.8</p>
+
+<h2 id="获取城市信息">获取城市信息</h2>
+<pre class="highlight javascript"><code><span class="nx">DPApp</span><span class="p">.</span><span class="nx">getCityId</span><span class="p">({</span>
+  <span class="na">success</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">){</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">cityId</span><span class="p">);</span> <span class="c1">// 切换城市</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">locCityId</span><span class="p">);</span> <span class="c1">// 定位城市 7.1.0 开始支持</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+</code></pre>
+
+<p>支持版本：≥ 6.9.8</p>
 
 <h2 id="获取联系人列表">获取联系人列表</h2>
 <pre class="highlight javascript"><code><span class="nx">DPApp</span><span class="p">.</span><span class="nx">getContactList</span><span class="p">({</span>
   <span class="na">success</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">){</span>
     <span class="nx">e</span><span class="p">.</span><span class="nx">contactList</span><span class="p">.</span><span class="nx">forEach</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">people</span><span class="p">){</span>
-      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">lastName</span><span class="p">);</span> <span class="c1">// 姓</span>
-      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">firstName</span><span class="p">);</span> <span class="c1">// 名</span>
-      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">phone</span><span class="p">);</span> <span class="c1">// 号码</span>
+      <span class="nx">alert</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">lastName</span><span class="p">);</span> <span class="c1">// 姓</span>
+      <span class="nx">alert</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">firstName</span><span class="p">);</span> <span class="c1">// 名</span>
+      <span class="nx">alert</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">phone</span><span class="p">);</span> <span class="c1">// 号码</span>
     <span class="p">});</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">authorized</span><span class="p">);</span> <span class="c1">// 用户是否授权</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">authorized</span><span class="p">);</span> <span class="c1">// 用户是否授权</span>
   <span class="p">}</span>
 <span class="p">});</span>
 </code></pre>
 
-<h2 id="ajax请求">Ajax请求</h2>
-<pre class="highlight javascript"><code><span class="nx">DPApp</span><span class="p">.</span><span class="nx">ajax</span><span class="p">({</span>
-  <span class="na">url</span><span class="p">:</span> <span class="s2">"http://m.dianping.com/...bin"</span><span class="p">,</span>
-  <span class="na">method</span><span class="p">:</span> <span class="s2">"post"</span><span class="p">,</span> <span class="c1">// get 或 post，默认为get</span>
-  <span class="na">data</span><span class="p">:</span> <span class="p">{},</span> <span class="c1">// 请求数据</span>
-  <span class="na">keys</span><span class="p">:</span> <span class="p">[</span>
-    <span class="s2">"Deal"</span><span class="p">,</span>
-    <span class="s2">"ID"</span><span class="p">,</span>
-    <span class="s2">"Price"</span>
-  <span class="p">],</span> <span class="c1">// 字段映射表</span>
-  <span class="na">success</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">){</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">Deal</span><span class="p">.</span><span class="nx">ID</span><span class="p">);</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">Deal</span><span class="p">.</span><span class="nx">Price</span><span class="p">);</span>
+<p>支持版本：≥ 7.0.0</p>
+
+<h2 id="获取诚信信息">获取诚信信息</h2>
+<pre class="highlight javascript"><code><span class="nx">DPApp</span><span class="p">.</span><span class="nx">getCX</span><span class="p">({</span>
+  <span class="na">business</span><span class="p">:</span> <span class="s2">"payorder"</span><span class="p">,</span> <span class="c1">// 业务名</span>
+  <span class="na">success</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">){</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">cx</span><span class="p">);</span>
   <span class="p">}</span>
 <span class="p">});</span>
 </code></pre>
+
+<p>支持版本：≥ 7.0.2</p>
+
+<p>用于用户登录，支付等校验。目前可用的业务类型包括：
+open，login，loginsuccess，cx，signup，payorder，createorder</p>
+
+<h2 id="获取requestid">获取requestId</h2>
+<pre class="highlight javascript"><code><span class="nx">DPApp</span><span class="p">.</span><span class="nx">getRequestId</span><span class="p">({</span>
+  <span class="na">data</span><span class="p">:</span> <span class="p">{},</span>
+  <span class="na">success</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">){</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">getRequestId</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+</code></pre>
+
+<p>支持版本：≥ 7.0.0</p>
+
+<p>获取hippo打点中需要使用的requestId</p>
+
+<h1 id="功能模块">功能模块</h1>
+
+<h2 id="ajax请求">Ajax请求</h2>
+<pre class="highlight javascript"><code><span class="nx">DPApp</span><span class="p">.</span><span class="nx">ajax</span><span class="p">({</span>
+  <span class="na">url</span><span class="p">:</span> <span class="s2">"http://m.api.dianping.com/indextabicon.bin?cityid=1&amp;version=7.0.1"</span><span class="p">,</span>
+  <span class="na">method</span><span class="p">:</span> <span class="s2">"get"</span><span class="p">,</span>
+  <span class="na">keys</span><span class="p">:[</span>
+    <span class="s2">"List"</span><span class="p">,</span>
+    <span class="s2">"HotName"</span><span class="p">,</span>
+    <span class="s2">"Id"</span><span class="p">,</span>
+    <span class="s2">"Icon"</span><span class="p">,</span>
+    <span class="s2">"Title"</span><span class="p">,</span>
+    <span class="s2">"Url"</span><span class="p">,</span>
+    <span class="s2">"Type"</span>
+  <span class="p">],</span> <span class="c1">// 字段映射表</span>
+  <span class="na">success</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">){</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">Deal</span><span class="p">.</span><span class="nx">ID</span><span class="p">);</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">Deal</span><span class="p">.</span><span class="nx">Price</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+</code></pre>
+
+<p>支持版本：≥ 6.9.8</p>
 
 <p>对于DPObject的请求，由于后端返回的内容中，字段的key使用算法进行了非对称加密。</p>
 
@@ -210,29 +288,24 @@ open，login，loginsuccess，cx，signup，payorder，createorder</p>
 
 <p>在web中，业务方需要自行通过后端开放CORS等方式解决跨域问题。</p>
 
-<h2 id="ga统计">ga统计</h2>
-<pre class="highlight javascript"><code><span class="nx">DPApp</span><span class="p">.</span><span class="nx">ga</span><span class="p">({</span>
-  <span class="na">data</span><span class="p">:</span> <span class="p">{},</span>
-  <span class="na">success</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">){</span>
-  <span class="p">}</span>
-<span class="p">});</span>
-</code></pre>
-
-<p>在web与native中都会将事件发送到hippo中。</p>
-
 <h2 id="上传图片">上传图片</h2>
 <pre class="highlight javascript"><code><span class="nx">DPApp</span><span class="p">.</span><span class="nx">uploadImage</span><span class="p">({</span>
-  <span class="na">uploadUrl</span><span class="p">:</span> <span class="s2">"http://upload.url/path"</span><span class="p">,</span> <span class="c1">// 上传图片调用的mapi接口的url</span>
-  <span class="na">extra</span><span class="p">:</span> <span class="p">{},</span> <span class="c1">// 业务参数</span>
+  <span class="na">uploadUrl</span><span class="p">:</span> <span class="s1">'http://m.api.dianping.com/shop/uploadfile.bin'</span><span class="p">,</span> <span class="c1">// 上传图片调用的mapi接口的url</span>
   <span class="na">compressFactor</span><span class="p">:</span> <span class="mi">1024</span><span class="p">,</span> <span class="c1">// 上传图片压缩到多少尺寸以下，单位为K</span>
-  <span class="na">maxNum</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
-  <span class="na">success</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">){</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">totalNum</span><span class="p">);</span> <span class="c1">// 图片上传张数</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">image</span><span class="p">);</span> <span class="c1">// 原始图片结果</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">progess</span><span class="p">);</span> <span class="c1">// start 开始上传, uploading 上传中, end 上传结束</span>
+  <span class="na">maxNum</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="c1">// 选择图片数</span>
+  <span class="na">extra</span><span class="p">:</span> <span class="p">{</span> <span class="c1">// 业务参数</span>
+    <span class="s2">"businessType"</span><span class="p">:</span> <span class="s2">"csc"</span><span class="p">,</span>
+    <span class="s2">"uploadurl"</span><span class="p">:</span> <span class="s2">"http://kfonline.dianping.com/AndroidPhotoServlet"</span>
+  <span class="p">},</span>
+  <span class="na">handle</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">result</span><span class="p">){</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">totalNum</span><span class="p">);</span> <span class="c1">// 图片上传张数</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">image</span><span class="p">);</span> <span class="c1">// 服务器返回的数据结果</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="nx">e</span><span class="p">.</span><span class="nx">progess</span><span class="p">);</span> <span class="c1">// start 开始上传, uploading 上传中, end 上传结束</span>
   <span class="p">}</span>
 <span class="p">});</span>
 </code></pre>
+
+<p>支持版本：≥ 7.0.2</p>
 
 <h2 id="下载图片">下载图片</h2>
 <pre class="highlight javascript"><code><span class="nx">DPApp</span><span class="p">.</span><span class="nx">downloadImage</span><span class="p">({</span>
@@ -243,12 +316,16 @@ open，login，loginsuccess，cx，signup，payorder，createorder</p>
 <span class="p">});</span>
 </code></pre>
 
+<p>支持版本：≥ 7.1.0</p>
+
 <p>下载完成后，图片会出现在用户设备的资源库中。
 web中没有此功能。</p>
 
 <h2 id="关闭webview">关闭webview</h2>
 <pre class="highlight javascript"><code><span class="nx">DPApp</span><span class="p">.</span><span class="nx">closeWindow</span><span class="p">();</span>
 </code></pre>
+
+<p>支持版本：≥ 6.9.8</p>
 
 <h2 id="第三方支付">第三方支付</h2>
 <pre class="highlight javascript"><code><span class="nx">DPApp</span><span class="p">.</span><span class="nx">pay</span><span class="p">({</span>
@@ -265,6 +342,8 @@ web中没有此功能。</p>
 <span class="p">});</span>
 </code></pre>
 
+<p>支持版本：≥ 7.0.2</p>
+
 <h2 id="分享">分享</h2>
 <pre class="highlight javascript"><code><span class="nx">DPApp</span><span class="p">.</span><span class="nx">share</span><span class="p">({</span>
   <span class="na">title</span><span class="p">:</span><span class="s2">"分享标题"</span><span class="p">,</span>
@@ -279,11 +358,56 @@ web中没有此功能。</p>
 <span class="p">});</span>
 </code></pre>
 
+<p>支持版本：≥ 6.9.8</p>
+
+<table><thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>title</td>
+<td>标题</td>
+</tr>
+<tr>
+<td>desc</td>
+<td>分享描述</td>
+</tr>
+<tr>
+<td>content</td>
+<td>分享内容，覆盖 title 和 desc 拼接逻辑</td>
+</tr>
+<tr>
+<td>feed</td>
+<td>分享到的渠道</td>
+</tr>
+</tbody></table>
+
 <p>有些分享渠道包含标题和内容，有些只有内容。
 对于只有内容的渠道，默认会拼接 title 和 desc 参数。
-当设定了 content 参数时，则会直接使用该参数的取值。
-feed包括需要展示的渠道，默认为所有渠道。
+当设定了 content 参数时，则会直接使用该参数的取值。</p>
+
+<p>feed包括需要展示的渠道，默认为所有渠道。
 web中由于无法分享到微信，短信等，故只支持部分渠道。</p>
+
+<h2 id="初始化右上角分享按钮">初始化右上角分享按钮</h2>
+<pre class="highlight javascript"><code><span class="nx">DPApp</span><span class="p">.</span><span class="nx">initShare</span><span class="p">({</span>
+  <span class="na">title</span><span class="p">:</span><span class="s2">"分享标题"</span><span class="p">,</span>
+  <span class="na">desc</span><span class="p">:</span><span class="s2">"分享描述"</span><span class="p">,</span>
+  <span class="na">content</span><span class="p">:</span><span class="s2">"分享内容"</span><span class="p">,</span> <span class="c1">// 7.1.0 支持</span>
+  <span class="na">image</span><span class="p">:</span><span class="s2">"http://www.dpfile.com/toevent/img/16d05c85a71b135edc39d197273746d6.png"</span><span class="p">,</span>
+  <span class="na">url</span><span class="p">:</span><span class="s2">"http://m.dianping.com"</span><span class="p">,</span>
+  <span class="na">success</span><span class="p">:</span> <span class="kd">function</span><span class="p">(){</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="s1">'分享成功'</span><span class="p">);</span>
+  <span class="p">},</span>
+  <span class="na">fail</span><span class="p">:</span> <span class="kd">function</span><span class="p">(){</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="s1">'分享失败'</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+</code></pre>
+
+<p>支持版本：≥ 6.9.8</p>
 
 <h2 id="发送短信">发送短信</h2>
 <pre class="highlight javascript"><code><span class="nx">DPApp</span><span class="p">.</span><span class="nx">sendSMS</span><span class="p">({</span>
@@ -294,17 +418,23 @@ web中由于无法分享到微信，短信等，故只支持部分渠道。</p>
 <span class="p">});</span>
 </code></pre>
 
+<p>支持版本：≥ 7.1.0</p>
+
+<h1 id="收发消息">收发消息</h1>
+
 <h2 id="订阅消息">订阅消息</h2>
 <pre class="highlight javascript"><code><span class="nx">DPApp</span><span class="p">.</span><span class="nx">subscribe</span><span class="p">({</span>
   <span class="na">action</span><span class="p">:</span> <span class="s1">'loginSuccess'</span><span class="p">,</span>
   <span class="na">success</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">){</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"订阅成功"</span><span class="p">);</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="s2">"订阅成功"</span><span class="p">);</span>
   <span class="p">},</span>
   <span class="na">handle</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">){</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"事件触发"</span><span class="p">);</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="s2">"事件触发"</span><span class="p">);</span>
   <span class="p">}</span>
 <span class="p">});</span>
 </code></pre>
+
+<p>支持版本：7.1.0</p>
 
 <p>默认广播类型包括
 loginSuccess: 登录成功
@@ -317,23 +447,29 @@ foreground: 应用切换回前台</p>
   <span class="na">action</span><span class="p">:</span> <span class="s1">'loginSuccess'</span><span class="p">,</span>
   <span class="na">handle</span><span class="p">:</span> <span class="nx">func</span><span class="p">,</span> <span class="c1">// 取消特定订阅回调，不传则取消所有回调</span>
   <span class="na">success</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">){</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"取消绑定"</span><span class="p">)</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="s2">"取消绑定"</span><span class="p">)</span>
   <span class="p">}</span>
 <span class="p">});</span>
 </code></pre>
+
+<p>支持版本：7.1.0</p>
 
 <h2 id="向native发布消息">向native发布消息</h2>
 <pre class="highlight javascript"><code><span class="nx">DPApp</span><span class="p">.</span><span class="nx">publish</span><span class="p">({</span>
   <span class="na">action</span><span class="p">:</span> <span class="s1">'myMessage'</span><span class="p">,</span>
   <span class="na">success</span><span class="p">:</span> <span class="kd">function</span><span class="p">(){</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"发送成功"</span><span class="p">);</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="s2">"发送成功"</span><span class="p">);</span>
   <span class="p">}</span>
 <span class="p">});</span>
 </code></pre>
 
+<p>支持版本：7.1.0</p>
+
 <p>注意，在web上因为没有native的参与，
 所有方法实际行为都在web一端发生。
 与传统的javascript sub/pub模式无异。</p>
+
+<h1 id="ui界面">UI界面</h1>
 
 <h2 id="设置标题">设置标题</h2>
 <pre class="highlight javascript"><code><span class="nx">DPApp</span><span class="p">.</span><span class="nx">setTitle</span><span class="p">({</span>
@@ -341,7 +477,41 @@ foreground: 应用切换回前台</p>
 <span class="p">});</span>
 </code></pre>
 
+<p>支持版本：7.1.0</p>
+
+<p>6.9.x存在bug，刷新或进入下一个界面后才会更新标题。</p>
+
 <h2 id="设置导航栏按钮">设置导航栏按钮</h2>
+
+<blockquote>
+<p>左侧第一个</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">DPApp</span><span class="p">.</span><span class="nx">setLLButton</span><span class="p">({</span>
+  <span class="na">text</span><span class="p">:</span> <span class="s2">"文字"</span><span class="p">,</span>
+  <span class="na">icon</span><span class="p">:</span> <span class="s2">"H5_Search"</span><span class="p">,</span>
+  <span class="na">success</span><span class="p">:</span> <span class="kd">function</span><span class="p">(){</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="s2">"设置成功"</span><span class="p">);</span>
+  <span class="p">},</span>
+  <span class="na">handle</span><span class="p">:</span> <span class="kd">function</span><span class="p">(){</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="s2">"按钮被点击"</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+</code></pre>
+
+<blockquote>
+<p>左侧第二个</p>
+</blockquote>
+<pre class="highlight javascript"><code><span class="nx">DPApp</span><span class="p">.</span><span class="nx">setLRButton</span><span class="p">({</span>
+  <span class="na">text</span><span class="p">:</span> <span class="s2">"文字"</span><span class="p">,</span>
+  <span class="na">icon</span><span class="p">:</span> <span class="s2">"H5_Search"</span><span class="p">,</span>
+  <span class="na">success</span><span class="p">:</span> <span class="kd">function</span><span class="p">(){</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="s2">"设置成功"</span><span class="p">);</span>
+  <span class="p">},</span>
+  <span class="na">handle</span><span class="p">:</span> <span class="kd">function</span><span class="p">(){</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="s2">"按钮被点击"</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+</code></pre>
 
 <blockquote>
 <p>右侧第一个</p>
@@ -350,10 +520,10 @@ foreground: 应用切换回前台</p>
   <span class="na">text</span><span class="p">:</span> <span class="s2">"文字"</span><span class="p">,</span>
   <span class="na">icon</span><span class="p">:</span> <span class="s2">"H5_Search"</span><span class="p">,</span>
   <span class="na">success</span><span class="p">:</span> <span class="kd">function</span><span class="p">(){</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"设置成功"</span><span class="p">);</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="s2">"设置成功"</span><span class="p">);</span>
   <span class="p">},</span>
   <span class="na">handle</span><span class="p">:</span> <span class="kd">function</span><span class="p">(){</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"按钮被点击"</span><span class="p">);</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="s2">"按钮被点击"</span><span class="p">);</span>
   <span class="p">}</span>
 <span class="p">});</span>
 </code></pre>
@@ -365,13 +535,15 @@ foreground: 应用切换回前台</p>
   <span class="na">text</span><span class="p">:</span> <span class="s2">"文字"</span><span class="p">,</span>
   <span class="na">icon</span><span class="p">:</span> <span class="s2">"H5_Share"</span><span class="p">,</span>
   <span class="na">success</span><span class="p">:</span> <span class="kd">function</span><span class="p">(){</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"设置成功"</span><span class="p">);</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="s2">"设置成功"</span><span class="p">);</span>
   <span class="p">},</span>
   <span class="na">handle</span><span class="p">:</span> <span class="kd">function</span><span class="p">(){</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"按钮被点击"</span><span class="p">);</span>
+    <span class="nx">alert</span><span class="p">(</span><span class="s2">"按钮被点击"</span><span class="p">);</span>
   <span class="p">}</span>
 <span class="p">});</span>
 </code></pre>
+
+<p>支持版本：≥ 7.1.0</p>
 
 <p>文字按钮或者图片按钮。
 icon属性定义了本地资源的名称，目前仅支持H5_Search、H5_Back、H5_Share
