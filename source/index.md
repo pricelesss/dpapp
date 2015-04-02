@@ -1,5 +1,5 @@
 ---
-title: 点评Jsbridge v1.0.0
+title: 点评Jsbridge v1.0
 
 language_tabs:
   - javascript
@@ -29,11 +29,12 @@ var DPApp = require('dpapp');
 在html代码中引入
 
 ```html
-<script src="http://i2.dpfile.com/mod/dpapp/1.0.0/standalone.js"></script>
+<script src="http://i2.dpfile.com/mod/dpapp/1.0.2/standalone.js"></script>
 ```
 
 dpapp模块支持通过Cortex通过CommonJS标准的方式引入，或者通过传统的script标签引入。
 
+注：文档可能更新不及时，实际最新版本可以通过 http://registry.cortexjs.org/dpapp/latest 确认
 # 基础方法
 
 ## 调用协议
