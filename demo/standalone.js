@@ -1420,26 +1420,27 @@ var mods = neuron.mods = {};
 neuron.config({
   "graph": {
     "0": [
-      "1.0.1"
+      "1.0.2"
     ],
     "_": {
-      "dpapp@1.0.1": 0,
+      "dpapp@1.0.2": 0,
       "dpapp@*": 0
     }
   }
 });neuron.config({path:"http://i{n}.dpfile.com/mod/"});(function(){
 function mix(a,b){for(var k in b){a[k]=b[k];}return a;}
-var _0 = "dpapp@1.0.1/lib/native-core.js";
-var _1 = "dpapp@1.0.1/lib/patch-7.1.js";
-var _2 = "dpapp@1.0.1/lib/patch-7.0.js";
-var _3 = "dpapp@1.0.1/lib/patch-6.x.js";
-var _4 = "dpapp@1.0.1/lib/web.js";
-var _5 = "dpapp@1.0.1/lib/core.js";
-var _6 = "dpapp@1.0.1/lib/queue.js";
-var _7 = "dpapp@1.0.1/index.js";
+var _0 = "dpapp@1.0.2/lib/native-core.js";
+var _1 = "dpapp@1.0.2/lib/patch-7.1.js";
+var _2 = "dpapp@1.0.2/lib/patch-7.0.js";
+var _3 = "dpapp@1.0.2/lib/patch-6.x.js";
+var _4 = "dpapp@1.0.2/lib/web.js";
+var _5 = "dpapp@1.0.2/lib/core.js";
+var _6 = "dpapp@1.0.2/lib/queue.js";
+var _7 = "dpapp@1.0.2/lib/apilist.js";
+var _8 = "dpapp@1.0.2/index.js";
 var asyncDepsToMix = {};
 var globalMap = asyncDepsToMix;
-define(_7, [_0,_1,_2,_3,_4], function(require, exports, module, __filename, __dirname) {
+define(_8, [_0,_1,_2,_3,_4], function(require, exports, module, __filename, __dirname) {
 (function (Host) {
   var Efte;
   var version;
@@ -1732,33 +1733,12 @@ Efte.extend({
     map:mix({"./core":_5,"./queue":_6},globalMap)
 });
 
-define(_1, [_2], function(require, exports, module, __filename, __dirname) {
-var apis = [
-  /**
-   * Infos
-   */
-  "getUserInfo", "getCityId", "getLocation", "getContactList", "getCX",
-  /**
-   * Common
-   */
-  "getRequestId", "downloadImage", "closeWindow", /* getNetworkType, share */
-  /**
-   * Funcs
-   */
-  "sendSMS", "openScheme", /* ajax */
-  /**
-   * Broadcast
-   */
-  "publish", /* subscribe, unsubscribe, login */
-  /**
-   * UI
-   */
-  "setTitle", "setLLButton", "setLRButton", "setRLButton", "setRRButton"
-];
-
+define(_1, [_7,_2], function(require, exports, module, __filename, __dirname) {
+var apiList = require('./apilist');
 
 var _events = {};
 var patch7 = require('./patch-7.0');
+
 var Patch = module.exports = {
 
 ready : function(callback) {
@@ -2025,13 +2005,13 @@ login : function(opts) {
 
 };
 
-
 apis.forEach(function(name) {
-  Patch[name] = function(options) {
-    this._send(name, options);
+  if(!Patch[name]){
+    Patch[name] = function(options) {
+      this._send(name, options);
+    }
   }
 });
-
 
 (function() {
   var uastr = navigator.userAgent;
@@ -2053,7 +2033,7 @@ apis.forEach(function(name) {
   };
 })();
 }, {
-    map:mix({"./patch-7.0":_2},globalMap)
+    map:mix({"./apilist":_7,"./patch-7.0":_2},globalMap)
 });
 
 define(_2, [_5,_3], function(require, exports, module, __filename, __dirname) {
@@ -2356,8 +2336,9 @@ var Patch = module.exports = {
     map:mix({"./core":_5},globalMap)
 });
 
-define(_4, [_5], function(require, exports, module, __filename, __dirname) {
+define(_4, [_5,_7], function(require, exports, module, __filename, __dirname) {
 var Efte = require('./core');
+var apis = require('./apilist');
 var notImplemented = Efte._notImplemented;
 
 
@@ -2365,7 +2346,7 @@ var notImplemented = Efte._notImplemented;
  * Common
  * 基础功能，所有app都会用到
  */
-Efte.extend({
+ Efte.extend({
   getUA: function(opt){
     var success = opt && opt.success;
     var ua = {
@@ -2438,12 +2419,6 @@ Efte.extend({
     }
     xhr.send(data);
   },
-  getRequestId: notImplemented,
-  // ImagePicker: ImagePicker,
-  uploadImage: function(){
-
-  },
-  downloadImage: notImplemented,
   closeWindow: function(){
     window.close();
   }
@@ -2465,12 +2440,13 @@ Efte.extend({
       fail && fail("ERR_GET_LOCATION");
     });
   },
-  // 无法完美实现就不实现
-  getNetworkType: notImplemented,
-  getCityId: notImplemented,
-  getUserInfo: notImplemented,
-  getContactList: notImplemented,
-  getCX: notImplemented
+  getCityId: function(opt){
+    var cityId = document.cookie.match(/cy=(\d+)/);
+    cityId = cityId ? +cityId[1] : null;
+    opt && opt.success && opt.success({
+      cityId: cityId
+    });
+  },
 });
 
 /**
@@ -2552,9 +2528,7 @@ Efte.extend({
     if(title){
       document.title = title;
     }
-  },
-  setRLButton: notImplemented,
-  setRRButton: notImplemented
+  }
 });
 
 
@@ -2604,9 +2578,17 @@ Efte.extend({
   }
 });
 
+
+apis.forEach(function(name){
+  if(!Efte[name]){
+    Efte[name] = notImplemented;
+  }
+});
+
+
 module.exports = Efte;
 }, {
-    map:mix({"./core":_5},globalMap)
+    map:mix({"./core":_5,"./apilist":_7},globalMap)
 });
 
 define(_5, [], function(require, exports, module, __filename, __dirname) {
@@ -2628,7 +2610,7 @@ var Efte = module.exports = {
     if (readyRE.test(document.readyState) && document.body){
       fn();
     }else{
-      document.addEventListener('DOMContentLoaded', function(){ callback($) }, false);
+      document.addEventListener('DOMContentLoaded', function(){ fn($) }, false);
     }
   },
   Semver: {
@@ -2778,4 +2760,32 @@ var queue = module.exports = function(worker){
 }, {
     map:globalMap
 });
-})();_use("dpapp@1.0.1",function(){});
+
+define(_7, [], function(require, exports, module, __filename, __dirname) {
+module.exports = [
+  /**
+   * Infos
+   */
+  "getUserInfo", "getCityId", "getLocation", "getContactList", "getCX",
+  /**
+   * Common
+   */
+  "getRequestId", "downloadImage", "closeWindow", "getNetworkType", "share",
+  /**
+   * Funcs
+   */
+  "sendSMS", "openScheme", "ajax",
+  /**
+   * Broadcast
+   */
+  "publish", "subscribe", "unsubscribe", "login",
+  /**
+   * UI
+   */
+  "setTitle", "setLLButton", "setLRButton", "setRLButton", "setRRButton"
+];
+
+}, {
+    map:globalMap
+});
+})();_use("dpapp@1.0.2",function(){});
