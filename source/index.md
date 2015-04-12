@@ -226,6 +226,19 @@ DPApp.getRequestId({
 
 # 功能模块
 
+## 登录
+
+```javascript
+DPApp.login({
+  success: function(user){
+    // 登录成功
+    // 回调中获取用户信息
+  }
+});
+```
+
+支持版本：≥ 7.1.0
+
 ## Ajax请求
 
 ```javascript
