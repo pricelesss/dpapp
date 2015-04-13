@@ -1,0 +1,55 @@
+.dpapp-login-panel{
+  position: fixed;
+  width: 100%;
+  top: 0;
+  left: 0;
+  background-color: #f0f0f0;
+  height: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.dpapp-login-panel .EasyLogin_row{
+  margin: 0;
+  padding: 5px 5px 5px 10px;
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  margin-bottom: 10px;
+}
+
+.dpapp-login-panel .EasyLogin_row input{
+  border: none;
+  display: block;
+  width: 120px;
+  float: left;
+  padding: 5px 0;
+  font-size: 14px;
+  height: 14px;
+}
+
+.dpapp-login-panel .EasyLogin_row .EasyLogin_send{
+  text-decoration: none;
+  color: #999;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  padding: 5px;
+  border-radius: 4px;
+  background-color: #fff;
+  float: right;
+}
+
+.dpapp-login-panel .login-btn{
+  border: none;
+  margin: 0;
+  display: block;
+  width: 100%;
+  background-color: #ff8400;
+  height: 40px;
+  margin-bottom: 12px;
+  line-height: 40px;
+  color: #fff;
+  font-size: 18px;
+  text-align: center;
+  border-radius: 5px;
+}

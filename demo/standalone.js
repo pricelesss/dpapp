@@ -1420,7 +1420,17 @@ var mods = neuron.mods = {};
 neuron.config({
   "graph": {
     "0": [
-      "1.0.2"
+      "1.0.2",
+      {
+        "dpapp-share@~0.1.0": 1,
+        "easy-login@~0.1.3": 2
+      }
+    ],
+    "1": [
+      "0.1.0"
+    ],
+    "2": [
+      "0.1.3"
     ],
     "_": {
       "dpapp@1.0.2": 0,
@@ -1429,18 +1439,22 @@ neuron.config({
   }
 });neuron.config({path:"http://i{n}.dpfile.com/mod/"});(function(){
 function mix(a,b){for(var k in b){a[k]=b[k];}return a;}
-var _0 = "dpapp@1.0.2/lib/native-core.js";
-var _1 = "dpapp@1.0.2/lib/patch-7.1.js";
-var _2 = "dpapp@1.0.2/lib/patch-7.0.js";
-var _3 = "dpapp@1.0.2/lib/patch-6.x.js";
-var _4 = "dpapp@1.0.2/lib/web.js";
-var _5 = "dpapp@1.0.2/lib/core.js";
-var _6 = "dpapp@1.0.2/lib/queue.js";
-var _7 = "dpapp@1.0.2/lib/apilist.js";
-var _8 = "dpapp@1.0.2/index.js";
-var asyncDepsToMix = {};
+var _0 = "easy-login@~0.1.3";
+var _1 = "dpapp-share@~0.1.0";
+var _2 = "dpapp@1.0.2/lib/native-core.js";
+var _3 = "dpapp@1.0.2/lib/patch-7.1.js";
+var _4 = "dpapp@1.0.2/lib/patch-7.0.js";
+var _5 = "dpapp@1.0.2/lib/patch-6.x.js";
+var _6 = "dpapp@1.0.2/lib/web.js";
+var _7 = "dpapp@1.0.2/lib/core.js";
+var _8 = "dpapp@1.0.2/lib/queue.js";
+var _9 = "dpapp@1.0.2/lib/apilist.js";
+var _10 = "dpapp@1.0.2/lib/login.css.js";
+var _11 = "dpapp@1.0.2/index.js";
+var asyncDeps = [_0,_1];
+var asyncDepsToMix = {"easy-login":_0,"dpapp-share":_1};
 var globalMap = asyncDepsToMix;
-define(_8, [_0,_1,_2,_3,_4], function(require, exports, module, __filename, __dirname) {
+define(_11, [_2,_3,_4,_5,_6], function(require, exports, module, __filename, __dirname) {
 (function (Host) {
   var Efte;
   var version;
@@ -1488,11 +1502,12 @@ define(_8, [_0,_1,_2,_3,_4], function(require, exports, module, __filename, __di
   }
 }(this));
 }, {
+    asyncDeps:asyncDeps,
     main:true,
-    map:mix({"./lib/native-core":_0,"./lib/patch-7.1":_1,"./lib/patch-7.0":_2,"./lib/patch-6.x":_3,"./lib/web":_4},globalMap)
+    map:mix({"./lib/native-core":_2,"./lib/patch-7.1":_3,"./lib/patch-7.0":_4,"./lib/patch-6.x":_5,"./lib/web":_6},globalMap)
 });
 
-define(_0, [_5,_6], function(require, exports, module, __filename, __dirname) {
+define(_2, [_7,_8], function(require, exports, module, __filename, __dirname) {
 var Efte = module.exports = require('./core');
 /**
  * count from 1
@@ -1620,6 +1635,13 @@ Efte.extend({
     } : null;
     this._sendMessage(method, args, callback);
   },
+  _convertUrlParams: function(params){
+    var result = [];
+    for(var i in params){
+      result.push(i + "=" + encodeURIComponent(params[i]));
+    }
+    return result.join("&");
+  },
   _sanitizeAjaxOpts: function(args){
     args.method = args.method || "get";
     args.data = args.data || "";
@@ -1730,10 +1752,11 @@ Efte.extend({
   }
 });
 }, {
-    map:mix({"./core":_5,"./queue":_6},globalMap)
+    asyncDeps:asyncDeps,
+    map:mix({"./core":_7,"./queue":_8},globalMap)
 });
 
-define(_1, [_7,_2], function(require, exports, module, __filename, __dirname) {
+define(_3, [_9,_4], function(require, exports, module, __filename, __dirname) {
 var apiList = require('./apilist');
 
 var _events = {};
@@ -1970,6 +1993,14 @@ uploadImage : function(opts){
   });
 },
 
+openScheme: function(opts){
+  var url = opt.url;
+  var extra = opt.extra;
+  if(extra){
+    url += "?" + this._convertUrlParams(extra);
+  }
+  this._send('openScheme', {url: url});
+},
 
 login : function(opts) {
   var self = this;
@@ -2033,10 +2064,11 @@ apis.forEach(function(name) {
   };
 })();
 }, {
-    map:mix({"./apilist":_7,"./patch-7.0":_2},globalMap)
+    asyncDeps:asyncDeps,
+    map:mix({"./apilist":_9,"./patch-7.0":_4},globalMap)
 });
 
-define(_2, [_5,_3], function(require, exports, module, __filename, __dirname) {
+define(_4, [_7,_5], function(require, exports, module, __filename, __dirname) {
 var core = require('./core');
 var patch6 = require('./patch-6.x');
 var Patch = module.exports = core._mixin(patch6, {
@@ -2134,10 +2166,11 @@ var Patch = module.exports = core._mixin(patch6, {
   }
 });
 }, {
-    map:mix({"./core":_5,"./patch-6.x":_3},globalMap)
+    asyncDeps:asyncDeps,
+    map:mix({"./core":_7,"./patch-6.x":_5},globalMap)
 });
 
-define(_3, [_5], function(require, exports, module, __filename, __dirname) {
+define(_5, [_7], function(require, exports, module, __filename, __dirname) {
 var core = require('./core');
 var NOOP = function() {};
 var cachedEnv = {};
@@ -2272,7 +2305,12 @@ var Patch = module.exports = {
     }, function() {});
   },
   openScheme : function(opt){
-    this._sendMessage('actionScheme', {url: opt.url});
+    var url = opt.url;
+    var extra = opt.extra;
+    if(extra){
+      url += "?" + this._convertUrlParams(extra);
+    }
+    this._sendMessage('actionScheme', {url: url});
   },
   ajax : function(opts) {
     opts = this._sanitizeAjaxOpts(opts);
@@ -2333,12 +2371,14 @@ var Patch = module.exports = {
   Patch[name] = core.notImplemented;
 });
 }, {
-    map:mix({"./core":_5},globalMap)
+    asyncDeps:asyncDeps,
+    map:mix({"./core":_7},globalMap)
 });
 
-define(_4, [_5,_7], function(require, exports, module, __filename, __dirname) {
+define(_6, [_10,_7,_9], function(require, exports, module, __filename, __dirname) {
 var Efte = require('./core');
 var apis = require('./apilist');
+var logincss = require('./login.css.js');
 var notImplemented = Efte._notImplemented;
 
 
@@ -2479,20 +2519,26 @@ Efte.extend({
   },
   sendSMS: notImplemented,
   login: function(opts){
+    var styleTag;
     require.async("easy-login", function(EasyLogin){
-
+      if(!styleTag){
+        styleTag = document.createElement('style');
+        styleTag.setAttribute('type','text/css');
+        styleTag.innerHTML = logincss;
+        document.getElementsByTagName('head')[0].appendChild(styleTag);
+      }
       var elem = document.createElement('div');
       var loginButton = document.createElement('input');
-      loginButton.value = "login";
+      elem.setAttribute('class','dpapp-login-panel');
+      loginButton.value = "登录";
       loginButton.type = "button";
-
-      elem.appendChild(loginButton);
+      loginButton.setAttribute('class','login-btn');
 
       document.body.appendChild(elem);
 
       var myLogin = EasyLogin(elem, {
         platform: "mobile",  //平台， mobile or pc
-        channel: "1"     //找账户中心申请的渠道ID
+        channel: opts.channel || "1"     //找账户中心申请的渠道ID
       });
 
       //处理Info信息
@@ -2508,12 +2554,15 @@ Efte.extend({
       //处理登录成功事件
       myLogin.on("login",function(){
         opts.success && opts.success();
+        elem.parentNode.removeChild(elem);
         //do something here
       });
-
+      elem.appendChild(loginButton);
       loginButton.onclick = function(){
         myLogin.login(); //触发登录
       }
+
+
 
     });
   }
@@ -2588,10 +2637,11 @@ apis.forEach(function(name){
 
 module.exports = Efte;
 }, {
-    map:mix({"./core":_5,"./apilist":_7},globalMap)
+    asyncDeps:asyncDeps,
+    map:mix({"./login.css.js":_10,"./core":_7,"./apilist":_9},globalMap)
 });
 
-define(_5, [], function(require, exports, module, __filename, __dirname) {
+define(_7, [], function(require, exports, module, __filename, __dirname) {
 function mixin(to, from) {
   for (var key in from) {
     to[key] = from[key];
@@ -2717,10 +2767,11 @@ if(window.DPApp){
   Efte = mixin(window.DPApp, Efte);
 }
 }, {
+    asyncDeps:asyncDeps,
     map:globalMap
 });
 
-define(_6, [], function(require, exports, module, __filename, __dirname) {
+define(_8, [], function(require, exports, module, __filename, __dirname) {
 var queue = module.exports = function(worker){
 	var currentData = null;
 	var currentCallback = null;
@@ -2758,10 +2809,11 @@ var queue = module.exports = function(worker){
 	return q;
 };
 }, {
+    asyncDeps:asyncDeps,
     map:globalMap
 });
 
-define(_7, [], function(require, exports, module, __filename, __dirname) {
+define(_9, [], function(require, exports, module, __filename, __dirname) {
 module.exports = [
   /**
    * Infos
@@ -2786,6 +2838,14 @@ module.exports = [
 ];
 
 }, {
+    asyncDeps:asyncDeps,
+    map:globalMap
+});
+
+define(_10, [], function(require, exports, module, __filename, __dirname) {
+module.exports='.dpapp-login-panel{position: fixed;width: 100%;top: 0;left: 0;background-color: #f0f0f0;height: 100%;padding: 20px;box-sizing: border-box;}.dpapp-login-panel .EasyLogin_row{margin: 0;padding: 5px 5px 5px 10px;overflow: hidden;border: 1px solid #ccc;background-color: #fff;margin-bottom: 10px;}.dpapp-login-panel .EasyLogin_row input{border: none;display: block;width: 120px;float: left;padding: 5px 0;font-size: 14px;height: 14px;}.dpapp-login-panel .EasyLogin_row .EasyLogin_send{text-decoration: none;color: #999;font-size: 14px;border: 1px solid #ccc;padding: 5px;border-radius: 4px;background-color: #fff;float: right;}.dpapp-login-panel .login-btn{border: none;margin: 0;display: block;width: 100%;background-color: #ff8400;height: 40px;margin-bottom: 12px;line-height: 40px;color: #fff;font-size: 18px;text-align: center;border-radius: 5px;}'
+}, {
+    asyncDeps:asyncDeps,
     map:globalMap
 });
 })();_use("dpapp@1.0.2",function(){});

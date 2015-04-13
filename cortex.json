@@ -24,6 +24,7 @@
   "scripts": {
     // `scripts.prebuild` runs at the beginning of the `cortex build` process.
     // If you wanna use gulp, remember to `npm install gulp --save-dev`
+    "prebuild": "gulp style",
     "postbuild": "./standalone.sh"
   },
   "repository": "git@code.dianpingoa.com:mobile/dpapp.git",
@@ -41,7 +42,7 @@
   },
   "homepage": "http://efte.github.com/dpapp",
   "asyncDependencies": {
-    // "easy-login": "~0.1.3",
-    // "dpapp-share": "~0.1.0"
+    "easy-login": "~0.1.3",
+    "dpapp-share": "~0.1.0"
   }
 }
