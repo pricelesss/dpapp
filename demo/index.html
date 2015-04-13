@@ -5,6 +5,11 @@
 <meta charset="UTF-8">
 <meta name="pagestatus" content="200">
 <title>DPApp JSBridge Demo</title>
+<script>
+window.onerror = function(a,b){
+  alert(a);
+}
+</script>
 <script src="./standalone.js"></script>
 <link rel="stylesheet" href="../lib/login.css">
 <style>
@@ -338,7 +343,6 @@
       }
     }
   })();
-
 
   DPApp.ready(function(){
     var ua = DPApp.getUA();

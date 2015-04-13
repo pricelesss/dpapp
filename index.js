@@ -1,10 +1,10 @@
 (function (Host) {
-  var Efte;
+  var DPApp;
   var version;
   var userAgent = Host.navigator.userAgent;
 
   // Require different platform js base on userAgent.
-  // Native part will inject the userAgent with string `efte`.
+  // Native part will inject the userAgent with string `DPApp`.
 
   function getQuery(){
     var query = location.search.slice(1);
@@ -16,31 +16,43 @@
     return ret;
   }
 
-  var EfteNativeCore = require('./lib/native-core');
-  if (EfteNativeCore._uaVersion == "7.1.x") {
-    Efte = EfteNativeCore.extend(require('./lib/patch-7.1'));
-  } else if(EfteNativeCore._uaVersion == "7.0.x"){
+  var Core = require('./lib/core');
+  var DPAppNativeCore = require('./lib/native-core');
+  if (DPAppNativeCore._uaVersion == "7.1.x") {
+    DPApp = DPAppNativeCore.extend(require('./lib/patch-7.1'));
+  } else if(DPAppNativeCore._uaVersion == "7.0.x"){
     // 目前有修改UA，而api尚未对齐的仅7.0版本
-    Efte = EfteNativeCore.extend(require('./lib/patch-7.0'));
+    DPApp = DPAppNativeCore.extend(require('./lib/patch-7.0'));
   } else{
-    // 更早的7.0之前的古早版本
-    if(getQuery().product == "dpapp"){
-      Efte = EfteNativeCore.extend(require('./lib/patch-6.x'));
-    }else{
-    // 认为是在web中
-      Efte = require('./lib/web');
+    var patch6 = require('./lib/patch-6.x');
+    var web = require('./lib/web');
+    // 默认认为6.x，当接口调用失败，认为是web
+    DPApp = DPAppNativeCore.extend(patch6);
+    DPApp._patch6Ready = DPApp.ready;
+    DPApp.ready = function(callback){
+      var timeout = setTimeout(function(){
+        DPApp._bindDOMReady(function(){
+          DPApp.getUA = web.getUA;
+          window.DPApp = web;
+          callback();
+        });
+      }, 50);
+      DPApp._patch6Ready(function(){
+        clearTimeout(timeout);
+        callback();
+      });
     }
   }
 
-  Efte.getQuery = getQuery;
+  DPApp.getQuery = getQuery;
 
-  // Export Efte object, if support AMD, CMD, CommonJS.
+  // Export DPApp object, if support AMD, CMD, CommonJS.
   if (typeof module !== 'undefined') {
-    module.exports = Efte;
+    module.exports = DPApp;
   }
 
-  // Export Efte object to Host
+  // Export DPApp object to Host
   if (typeof Host !== 'undefined') {
-    Host.DPApp = Efte;
+    Host.DPApp = DPApp;
   }
 }(this));
