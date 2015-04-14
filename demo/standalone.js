@@ -1429,24 +1429,26 @@ neuron.config({
   }
 });neuron.config({path:"http://i{n}.dpfile.com/mod/"});(function(){
 function mix(a,b){for(var k in b){a[k]=b[k];}return a;}
-var _0 = "dpapp@1.0.3/lib/apilist.js";
-var _1 = "dpapp@1.0.3/lib/core.js";
-var _2 = "dpapp@1.0.3/lib/native-core.js";
-var _3 = "dpapp@1.0.3/lib/patch-7.1.js";
-var _4 = "dpapp@1.0.3/lib/patch-7.0.js";
-var _5 = "dpapp@1.0.3/lib/patch-6.x.js";
-var _6 = "dpapp@1.0.3/lib/web.js";
+var _0 = "dpapp@1.0.3/lib/native-core.js";
+var _1 = "dpapp@1.0.3/lib/decorator.js";
+var _2 = "dpapp@1.0.3/lib/patch-7.1.js";
+var _3 = "dpapp@1.0.3/lib/patch-7.0.js";
+var _4 = "dpapp@1.0.3/lib/patch-6.x.js";
+var _5 = "dpapp@1.0.3/lib/web.js";
+var _6 = "dpapp@1.0.3/lib/core.js";
 var _7 = "dpapp@1.0.3/lib/queue.js";
-var _8 = "dpapp@1.0.3/lib/login.css.js";
-var _9 = "dpapp@1.0.3/index.js";
+var _8 = "dpapp@1.0.3/lib/apilist.js";
+var _9 = "dpapp@1.0.3/lib/login.css.js";
+var _10 = "dpapp@1.0.3/index.js";
 var asyncDepsToMix = {};
 var globalMap = asyncDepsToMix;
-define(_9, [_0,_1,_2,_3,_4,_5,_6], function(require, exports, module, __filename, __dirname) {
+define(_10, [_0,_1,_2,_3,_4,_5], function(require, exports, module, __filename, __dirname) {
 (function (Host) {
   var DPApp;
   var version;
   var userAgent = Host.navigator.userAgent;
-  var apis = require('./lib/apilist');
+  var DPAppNativeCore = require('./lib/native-core');
+  var decorateForTrace = require('./lib/decorator');
 
   // Require different platform js base on userAgent.
   // Native part will inject the userAgent with string `DPApp`.
@@ -1461,13 +1463,13 @@ define(_9, [_0,_1,_2,_3,_4,_5,_6], function(require, exports, module, __filename
     return ret;
   }
 
-  var Core = require('./lib/core');
-  var DPAppNativeCore = require('./lib/native-core');
   if (DPAppNativeCore._uaVersion == "7.1.x") {
     DPApp = DPAppNativeCore.extend(require('./lib/patch-7.1'));
+    decorateForTrace(DPApp);
   } else if(DPAppNativeCore._uaVersion == "7.0.x"){
     // 目前有修改UA，而api尚未对齐的仅7.0版本
     DPApp = DPAppNativeCore.extend(require('./lib/patch-7.0'));
+    decorateForTrace(DPApp);
   } else{
     var patch6 = require('./lib/patch-6.x');
     var web = require('./lib/web');
@@ -1475,10 +1477,11 @@ define(_9, [_0,_1,_2,_3,_4,_5,_6], function(require, exports, module, __filename
     DPApp = DPAppNativeCore.extend(patch6);
     DPApp._patch6Ready = DPApp.ready;
     DPApp.ready = function(callback){
+      var cfg = DPApp._cfg;
       var timeout = setTimeout(function(){
         DPApp._bindDOMReady(function(){
-          DPApp.getUA = web.getUA;
-          window.DPApp = web;
+          web._cfg = cfg;
+          window.DPApp = decorateForTrace(web);
           callback();
         });
       }, 50);
@@ -1486,10 +1489,12 @@ define(_9, [_0,_1,_2,_3,_4,_5,_6], function(require, exports, module, __filename
         clearTimeout(timeout);
         callback();
       });
+      decorateForTrace(DPApp);
     }
   }
 
   DPApp.getQuery = getQuery;
+
 
   // Export DPApp object, if support AMD, CMD, CommonJS.
   if (typeof module !== 'undefined') {
@@ -1504,175 +1509,14 @@ define(_9, [_0,_1,_2,_3,_4,_5,_6], function(require, exports, module, __filename
       Host.DPApp = DPApp;
     }
   }
+
 }(this));
 }, {
     main:true,
-    map:mix({"./lib/apilist":_0,"./lib/core":_1,"./lib/native-core":_2,"./lib/patch-7.1":_3,"./lib/patch-7.0":_4,"./lib/patch-6.x":_5,"./lib/web":_6},globalMap)
+    map:mix({"./lib/native-core":_0,"./lib/decorator":_1,"./lib/patch-7.1":_2,"./lib/patch-7.0":_3,"./lib/patch-6.x":_4,"./lib/web":_5},globalMap)
 });
 
-define(_0, [], function(require, exports, module, __filename, __dirname) {
-module.exports = [
-  /**
-   * Infos
-   */
-  "getUserInfo", "getCityId", "getLocation", "getContactList", "getCX",
-  /**
-   * Common
-   */
-  "getRequestId", "downloadImage", "closeWindow", "getNetworkType", "share",
-  /**
-   * Funcs
-   */
-  "sendSMS", "openScheme", "jumpToScheme", "store", "retrieve", "ajax",
-  /**
-   * Broadcast
-   */
-  "publish", "subscribe", "unsubscribe", "login",
-  /**
-   * UI
-   */
-  "setTitle", "setLLButton", "setLRButton", "setRLButton", "setRRButton"
-];
-
-}, {
-    map:globalMap
-});
-
-define(_1, [], function(require, exports, module, __filename, __dirname) {
-function mixin(to, from) {
-  for (var key in from) {
-    to[key] = from[key];
-  }
-  return to;
-}
-var core = module.exports = {
-  _cfg: {
-    debug: false
-  },
-  config: function(config) {
-    this._cfg = config;
-  },
-  _bindDOMReady: function(fn){
-    var readyRE = /complete|loaded|interactive/;
-    if (readyRE.test(document.readyState) && document.body){
-      fn();
-    }else{
-      document.addEventListener('DOMContentLoaded', function(){ fn() }, false);
-    }
-  },
-  Semver: {
-    eq: function(a, b) {
-      return a === b;
-    },
-    gt: function(a, b) {
-      var splitedA = a.split(".");
-      var splitedB = b.split(".");
-      if (+splitedA[0] > +splitedB[0]) {
-        return true;
-      } else {
-        if (+splitedA[1] > splitedB[1]) {
-          return true;
-        } else {
-          return splitedA[2] > splitedB[2];
-        }
-      }
-    },
-    lt: function(a, b) {
-      return !this.gte(a, b);
-    },
-    gte: function(a, b) {
-      return this.eq(a, b) || this.gt(a, b);
-    },
-    lte: function(a, b) {
-      return this.eq(a, b) || this.lt(a, b);
-    }
-  },
-  Share: {
-    WECHAT_FRIENDS: 0,
-    WECHAT_TIMELINE: 1,
-    QQ: 2,
-    SMS: 3,
-    WEIBO: 4,
-    QZONE: 5,
-    EMAIL: 6,
-    COPY: 7
-  },
-  _osUA: (function() {
-    var ua = navigator.userAgent;
-    var osName, osVersion;
-    if (ua.match(/iPhone/)) {
-      osName = "iphone";
-      osVersion = ua.match(/iPhone\sOS\s([\d_]+)/i)[1].replace(/_/g, ".");
-    } else if (ua.match(/Android/)) {
-      osName = "android";
-      osVersion = ua.match(/Android\s([\w\.]+)/)[1]
-    } else {
-      osName = null;
-      osVersion = null;
-    }
-    return {
-      name: osName,
-      version: osVersion
-    }
-  })(),
-  _uaVersion: (function(){
-    // ua格式的版本
-    var userAgent = navigator.userAgent;
-
-    if(/dp\/com\.dianping/.test(userAgent)){
-      return "7.1.x";
-    }else if(/MApi/.test(userAgent)){
-      return "7.0.x";
-    }else{
-      return "6.9.x";
-    }
-  })(),
-  _trace: function(name){
-    _hip && _hip.push('mv', {
-      module: name
-    });
-  },
-  log: function() {
-
-    var message = [];
-    for(var i=0; i < arguments.length; i++){
-      if(typeof arguments[i] == "string"){
-        message.push(arguments[i]);
-      }else if(arguments[i] != undefined){
-        message.push(JSON.stringify(arguments[i]));
-      }
-    }
-
-    message = message.join(" ");
-    if (this._cfg && this._cfg.debug) {
-      alert(message);
-    }else{
-      console.log(message);
-    }
-  },
-  _mixin: mixin,
-  extend: function(args) {
-    return this._mixin(this, args);
-  },
-  _notImplemented: function notImplemented(opt) {
-    opt && opt.fail && opt.fail({
-      errMsg:"ERR_NOT_IMPLEMENTED"
-    });
-  },
-  isSupport: function(funcName) {
-    var api = this[funcName];
-    return api && typeof api == "function" && api != core._notImplemented
-  }
-};
-
-if(window.DPApp){
-  core = mixin(window.DPApp, core);
-}
-}, {
-    map:globalMap
-});
-
-define(_2, [_7,_1], function(require, exports, module, __filename, __dirname) {
+define(_0, [_6,_7], function(require, exports, module, __filename, __dirname) {
 var core = module.exports = require('./core');
 /**
  * count from 1
@@ -1915,10 +1759,55 @@ core.extend({
   }
 });
 }, {
-    map:mix({"./queue":_7,"./core":_1},globalMap)
+    map:mix({"./core":_6,"./queue":_7},globalMap)
 });
 
-define(_3, [_0,_4], function(require, exports, module, __filename, __dirname) {
+define(_1, [_8,_6], function(require, exports, module, __filename, __dirname) {
+var apis = require('./apilist');
+var core = require('./core');
+
+module.exports = function decorateForTrace(target){
+
+  apis.forEach(function(name){
+    if(!target[name]){
+      target[name] = core._notImplemented;
+    }
+  });
+
+
+  apis.forEach(function(api){
+    var _origin = target[api];
+    if(target[api] && target[api]._decorated){
+      return;
+    }
+    target[api] = function(args){
+      var _args = core._mixin({}, args);
+      DPApp._trace(api + "_call");
+      var _success = _args.success;
+      var _fail = _args.fail;
+      _args.success = function(result){
+        target._trace(api + "_success");
+        _success(result);
+      };
+      _args.fail = function(result){
+        target._trace(api + "_fail");
+        _fail(result);
+      }
+      _origin.call(target, _args);
+    }
+    target[api]._decorated = true;
+    if(_origin == target._notImplemented){
+      target[api]._notReady = true;
+    }
+  });
+
+  return target;
+}
+}, {
+    map:mix({"./apilist":_8,"./core":_6},globalMap)
+});
+
+define(_2, [_8,_3], function(require, exports, module, __filename, __dirname) {
 var apis = require('./apilist');
 
 var _events = {};
@@ -2235,10 +2124,10 @@ apis.forEach(function(name) {
   };
 })();
 }, {
-    map:mix({"./apilist":_0,"./patch-7.0":_4},globalMap)
+    map:mix({"./apilist":_8,"./patch-7.0":_3},globalMap)
 });
 
-define(_4, [_1,_5], function(require, exports, module, __filename, __dirname) {
+define(_3, [_6,_4], function(require, exports, module, __filename, __dirname) {
 var core = require('./core');
 var patch6 = require('./patch-6.x');
 var Patch = module.exports = core._mixin(patch6, {
@@ -2336,10 +2225,10 @@ var Patch = module.exports = core._mixin(patch6, {
   }
 });
 }, {
-    map:mix({"./core":_1,"./patch-6.x":_5},globalMap)
+    map:mix({"./core":_6,"./patch-6.x":_4},globalMap)
 });
 
-define(_5, [_1], function(require, exports, module, __filename, __dirname) {
+define(_4, [_6], function(require, exports, module, __filename, __dirname) {
 var core = require('./core');
 var NOOP = function() {};
 var cachedEnv = {};
@@ -2550,16 +2439,13 @@ var Patch = module.exports = {
   Patch[name] = core.notImplemented;
 });
 }, {
-    map:mix({"./core":_1},globalMap)
+    map:mix({"./core":_6},globalMap)
 });
 
-define(_6, [_8,_1,_0], function(require, exports, module, __filename, __dirname) {
+define(_5, [_9,_6], function(require, exports, module, __filename, __dirname) {
 var core = require('./core');
-var apis = require('./apilist');
 var logincss = require('./login.css.js');
-var notImplemented = core._notImplemented;
-
-var core = core._mixin({}, core);
+core = core._mixin({}, core);
 
 /**
  * Common
@@ -2696,7 +2582,6 @@ core.extend({
       success && success();
     });
   },
-  sendSMS: notImplemented,
   login: function(opts){
     var styleTag;
     require.async("easy-login", function(EasyLogin){
@@ -2806,17 +2691,150 @@ core.extend({
   }
 });
 
-
-apis.forEach(function(name){
-  if(!core[name]){
-    core[name] = notImplemented;
-  }
-});
-
-
 module.exports = core;
 }, {
-    map:mix({"./login.css.js":_8,"./core":_1,"./apilist":_0},globalMap)
+    map:mix({"./login.css.js":_9,"./core":_6},globalMap)
+});
+
+define(_6, [], function(require, exports, module, __filename, __dirname) {
+function mixin(to, from) {
+  for (var key in from) {
+    to[key] = from[key];
+  }
+  return to;
+}
+var core = module.exports = {
+  _cfg: {
+    debug: false
+  },
+  config: function(config) {
+    this._cfg = config;
+  },
+  _bindDOMReady: function(fn){
+    var readyRE = /complete|loaded|interactive/;
+    if (readyRE.test(document.readyState) && document.body){
+      fn();
+    }else{
+      document.addEventListener('DOMContentLoaded', function(){ fn() }, false);
+    }
+  },
+  Semver: {
+    eq: function(a, b) {
+      return a === b;
+    },
+    gt: function(a, b) {
+      var splitedA = a.split(".");
+      var splitedB = b.split(".");
+      if (+splitedA[0] > +splitedB[0]) {
+        return true;
+      } else {
+        if (+splitedA[1] > splitedB[1]) {
+          return true;
+        } else {
+          return splitedA[2] > splitedB[2];
+        }
+      }
+    },
+    lt: function(a, b) {
+      return !this.gte(a, b);
+    },
+    gte: function(a, b) {
+      return this.eq(a, b) || this.gt(a, b);
+    },
+    lte: function(a, b) {
+      return this.eq(a, b) || this.lt(a, b);
+    }
+  },
+  Share: {
+    WECHAT_FRIENDS: 0,
+    WECHAT_TIMELINE: 1,
+    QQ: 2,
+    SMS: 3,
+    WEIBO: 4,
+    QZONE: 5,
+    EMAIL: 6,
+    COPY: 7
+  },
+  _osUA: (function() {
+    var ua = navigator.userAgent;
+    var osName, osVersion;
+    if (ua.match(/iPhone/)) {
+      osName = "iphone";
+      osVersion = ua.match(/iPhone\sOS\s([\d_]+)/i)[1].replace(/_/g, ".");
+    } else if (ua.match(/Android/)) {
+      osName = "android";
+      osVersion = ua.match(/Android\s([\w\.]+)/)[1]
+    } else {
+      osName = null;
+      osVersion = null;
+    }
+    return {
+      name: osName,
+      version: osVersion
+    }
+  })(),
+  _uaVersion: (function(){
+    // ua格式的版本
+    var userAgent = navigator.userAgent;
+
+    if(/dp\/com\.dianping/.test(userAgent)){
+      return "7.1.x";
+    }else if(/MApi/.test(userAgent)){
+      return "7.0.x";
+    }else{
+      return "6.9.x";
+    }
+  })(),
+  _trace: function(name){
+    var logFact = (this._cfg && this._cfg.logFact) || 0.01;
+    if(Math.random() < logFact){
+      console.log("_trace", name)
+      _hip && _hip.push(['mv', {
+        module: name
+      }]);
+    }
+  },
+  log: function() {
+
+    var message = [];
+    for(var i=0; i < arguments.length; i++){
+      if(typeof arguments[i] == "string"){
+        message.push(arguments[i]);
+      }else if(arguments[i] != undefined){
+        message.push(JSON.stringify(arguments[i]));
+      }
+    }
+
+    message = message.join(" ");
+    if (this._cfg && this._cfg.debug) {
+      alert(message);
+    }else{
+      console.log(message);
+    }
+  },
+  _mixin: mixin,
+  extend: function(args) {
+    return this._mixin(this, args);
+  },
+  _notImplemented: function notImplemented(opt) {
+    opt && opt.fail && opt.fail({
+      errMsg:"ERR_NOT_IMPLEMENTED"
+    });
+  },
+  isSupport: function(funcName) {
+    var api = this[funcName];
+    return api
+      && typeof api == "function"
+      && api != core._notImplemented
+      && api._notReady != true
+  }
+};
+
+if(window.DPApp){
+  core = mixin(window.DPApp, core);
+}
+}, {
+    map:globalMap
 });
 
 define(_7, [], function(require, exports, module, __filename, __dirname) {
@@ -2861,6 +2879,34 @@ var queue = module.exports = function(worker){
 });
 
 define(_8, [], function(require, exports, module, __filename, __dirname) {
+module.exports = [
+  /**
+   * Infos
+   */
+  "getUserInfo", "getCityId", "getLocation", "getContactList", "getCX",
+  /**
+   * Common
+   */
+  "getRequestId", "downloadImage", "closeWindow", "getNetworkType", "share",
+  /**
+   * Funcs
+   */
+  "sendSMS", "openScheme", "jumpToScheme", "store", "retrieve", "ajax",
+  /**
+   * Broadcast
+   */
+  "publish", "subscribe", "unsubscribe", "login",
+  /**
+   * UI
+   */
+  "setTitle", "setLLButton", "setLRButton", "setRLButton", "setRRButton"
+];
+
+}, {
+    map:globalMap
+});
+
+define(_9, [], function(require, exports, module, __filename, __dirname) {
 module.exports='.dpapp-login-panel{position: fixed;width: 100%;top: 0;left: 0;background-color: #f0f0f0;height: 100%;padding: 20px;box-sizing: border-box;}.dpapp-login-panel .EasyLogin_row{margin: 0;padding: 5px 5px 5px 10px;overflow: hidden;border: 1px solid #ccc;background-color: #fff;margin-bottom: 10px;}.dpapp-login-panel .EasyLogin_row input{border: none;display: block;width: 120px;float: left;padding: 5px 0;font-size: 14px;height: 14px;}.dpapp-login-panel .EasyLogin_row .EasyLogin_send{text-decoration: none;color: #999;font-size: 14px;border: 1px solid #ccc;padding: 5px;border-radius: 4px;background-color: #fff;float: right;}.dpapp-login-panel .login-btn{border: none;margin: 0;display: block;width: 100%;background-color: #ff8400;height: 40px;margin-bottom: 12px;line-height: 40px;color: #fff;font-size: 18px;text-align: center;border-radius: 5px;}'
 }, {
     map:globalMap
