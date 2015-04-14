@@ -250,6 +250,76 @@ DPApp.login({
 
 支持版本：≥ 7.1.0
 
+
+## openScheme
+
+```javascript
+DPApp.login({
+  url: "dianping://websearch",
+  extra: {
+    "searchurl": "dianping://searchshoplist",
+    "hotsuggesturl":"http://m.api.dianping.com/advancedsuggest.bin?cityid=1&mylat=31.215870&mylng=121.419100&myacc=0.000000",
+    "keywordurl":"http://m.api.dianping.com/advancedsuggest.bin?cityid=1&mylat=31.215870&mylng=121.419100&myacc=0.000000"
+  },
+  success: function(){
+    // 跳转成功
+  }
+});
+```
+
+打开scheme
+支持版本：≥ 7.1.0
+
+
+## jumpToScheme
+
+```javascript
+DPApp.login({
+  url: "dianping://websearch",
+  extra: {
+    "searchurl": "dianping://searchshoplist",
+    "hotsuggesturl":"http://m.api.dianping.com/advancedsuggest.bin?cityid=1&mylat=31.215870&mylng=121.419100&myacc=0.000000",
+    "keywordurl":"http://m.api.dianping.com/advancedsuggest.bin?cityid=1&mylat=31.215870&mylng=121.419100&myacc=0.000000"
+  },
+  success: function(){
+    // 跳转成功
+  }
+});
+```
+
+打开scheme，并关闭原窗口。
+支持版本：≥ 7.2.0
+
+
+## store
+
+```javascript
+DPApp.store({
+  key: "key",
+  value: "value"
+  success: function(){
+    // 存值成功
+  }
+});
+```
+
+向native本地空间存值
+支持版本：≥ 7.2.0
+
+## retrieve
+
+```javascript
+DPApp.retrieve({
+  key: "key",
+  success: function(value){
+    // 获取值成功
+  }
+});
+```
+
+向native本地空间取值
+支持版本：≥ 7.2.0
+
 ## Ajax请求
 
 ```javascript

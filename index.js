@@ -2,6 +2,7 @@
   var DPApp;
   var version;
   var userAgent = Host.navigator.userAgent;
+  var apis = require('./lib/apilist');
 
   // Require different platform js base on userAgent.
   // Native part will inject the userAgent with string `DPApp`.
@@ -53,6 +54,10 @@
 
   // Export DPApp object to Host
   if (typeof Host !== 'undefined') {
-    Host.DPApp = DPApp;
+    if(Host.DPApp){
+      DPApp._mixin(Host.DPApp, DPApp);
+    }else{
+      Host.DPApp = DPApp;
+    }
   }
 }(this));

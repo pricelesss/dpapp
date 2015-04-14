@@ -1429,23 +1429,24 @@ neuron.config({
   }
 });neuron.config({path:"http://i{n}.dpfile.com/mod/"});(function(){
 function mix(a,b){for(var k in b){a[k]=b[k];}return a;}
-var _0 = "dpapp@1.0.3/lib/core.js";
-var _1 = "dpapp@1.0.3/lib/native-core.js";
-var _2 = "dpapp@1.0.3/lib/patch-7.1.js";
-var _3 = "dpapp@1.0.3/lib/patch-7.0.js";
-var _4 = "dpapp@1.0.3/lib/patch-6.x.js";
-var _5 = "dpapp@1.0.3/lib/web.js";
-var _6 = "dpapp@1.0.3/lib/queue.js";
-var _7 = "dpapp@1.0.3/lib/apilist.js";
+var _0 = "dpapp@1.0.3/lib/apilist.js";
+var _1 = "dpapp@1.0.3/lib/core.js";
+var _2 = "dpapp@1.0.3/lib/native-core.js";
+var _3 = "dpapp@1.0.3/lib/patch-7.1.js";
+var _4 = "dpapp@1.0.3/lib/patch-7.0.js";
+var _5 = "dpapp@1.0.3/lib/patch-6.x.js";
+var _6 = "dpapp@1.0.3/lib/web.js";
+var _7 = "dpapp@1.0.3/lib/queue.js";
 var _8 = "dpapp@1.0.3/lib/login.css.js";
 var _9 = "dpapp@1.0.3/index.js";
 var asyncDepsToMix = {};
 var globalMap = asyncDepsToMix;
-define(_9, [_0,_1,_2,_3,_4,_5], function(require, exports, module, __filename, __dirname) {
+define(_9, [_0,_1,_2,_3,_4,_5,_6], function(require, exports, module, __filename, __dirname) {
 (function (Host) {
   var DPApp;
   var version;
   var userAgent = Host.navigator.userAgent;
+  var apis = require('./lib/apilist');
 
   // Require different platform js base on userAgent.
   // Native part will inject the userAgent with string `DPApp`.
@@ -1497,15 +1498,47 @@ define(_9, [_0,_1,_2,_3,_4,_5], function(require, exports, module, __filename, _
 
   // Export DPApp object to Host
   if (typeof Host !== 'undefined') {
-    Host.DPApp = DPApp;
+    if(Host.DPApp){
+      DPApp._mixin(Host.DPApp, DPApp);
+    }else{
+      Host.DPApp = DPApp;
+    }
   }
 }(this));
 }, {
     main:true,
-    map:mix({"./lib/core":_0,"./lib/native-core":_1,"./lib/patch-7.1":_2,"./lib/patch-7.0":_3,"./lib/patch-6.x":_4,"./lib/web":_5},globalMap)
+    map:mix({"./lib/apilist":_0,"./lib/core":_1,"./lib/native-core":_2,"./lib/patch-7.1":_3,"./lib/patch-7.0":_4,"./lib/patch-6.x":_5,"./lib/web":_6},globalMap)
 });
 
 define(_0, [], function(require, exports, module, __filename, __dirname) {
+module.exports = [
+  /**
+   * Infos
+   */
+  "getUserInfo", "getCityId", "getLocation", "getContactList", "getCX",
+  /**
+   * Common
+   */
+  "getRequestId", "downloadImage", "closeWindow", "getNetworkType", "share",
+  /**
+   * Funcs
+   */
+  "sendSMS", "openScheme", "jumpToScheme", "store", "retrieve", "ajax",
+  /**
+   * Broadcast
+   */
+  "publish", "subscribe", "unsubscribe", "login",
+  /**
+   * UI
+   */
+  "setTitle", "setLLButton", "setLRButton", "setRLButton", "setRRButton"
+];
+
+}, {
+    map:globalMap
+});
+
+define(_1, [], function(require, exports, module, __filename, __dirname) {
 function mixin(to, from) {
   for (var key in from) {
     to[key] = from[key];
@@ -1594,6 +1627,11 @@ var core = module.exports = {
       return "6.9.x";
     }
   })(),
+  _trace: function(name){
+    _hip && _hip.push('mv', {
+      module: name
+    });
+  },
   log: function() {
 
     var message = [];
@@ -1634,7 +1672,7 @@ if(window.DPApp){
     map:globalMap
 });
 
-define(_1, [_0,_6], function(require, exports, module, __filename, __dirname) {
+define(_2, [_1,_7], function(require, exports, module, __filename, __dirname) {
 var core = module.exports = require('./core');
 /**
  * count from 1
@@ -1696,14 +1734,12 @@ core.extend({
         args = {};
       }
 
-      var oldProto = (this._uaVersion !== "7.1.x");
-      if(oldProto){
-        args.callbackId = callbackId;
-      }
-
+      // 某些版本app很任性的把callbackId参数放到args里了
+      args.callbackId = callbackId;
       args = JSON.stringify(args);
 
-      this._createIframe('js://_?method=' + method + '&args=' + encodeURIComponent(args) + (oldProto ? '' : ('&callbackId=' + callbackId)));
+      var bridgeUrl = 'js://_?method=' + method + '&args=' + encodeURIComponent(args) + '&callbackId=' + callbackId;
+      this._createIframe(bridgeUrl);
   },
   _createIframe: function(src){
     /**
@@ -1879,10 +1915,10 @@ core.extend({
   }
 });
 }, {
-    map:mix({"./core":_0,"./queue":_6},globalMap)
+    map:mix({"./core":_1,"./queue":_7},globalMap)
 });
 
-define(_2, [_7,_3], function(require, exports, module, __filename, __dirname) {
+define(_3, [_0,_4], function(require, exports, module, __filename, __dirname) {
 var apis = require('./apilist');
 
 var _events = {};
@@ -2128,6 +2164,15 @@ openScheme: function(opts){
   this._send('openScheme', {url: url});
 },
 
+jumpToScheme: function(opts){
+  var url = opt.url;
+  var extra = opt.extra;
+  if(extra){
+    url += "?" + this._convertUrlParams(extra);
+  }
+  this._send('jumpToScheme', {url: url});
+},
+
 login : function(opts) {
   var self = this;
   function getUser(callback) {
@@ -2190,10 +2235,10 @@ apis.forEach(function(name) {
   };
 })();
 }, {
-    map:mix({"./apilist":_7,"./patch-7.0":_3},globalMap)
+    map:mix({"./apilist":_0,"./patch-7.0":_4},globalMap)
 });
 
-define(_3, [_0,_4], function(require, exports, module, __filename, __dirname) {
+define(_4, [_1,_5], function(require, exports, module, __filename, __dirname) {
 var core = require('./core');
 var patch6 = require('./patch-6.x');
 var Patch = module.exports = core._mixin(patch6, {
@@ -2291,10 +2336,10 @@ var Patch = module.exports = core._mixin(patch6, {
   }
 });
 }, {
-    map:mix({"./core":_0,"./patch-6.x":_4},globalMap)
+    map:mix({"./core":_1,"./patch-6.x":_5},globalMap)
 });
 
-define(_4, [_0], function(require, exports, module, __filename, __dirname) {
+define(_5, [_1], function(require, exports, module, __filename, __dirname) {
 var core = require('./core');
 var NOOP = function() {};
 var cachedEnv = {};
@@ -2436,6 +2481,16 @@ var Patch = module.exports = {
     }
     this._sendMessage('actionScheme', {url: url});
   },
+
+  jumpToScheme: function(opts){
+    var url = opt.url;
+    var extra = opt.extra;
+    if(extra){
+      url += "?" + this._convertUrlParams(extra);
+    }
+    this._sendMessage('jumpToScheme', {url: url});
+  },
+
   ajax : function(opts) {
     opts = this._sanitizeAjaxOpts(opts);
     var self = this;
@@ -2495,10 +2550,10 @@ var Patch = module.exports = {
   Patch[name] = core.notImplemented;
 });
 }, {
-    map:mix({"./core":_0},globalMap)
+    map:mix({"./core":_1},globalMap)
 });
 
-define(_5, [_8,_0,_7], function(require, exports, module, __filename, __dirname) {
+define(_6, [_8,_1,_0], function(require, exports, module, __filename, __dirname) {
 var core = require('./core');
 var apis = require('./apilist');
 var logincss = require('./login.css.js');
@@ -2761,10 +2816,10 @@ apis.forEach(function(name){
 
 module.exports = core;
 }, {
-    map:mix({"./login.css.js":_8,"./core":_0,"./apilist":_7},globalMap)
+    map:mix({"./login.css.js":_8,"./core":_1,"./apilist":_0},globalMap)
 });
 
-define(_6, [], function(require, exports, module, __filename, __dirname) {
+define(_7, [], function(require, exports, module, __filename, __dirname) {
 var queue = module.exports = function(worker){
 	var currentData = null;
 	var currentCallback = null;
@@ -2801,34 +2856,6 @@ var queue = module.exports = function(worker){
 	}
 	return q;
 };
-}, {
-    map:globalMap
-});
-
-define(_7, [], function(require, exports, module, __filename, __dirname) {
-module.exports = [
-  /**
-   * Infos
-   */
-  "getUserInfo", "getCityId", "getLocation", "getContactList", "getCX",
-  /**
-   * Common
-   */
-  "getRequestId", "downloadImage", "closeWindow", "getNetworkType", "share",
-  /**
-   * Funcs
-   */
-  "sendSMS", "openScheme", "ajax",
-  /**
-   * Broadcast
-   */
-  "publish", "subscribe", "unsubscribe", "login",
-  /**
-   * UI
-   */
-  "setTitle", "setLLButton", "setLRButton", "setRLButton", "setRRButton"
-];
-
 }, {
     map:globalMap
 });

@@ -6,10 +6,14 @@
 <meta name="pagestatus" content="200">
 <title>DPApp JSBridge Demo</title>
 <script>
-window.onerror = function(a,b){
-  alert(a);
+var _hip = [
+  ['_setPageId', 201]
+];
+window.onerror = function(e,f,l){
+  alert("onerror:" + e + ",file:" + f + ",line:" + l);
 }
 </script>
+<script src="http://s2.51ping.com/hls/hippo3.js"></script>
 <script src="./standalone.js"></script>
 <link rel="stylesheet" href="../lib/login.css">
 <style>
@@ -100,6 +104,10 @@ window.onerror = function(a,b){
   <a class="btn" id="share" href="javascript:;">分享</a>
   <a class="btn" id="initShare" href="javascript:;">右上分享按钮</a>
   <a class="btn" id="sendSMS" href="javascript:;">发送短信</a>
+  <a class="btn" id="openScheme" href="javascript:;">openScheme</a>
+  <a class="btn" id="jumpToScheme" href="javascript:;">jumpToScheme</a>
+  <a class="btn" id="store" href="javascript:;">store</a>
+  <a class="btn" id="retrieve" href="javascript:;">retrieve</a>
 
   <h2>收发消息</h2>
   <a class="btn" id="subscribe" href="javascript:;">订阅消息</a>
@@ -118,9 +126,6 @@ window.onerror = function(a,b){
   <a class="btn" id="login" href="javascript:;">登录</a>
 <script>
   function $(id){return document.getElementById(id);}
-  window.onerror = function(e,f,l){
-    DPApp.log("onerror:" + e + ",file:" + f + ",line:" + l);
-  }
 
 </script>
 <script src="./pay.js"></script>
