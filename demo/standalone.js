@@ -1660,7 +1660,7 @@ var core = module.exports = {
     });
   },
   isSupport: function(funcName) {
-    var api = core[funcName];
+    var api = this[funcName];
     return api && typeof api == "function" && api != core._notImplemented
   }
 };
@@ -1672,7 +1672,7 @@ if(window.DPApp){
     map:globalMap
 });
 
-define(_2, [_1,_7], function(require, exports, module, __filename, __dirname) {
+define(_2, [_7,_1], function(require, exports, module, __filename, __dirname) {
 var core = module.exports = require('./core');
 /**
  * count from 1
@@ -1915,7 +1915,7 @@ core.extend({
   }
 });
 }, {
-    map:mix({"./core":_1,"./queue":_7},globalMap)
+    map:mix({"./queue":_7,"./core":_1},globalMap)
 });
 
 define(_3, [_0,_4], function(require, exports, module, __filename, __dirname) {

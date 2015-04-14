@@ -336,20 +336,20 @@ window.onerror = function(e,f,l){
     DPApp.getNetworkType({success:success});
   }
 
-  (function(){
-    var buttons = document.querySelectorAll('.btn');
-    for(var i = 0; i < buttons.length; i++){
-      var button = buttons[i];
-      var funcName = button.getAttribute('data-api')
-       || button.getAttribute("id");
-
-      if(funcName && !DPApp.isSupport(funcName)){
-        button.classList.add("disabled");
-      }
-    }
-  })();
-
   DPApp.ready(function(){
+    (function(){
+      var buttons = document.querySelectorAll('.btn');
+      for(var i = 0; i < buttons.length; i++){
+        var button = buttons[i];
+        var funcName = button.getAttribute('data-api')
+         || button.getAttribute("id");
+
+        if(funcName && !DPApp.isSupport(funcName)){
+          button.classList.add("disabled");
+        }
+      }
+    })();
+
     var ua = DPApp.getUA();
     baseInfos.innerHTML = [
       "平台: " + ua.platform,
