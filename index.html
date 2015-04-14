@@ -116,6 +116,14 @@
 <p>使用字符串比对并不严谨，比如 &ldquo;6.2.1&rdquo; &lt; &ldquo;6.10.1&rdquo; 会返回 false。
 虽然通常app版本号第二位不会上两位数，不过推荐使用该api来比对版本。</p>
 
+<h2 id="判断是否支持某方法">判断是否支持某方法</h2>
+<pre class="highlight javascript"><code><span class="nx">DPApp</span><span class="p">.</span><span class="nx">isSupport</span><span class="p">(</span><span class="nx">funcName</span><span class="p">);</span> <span class="c1">// 返回true|false</span>
+</code></pre>
+
+<h2 id="获取query参数">获取query参数</h2>
+<pre class="highlight javascript"><code><span class="nx">DPApp</span><span class="p">.</span><span class="nx">getQuery</span><span class="p">();</span> <span class="c1">// 返回JSONObject</span>
+</code></pre>
+
 <h1 id="测试">测试</h1>
 
 <p>手机连上内网wifi，前往http://app.dp/ 下载对应的app（需v7.0.1及以上）
