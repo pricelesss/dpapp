@@ -91,6 +91,11 @@ DPApp.Semver.eq(versionA,versionB); // 是否相同
 DPApp.isSupport(funcName); // 返回true|false
 ```
 
+## 获取query参数
+```javascript
+DPApp.getQuery(); // 返回JSONObject
+```
+
 #测试
 
 手机连上内网wifi，前往http://app.dp/ 下载对应的app（需v7.0.1及以上）
