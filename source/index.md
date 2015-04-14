@@ -85,6 +85,12 @@ DPApp.Semver.eq(versionA,versionB); // 是否相同
 使用字符串比对并不严谨，比如 "6.2.1" < "6.10.1" 会返回 false。
 虽然通常app版本号第二位不会上两位数，不过推荐使用该api来比对版本。
 
+## 判断是否支持某方法
+
+```javascript
+DPApp.isSupport(funcName); // 返回true|false
+```
+
 #测试
 
 手机连上内网wifi，前往http://app.dp/ 下载对应的app（需v7.0.1及以上）
