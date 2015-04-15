@@ -1420,7 +1420,17 @@ var mods = neuron.mods = {};
 neuron.config({
   "graph": {
     "0": [
-      "1.0.3"
+      "1.0.3",
+      {
+        "dpapp-share@~0.1.0": 1,
+        "easy-login@~0.1.3": 2
+      }
+    ],
+    "1": [
+      "0.1.0"
+    ],
+    "2": [
+      "0.1.3"
     ],
     "_": {
       "dpapp@1.0.3": 0,
@@ -1429,20 +1439,23 @@ neuron.config({
   }
 });neuron.config({path:"http://i{n}.dpfile.com/mod/"});(function(){
 function mix(a,b){for(var k in b){a[k]=b[k];}return a;}
-var _0 = "dpapp@1.0.3/lib/native-core.js";
-var _1 = "dpapp@1.0.3/lib/decorator.js";
-var _2 = "dpapp@1.0.3/lib/patch-7.1.js";
-var _3 = "dpapp@1.0.3/lib/patch-7.0.js";
-var _4 = "dpapp@1.0.3/lib/patch-6.x.js";
-var _5 = "dpapp@1.0.3/lib/web.js";
-var _6 = "dpapp@1.0.3/lib/core.js";
-var _7 = "dpapp@1.0.3/lib/queue.js";
-var _8 = "dpapp@1.0.3/lib/apilist.js";
-var _9 = "dpapp@1.0.3/lib/login.css.js";
-var _10 = "dpapp@1.0.3/index.js";
-var asyncDepsToMix = {};
+var _0 = "easy-login@~0.1.3";
+var _1 = "dpapp-share@~0.1.0";
+var _2 = "dpapp@1.0.3/lib/native-core.js";
+var _3 = "dpapp@1.0.3/lib/decorator.js";
+var _4 = "dpapp@1.0.3/lib/patch-7.1.js";
+var _5 = "dpapp@1.0.3/lib/patch-6.x.js";
+var _6 = "dpapp@1.0.3/lib/patch-7.0.js";
+var _7 = "dpapp@1.0.3/lib/web.js";
+var _8 = "dpapp@1.0.3/lib/core.js";
+var _9 = "dpapp@1.0.3/lib/queue.js";
+var _10 = "dpapp@1.0.3/lib/apilist.js";
+var _11 = "dpapp@1.0.3/lib/login.css.js";
+var _12 = "dpapp@1.0.3/index.js";
+var asyncDeps = [_0,_1];
+var asyncDepsToMix = {"easy-login":_0,"dpapp-share":_1};
 var globalMap = asyncDepsToMix;
-define(_10, [_0,_1,_2,_3,_4,_5], function(require, exports, module, __filename, __dirname) {
+define(_12, [_2,_3,_4,_5,_6,_7], function(require, exports, module, __filename, __dirname) {
 (function (Host) {
   var DPApp;
   var version;
@@ -1512,11 +1525,12 @@ define(_10, [_0,_1,_2,_3,_4,_5], function(require, exports, module, __filename, 
 
 }(this));
 }, {
+    asyncDeps:asyncDeps,
     main:true,
-    map:mix({"./lib/native-core":_0,"./lib/decorator":_1,"./lib/patch-7.1":_2,"./lib/patch-7.0":_3,"./lib/patch-6.x":_4,"./lib/web":_5},globalMap)
+    map:mix({"./lib/native-core":_2,"./lib/decorator":_3,"./lib/patch-7.1":_4,"./lib/patch-6.x":_5,"./lib/patch-7.0":_6,"./lib/web":_7},globalMap)
 });
 
-define(_0, [_6,_7], function(require, exports, module, __filename, __dirname) {
+define(_2, [_8,_9], function(require, exports, module, __filename, __dirname) {
 var core = module.exports = require('./core');
 /**
  * count from 1
@@ -1759,10 +1773,11 @@ core.extend({
   }
 });
 }, {
-    map:mix({"./core":_6,"./queue":_7},globalMap)
+    asyncDeps:asyncDeps,
+    map:mix({"./core":_8,"./queue":_9},globalMap)
 });
 
-define(_1, [_8,_6], function(require, exports, module, __filename, __dirname) {
+define(_3, [_10,_8], function(require, exports, module, __filename, __dirname) {
 var apis = require('./apilist');
 var core = require('./core');
 
@@ -1804,10 +1819,11 @@ module.exports = function decorateForTrace(target){
   return target;
 }
 }, {
-    map:mix({"./apilist":_8,"./core":_6},globalMap)
+    asyncDeps:asyncDeps,
+    map:mix({"./apilist":_10,"./core":_8},globalMap)
 });
 
-define(_2, [_8,_3], function(require, exports, module, __filename, __dirname) {
+define(_4, [_10,_6], function(require, exports, module, __filename, __dirname) {
 var apis = require('./apilist');
 
 var _events = {};
@@ -2053,7 +2069,7 @@ openScheme: function(opts){
   this._send('openScheme', {url: url});
 },
 
-jumpToScheme: function(opts){
+jumpToScheme: function(opt){
   var url = opt.url;
   var extra = opt.extra;
   if(extra){
@@ -2124,111 +2140,11 @@ apis.forEach(function(name) {
   };
 })();
 }, {
-    map:mix({"./apilist":_8,"./patch-7.0":_3},globalMap)
+    asyncDeps:asyncDeps,
+    map:mix({"./apilist":_10,"./patch-7.0":_6},globalMap)
 });
 
-define(_3, [_6,_4], function(require, exports, module, __filename, __dirname) {
-var core = require('./core');
-var patch6 = require('./patch-6.x');
-var Patch = module.exports = core._mixin(patch6, {
-	getUA : function(opt){
-		var result = {};
-  	var success = opt && opt.success;
-  	var appVersion = navigator.userAgent.match(/MApi\s[\w\.]+\s\([\w\.\d]+\s([\d\.]+)/)[1];
-  	var ua = {
-      platform: "dpapp",
-      appName: "dianping",
-      appVersion: appVersion,
-      osName: this._osUA.name,
-      osVersion: this._osUA.version
-    };
-  	success && success(ua);
-    return ua;
-	},
-
-  Share: core.Share,
-  pay: function(args){
-    var self = this;
-    var payType = args.payType;
-    var success = args.success;
-    var fail = args.fail;
-    var cx = args.cx;
-
-    function payOrder(data, callback) {
-      DPApp.ajax({
-        url: 'http://api.p.dianping.com/payorder.pay',
-        data: data,
-        keys: ["Content"],
-        success: function(paymsg) {
-          callback(null, paymsg);
-        },
-        fail: function(fail) {
-          callback("fail payorder");
-        }
-      });
-    }
-
-    function getPaymentTool(payType) {
-      var PAY_TYPE_MINIALIPAY = 1;
-      var PAY_TYPE_WEIXINPAY = 7;
-      var PAYMENTTOOL_ALIPAY = "5:1:null#219#0";
-      var PAYMENTTOOL_WEIXINPAY = "11:1:null#217#0";
-      if (payType == PAY_TYPE_WEIXINPAY) {
-        paymentTool = PAYMENTTOOL_WEIXINPAY;
-      } else {
-        paymentTool = PAYMENTTOOL_ALIPAY;
-      }
-      return paymentTool;
-    }
-
-    payOrder({
-      token: args.token,
-      orderid: args.orderId,
-      paymenttool: getPaymentTool(payType),
-      cx: cx
-    }, function(err, paymsg) {
-      if (err) {
-        return fail && fail(err);
-      }
-
-
-      self._sendMessage('pay', {
-        paytype: payType,
-        paycontent: paymsg.Content
-      }, function(data) {
-        if (data.payresult) {
-          success && success(data);
-        } else {
-          fail && fail(data);
-        }
-      });
-    });
-  },
-  uploadImage : function(opts){
-    var success = opts.success;
-    var fail = opts.fail;
-    var handle = opts.handle;
-
-    this._sendMessage("uploadImage", opts, function(result){
-      var status = result.status;
-      if(status == "fail"){
-        fail && fail(result);
-        return;
-      }else{
-        handle && handle(result);
-      }
-    });
-  },
-
-  closeWindow : function(){
-    this._sendMessage('close_web');
-  }
-});
-}, {
-    map:mix({"./core":_6,"./patch-6.x":_4},globalMap)
-});
-
-define(_4, [_6], function(require, exports, module, __filename, __dirname) {
+define(_5, [_8], function(require, exports, module, __filename, __dirname) {
 var core = require('./core');
 var NOOP = function() {};
 var cachedEnv = {};
@@ -2371,7 +2287,7 @@ var Patch = module.exports = {
     this._sendMessage('actionScheme', {url: url});
   },
 
-  jumpToScheme: function(opts){
+  jumpToScheme: function(opt){
     var url = opt.url;
     var extra = opt.extra;
     if(extra){
@@ -2439,10 +2355,113 @@ var Patch = module.exports = {
   Patch[name] = core.notImplemented;
 });
 }, {
-    map:mix({"./core":_6},globalMap)
+    asyncDeps:asyncDeps,
+    map:mix({"./core":_8},globalMap)
 });
 
-define(_5, [_9,_6], function(require, exports, module, __filename, __dirname) {
+define(_6, [_8,_5], function(require, exports, module, __filename, __dirname) {
+var core = require('./core');
+var patch6 = require('./patch-6.x');
+var Patch = module.exports = core._mixin(patch6, {
+	getUA : function(opt){
+		var result = {};
+  	var success = opt && opt.success;
+  	var appVersion = navigator.userAgent.match(/MApi\s[\w\.]+\s\([\w\.\d]+\s([\d\.]+)/)[1];
+  	var ua = {
+      platform: "dpapp",
+      appName: "dianping",
+      appVersion: appVersion,
+      osName: this._osUA.name,
+      osVersion: this._osUA.version
+    };
+  	success && success(ua);
+    return ua;
+	},
+
+  Share: core.Share,
+  pay: function(args){
+    var self = this;
+    var payType = args.payType;
+    var success = args.success;
+    var fail = args.fail;
+    var cx = args.cx;
+
+    function payOrder(data, callback) {
+      DPApp.ajax({
+        url: 'http://api.p.dianping.com/payorder.pay',
+        data: data,
+        keys: ["Content"],
+        success: function(paymsg) {
+          callback(null, paymsg);
+        },
+        fail: function(fail) {
+          callback("fail payorder");
+        }
+      });
+    }
+
+    function getPaymentTool(payType) {
+      var PAY_TYPE_MINIALIPAY = 1;
+      var PAY_TYPE_WEIXINPAY = 7;
+      var PAYMENTTOOL_ALIPAY = "5:1:null#219#0";
+      var PAYMENTTOOL_WEIXINPAY = "11:1:null#217#0";
+      if (payType == PAY_TYPE_WEIXINPAY) {
+        paymentTool = PAYMENTTOOL_WEIXINPAY;
+      } else {
+        paymentTool = PAYMENTTOOL_ALIPAY;
+      }
+      return paymentTool;
+    }
+
+    payOrder({
+      token: args.token,
+      orderid: args.orderId,
+      paymenttool: getPaymentTool(payType),
+      cx: cx
+    }, function(err, paymsg) {
+      if (err) {
+        return fail && fail(err);
+      }
+
+
+      self._sendMessage('pay', {
+        paytype: payType,
+        paycontent: paymsg.Content
+      }, function(data) {
+        if (data.payresult) {
+          success && success(data);
+        } else {
+          fail && fail(data);
+        }
+      });
+    });
+  },
+  uploadImage : function(opts){
+    var success = opts.success;
+    var fail = opts.fail;
+    var handle = opts.handle;
+
+    this._sendMessage("uploadImage", opts, function(result){
+      var status = result.status;
+      if(status == "fail"){
+        fail && fail(result);
+        return;
+      }else{
+        handle && handle(result);
+      }
+    });
+  },
+
+  closeWindow : function(){
+    this._sendMessage('close_web');
+  }
+});
+}, {
+    asyncDeps:asyncDeps,
+    map:mix({"./core":_8,"./patch-6.x":_5},globalMap)
+});
+
+define(_7, [_11,_8], function(require, exports, module, __filename, __dirname) {
 var core = require('./core');
 var logincss = require('./login.css.js');
 core = core._mixin({}, core);
@@ -2693,10 +2712,11 @@ core.extend({
 
 module.exports = core;
 }, {
-    map:mix({"./login.css.js":_9,"./core":_6},globalMap)
+    asyncDeps:asyncDeps,
+    map:mix({"./login.css.js":_11,"./core":_8},globalMap)
 });
 
-define(_6, [], function(require, exports, module, __filename, __dirname) {
+define(_8, [], function(require, exports, module, __filename, __dirname) {
 function mixin(to, from) {
   for (var key in from) {
     to[key] = from[key];
@@ -2834,10 +2854,11 @@ if(window.DPApp){
   core = mixin(window.DPApp, core);
 }
 }, {
+    asyncDeps:asyncDeps,
     map:globalMap
 });
 
-define(_7, [], function(require, exports, module, __filename, __dirname) {
+define(_9, [], function(require, exports, module, __filename, __dirname) {
 var queue = module.exports = function(worker){
 	var currentData = null;
 	var currentCallback = null;
@@ -2875,10 +2896,11 @@ var queue = module.exports = function(worker){
 	return q;
 };
 }, {
+    asyncDeps:asyncDeps,
     map:globalMap
 });
 
-define(_8, [], function(require, exports, module, __filename, __dirname) {
+define(_10, [], function(require, exports, module, __filename, __dirname) {
 module.exports = [
   /**
    * Infos
@@ -2903,12 +2925,14 @@ module.exports = [
 ];
 
 }, {
+    asyncDeps:asyncDeps,
     map:globalMap
 });
 
-define(_9, [], function(require, exports, module, __filename, __dirname) {
+define(_11, [], function(require, exports, module, __filename, __dirname) {
 module.exports='.dpapp-login-panel{position: fixed;width: 100%;top: 0;left: 0;background-color: #f0f0f0;height: 100%;padding: 20px;box-sizing: border-box;}.dpapp-login-panel .EasyLogin_row{margin: 0;padding: 5px 5px 5px 10px;overflow: hidden;border: 1px solid #ccc;background-color: #fff;margin-bottom: 10px;}.dpapp-login-panel .EasyLogin_row input{border: none;display: block;width: 120px;float: left;padding: 5px 0;font-size: 14px;height: 14px;}.dpapp-login-panel .EasyLogin_row .EasyLogin_send{text-decoration: none;color: #999;font-size: 14px;border: 1px solid #ccc;padding: 5px;border-radius: 4px;background-color: #fff;float: right;}.dpapp-login-panel .login-btn{border: none;margin: 0;display: block;width: 100%;background-color: #ff8400;height: 40px;margin-bottom: 12px;line-height: 40px;color: #fff;font-size: 18px;text-align: center;border-radius: 5px;}'
 }, {
+    asyncDeps:asyncDeps,
     map:globalMap
 });
 })();_use("dpapp@1.0.3",function(){});
