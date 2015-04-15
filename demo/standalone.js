@@ -1444,8 +1444,8 @@ var _1 = "dpapp-share@~0.1.0";
 var _2 = "dpapp@1.0.3/lib/native-core.js";
 var _3 = "dpapp@1.0.3/lib/decorator.js";
 var _4 = "dpapp@1.0.3/lib/patch-7.1.js";
-var _5 = "dpapp@1.0.3/lib/patch-6.x.js";
-var _6 = "dpapp@1.0.3/lib/patch-7.0.js";
+var _5 = "dpapp@1.0.3/lib/patch-7.0.js";
+var _6 = "dpapp@1.0.3/lib/patch-6.x.js";
 var _7 = "dpapp@1.0.3/lib/web.js";
 var _8 = "dpapp@1.0.3/lib/core.js";
 var _9 = "dpapp@1.0.3/lib/queue.js";
@@ -1527,7 +1527,7 @@ define(_12, [_2,_3,_4,_5,_6,_7], function(require, exports, module, __filename, 
 }, {
     asyncDeps:asyncDeps,
     main:true,
-    map:mix({"./lib/native-core":_2,"./lib/decorator":_3,"./lib/patch-7.1":_4,"./lib/patch-6.x":_5,"./lib/patch-7.0":_6,"./lib/web":_7},globalMap)
+    map:mix({"./lib/native-core":_2,"./lib/decorator":_3,"./lib/patch-7.1":_4,"./lib/patch-7.0":_5,"./lib/patch-6.x":_6,"./lib/web":_7},globalMap)
 });
 
 define(_2, [_8,_9], function(require, exports, module, __filename, __dirname) {
@@ -1823,14 +1823,37 @@ module.exports = function decorateForTrace(target){
     map:mix({"./apilist":_10,"./core":_8},globalMap)
 });
 
-define(_4, [_10,_6], function(require, exports, module, __filename, __dirname) {
+define(_4, [_10,_5,_8], function(require, exports, module, __filename, __dirname) {
 var apis = require('./apilist');
 
 var _events = {};
 var patch7 = require('./patch-7.0');
+var core = require('./core');
+var getUA = (function(){
+  var uastr = navigator.userAgent;
+  var appVersionMatch = uastr.match(/dp\/[\w\.\d]+\/([\d\.]+)/);
+  var appVersion = appVersionMatch && appVersionMatch[1];
+  return function(opt) {
+    var result = {};
+    var success = opt && opt.success;
+    var ua = {
+      platform: "dpapp",
+      appName: "dianping",
+      appVersion: appVersion,
+      osName: core._osUA.name,
+      osVersion: core._osUA.version
+    };
+    success && success(ua);
+    return ua;
+  };
+})();
+
+var ua = getUA();
+
+var is7_1 = core.Semver.lt(ua.appVersion, "7.2.0");
 
 var Patch = module.exports = {
-
+getUA: getUA,
 ready : function(callback) {
   this._send("ready", {
     success: callback
@@ -2069,13 +2092,21 @@ openScheme: function(opts){
   this._send('openScheme', {url: url});
 },
 
-jumpToScheme: function(opt){
+jumpToScheme: is7_1 ? core._notImplemented : function(opt){
   var url = opt.url;
   var extra = opt.extra;
   if(extra){
     url += "?" + this._convertUrlParams(extra);
   }
   this._send('jumpToScheme', {url: url});
+},
+
+store: is7_1 ? core._notImplemented : function(opt){
+  this._send("store", opt);
+},
+
+retrieve: is7_1 ? core._notImplemented : function(opt){
+  this._send("retrieve", opt);
 },
 
 login : function(opts) {
@@ -2119,32 +2150,114 @@ apis.forEach(function(name) {
     }
   }
 });
+}, {
+    asyncDeps:asyncDeps,
+    map:mix({"./apilist":_10,"./patch-7.0":_5,"./core":_8},globalMap)
+});
 
-(function() {
-  var uastr = navigator.userAgent;
-  var appVersionMatch = uastr.match(/dp\/[\w\.\d]+\/([\d\.]+)/);
-  var appVersion = appVersionMatch && appVersionMatch[1];
-
-  Patch.getUA = function(opt) {
-    var result = {};
-    var success = opt && opt.success;
-    var ua = {
+define(_5, [_8,_6], function(require, exports, module, __filename, __dirname) {
+var core = require('./core');
+var patch6 = require('./patch-6.x');
+var Patch = module.exports = core._mixin(patch6, {
+	getUA : function(opt){
+		var result = {};
+  	var success = opt && opt.success;
+  	var appVersion = navigator.userAgent.match(/MApi\s[\w\.]+\s\([\w\.\d]+\s([\d\.]+)/)[1];
+  	var ua = {
       platform: "dpapp",
       appName: "dianping",
       appVersion: appVersion,
       osName: this._osUA.name,
       osVersion: this._osUA.version
     };
-    success && success(ua);
+  	success && success(ua);
     return ua;
-  };
-})();
+	},
+
+  Share: core.Share,
+  pay: function(args){
+    var self = this;
+    var payType = args.payType;
+    var success = args.success;
+    var fail = args.fail;
+    var cx = args.cx;
+
+    function payOrder(data, callback) {
+      DPApp.ajax({
+        url: 'http://api.p.dianping.com/payorder.pay',
+        data: data,
+        keys: ["Content"],
+        success: function(paymsg) {
+          callback(null, paymsg);
+        },
+        fail: function(fail) {
+          callback("fail payorder");
+        }
+      });
+    }
+
+    function getPaymentTool(payType) {
+      var PAY_TYPE_MINIALIPAY = 1;
+      var PAY_TYPE_WEIXINPAY = 7;
+      var PAYMENTTOOL_ALIPAY = "5:1:null#219#0";
+      var PAYMENTTOOL_WEIXINPAY = "11:1:null#217#0";
+      if (payType == PAY_TYPE_WEIXINPAY) {
+        paymentTool = PAYMENTTOOL_WEIXINPAY;
+      } else {
+        paymentTool = PAYMENTTOOL_ALIPAY;
+      }
+      return paymentTool;
+    }
+
+    payOrder({
+      token: args.token,
+      orderid: args.orderId,
+      paymenttool: getPaymentTool(payType),
+      cx: cx
+    }, function(err, paymsg) {
+      if (err) {
+        return fail && fail(err);
+      }
+
+
+      self._sendMessage('pay', {
+        paytype: payType,
+        paycontent: paymsg.Content
+      }, function(data) {
+        if (data.payresult) {
+          success && success(data);
+        } else {
+          fail && fail(data);
+        }
+      });
+    });
+  },
+  uploadImage : function(opts){
+    var success = opts.success;
+    var fail = opts.fail;
+    var handle = opts.handle;
+
+    this._sendMessage("uploadImage", opts, function(result){
+      var status = result.status;
+      if(status == "fail"){
+        fail && fail(result);
+        return;
+      }else{
+        handle && handle(result);
+      }
+    });
+  },
+
+  closeWindow : function(){
+    this._sendMessage('close_web');
+  }
+});
 }, {
     asyncDeps:asyncDeps,
-    map:mix({"./apilist":_10,"./patch-7.0":_6},globalMap)
+    map:mix({"./core":_8,"./patch-6.x":_6},globalMap)
 });
 
-define(_5, [_8], function(require, exports, module, __filename, __dirname) {
+define(_6, [_8], function(require, exports, module, __filename, __dirname) {
 var core = require('./core');
 var NOOP = function() {};
 var cachedEnv = {};
@@ -2357,108 +2470,6 @@ var Patch = module.exports = {
 }, {
     asyncDeps:asyncDeps,
     map:mix({"./core":_8},globalMap)
-});
-
-define(_6, [_8,_5], function(require, exports, module, __filename, __dirname) {
-var core = require('./core');
-var patch6 = require('./patch-6.x');
-var Patch = module.exports = core._mixin(patch6, {
-	getUA : function(opt){
-		var result = {};
-  	var success = opt && opt.success;
-  	var appVersion = navigator.userAgent.match(/MApi\s[\w\.]+\s\([\w\.\d]+\s([\d\.]+)/)[1];
-  	var ua = {
-      platform: "dpapp",
-      appName: "dianping",
-      appVersion: appVersion,
-      osName: this._osUA.name,
-      osVersion: this._osUA.version
-    };
-  	success && success(ua);
-    return ua;
-	},
-
-  Share: core.Share,
-  pay: function(args){
-    var self = this;
-    var payType = args.payType;
-    var success = args.success;
-    var fail = args.fail;
-    var cx = args.cx;
-
-    function payOrder(data, callback) {
-      DPApp.ajax({
-        url: 'http://api.p.dianping.com/payorder.pay',
-        data: data,
-        keys: ["Content"],
-        success: function(paymsg) {
-          callback(null, paymsg);
-        },
-        fail: function(fail) {
-          callback("fail payorder");
-        }
-      });
-    }
-
-    function getPaymentTool(payType) {
-      var PAY_TYPE_MINIALIPAY = 1;
-      var PAY_TYPE_WEIXINPAY = 7;
-      var PAYMENTTOOL_ALIPAY = "5:1:null#219#0";
-      var PAYMENTTOOL_WEIXINPAY = "11:1:null#217#0";
-      if (payType == PAY_TYPE_WEIXINPAY) {
-        paymentTool = PAYMENTTOOL_WEIXINPAY;
-      } else {
-        paymentTool = PAYMENTTOOL_ALIPAY;
-      }
-      return paymentTool;
-    }
-
-    payOrder({
-      token: args.token,
-      orderid: args.orderId,
-      paymenttool: getPaymentTool(payType),
-      cx: cx
-    }, function(err, paymsg) {
-      if (err) {
-        return fail && fail(err);
-      }
-
-
-      self._sendMessage('pay', {
-        paytype: payType,
-        paycontent: paymsg.Content
-      }, function(data) {
-        if (data.payresult) {
-          success && success(data);
-        } else {
-          fail && fail(data);
-        }
-      });
-    });
-  },
-  uploadImage : function(opts){
-    var success = opts.success;
-    var fail = opts.fail;
-    var handle = opts.handle;
-
-    this._sendMessage("uploadImage", opts, function(result){
-      var status = result.status;
-      if(status == "fail"){
-        fail && fail(result);
-        return;
-      }else{
-        handle && handle(result);
-      }
-    });
-  },
-
-  closeWindow : function(){
-    this._sendMessage('close_web');
-  }
-});
-}, {
-    asyncDeps:asyncDeps,
-    map:mix({"./core":_8,"./patch-6.x":_5},globalMap)
 });
 
 define(_7, [_11,_8], function(require, exports, module, __filename, __dirname) {
