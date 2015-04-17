@@ -1567,7 +1567,7 @@ module.exports = [
   /**
    * Infos
    */
-  "getUserInfo", "getCityId", "getLocation", "getContactList", "getCX",
+  "getUA", "getUserInfo", "getCityId", "getLocation", "getContactList", "getCX",
   /**
    * Common
    */
@@ -1841,6 +1841,7 @@ core.extend({
 define(_4, [_2,_10], function(require, exports, module, __filename, __dirname) {
 var apis = require('./apilist');
 var core = require('./core');
+var allowBeforReady = ['getRequestId'];
 
 module.exports = function decorateForTrace(target){
   apis.forEach(function(name){
@@ -1868,6 +1869,7 @@ module.exports = function decorateForTrace(target){
             var err = new Error(errorMessage);
             err.name = "DPAppError";
             console.error("`DPApp." + api + "` call faild");
+            target._trace('throw');
             throw new Error(err);
           }
         }else{
@@ -1892,7 +1894,7 @@ module.exports = function decorateForTrace(target){
         _wrapped_fail(result);
       }
 
-      if(!this._isReady){
+      if(!this._isReady && allowBeforReady.indexOf(api) === -1 && !target._isProduct){
         _wrapped_fail("use `DPApp.ready(fn)` to wrap api calls");
         return;
       }
@@ -1910,18 +1912,19 @@ module.exports = function decorateForTrace(target){
 define(_5, [], function(require, exports, module, __filename, __dirname) {
 var _err = window.onerror;
 var url = "http://114.80.165.63/broker-service/api/js";
-window.onerror = function(err, file, line){
+window.onerror = function(err, file, line, col, error){
   var e = encodeURIComponent;
   var time = Date.now();
   (new Image).src = url
     + "?error=" + e(err)
     + "&v=1"
-    + '&data=' + e(err.stack ? err.stack : "")
+    + '&data=' + e(error.stack ? error.stack : "")
     + "&url=" + e(location.href)
     + "&file=" + e(file)
     + "&line=" + e(line)
+    + "&col=" + e(col)
     + "&timestamp=" + time;
-  _err && _err(err, file, line);
+  _err && _err(err, file, line, col, error);
 }
 }, {
     asyncDeps:asyncDeps,
@@ -2242,7 +2245,11 @@ retrieve: is7_1 ? core._notImplemented : function(opt){
   }
 },
 
-publish: is7_1 ? core._notImplemented : function(opt){
+publish: function(opt){
+  if(is7_1){
+    return this.send("publish", opt);
+  }
+
   var bizname = this._getBizName(opt);
   var CONSTS = ["phoneChanged", "AccountBindChange"];
   if(bizname){
@@ -2892,6 +2899,7 @@ var core = module.exports = {
   _cfg: {
     debug: false
   },
+  _isProduct: !!location.href.match(".dianping.com"),
   _isReady: false,
   config: function(config) {
     for(var key in config){
