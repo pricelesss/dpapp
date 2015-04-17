@@ -1851,6 +1851,7 @@ module.exports = function decorateForTrace(target){
       }
 
       if(!this._isReady){
+        console.error("`DPApp." + api + "` should be called after DPApp.ready");
         _wrapped_fail("use `DPApp.ready(fn)` to wrap api calls");
         return;
       }
@@ -1876,11 +1877,13 @@ window.onerror = function(err, file, line){
   var e = encodeURIComponent;
   var time = Date.now();
   (new Image).src = url
-  	+ "?error=" + e(err)
-  	+ "&file=" + e(file)
-  	+ "&line=" + e(line)
-  	+ "&timestamp=" + time;
-	_err && _err(err, file, line);
+    + "?error=" + e(err)
+    + "&v=1"
+    + "&url=" + e(location.href)
+    + "&file=" + e(file)
+    + "&line=" + e(line)
+    + "&timestamp=" + time;
+  _err && _err(err, file, line);
 }
 }, {
     asyncDeps:asyncDeps,

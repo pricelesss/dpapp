@@ -37,6 +37,20 @@ dpapp模块支持通过Cortex通过CommonJS标准的方式引入，或者通过�
 注：文档可能更新不及时，实际最新版本可以通过 http://registry.cortexjs.org/dpapp/latest 确认
 # 基础方法
 
+## 配置
+
+在开始之前，你可以选择配置DPApp
+```javascript
+  DPApp.config({
+    debug:true,
+    bizname:"your-bizname"
+  })
+```
+
+参数说明：
+debug: 是否开启调试模式。开启后会以alert的方式打印调试信息。默认为关闭。
+bizname: native存储及广播相关api需要该配置
+
 ## 调用协议
 
 ```javascript
@@ -57,9 +71,6 @@ DPApp.ready(function(){
 });
 ```
 
-在开始之前，你可以选择配置DPApp，目前可选配置只有debug一个，表示是否开启调试模式。
-`DPApp.config({debug:true})` 开启后会以alert的方式打印调试信息。默认为关闭。
-
 DPApp默认开启校验，目前的校验规则基于域名，即只有在点评的域名下才可以使用jsbridge，包含 alpha.dp、 51ping.com、 dpfile.com、 dianping.com。可以在测试版的debug控制台中关闭校验。
 
 所有若非特别说明，方法接受一个javascript对象作为参数，其中success，fail分别为成功与失败后的回调。
@@ -73,6 +84,13 @@ DPApp默认开启校验，目前的校验规则基于域名，即只有在点评
 所有方法调用之前，需要使用DPApp.ready确保native已就绪。
 
 支持版本：≥ 6.9.8
+
+## 错误处理
+
+错误处理分几个层级，首先可以在api调用的fail回调中，处理对应的错误。
+也可以配置`DPApp.onerror = handler`来接收未使用fail回调处理的错误。
+如果`DPApp.onerror`未定义，则会抛出`DPAppError`
+所有抛到window上的错误都会被记录到cat平台的js报错收集中
 
 ## 版本比对
 ```javascript
