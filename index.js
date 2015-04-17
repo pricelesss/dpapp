@@ -3,9 +3,8 @@
   var version;
   var userAgent = Host.navigator.userAgent;
   var DPAppNativeCore = require('./lib/native-core');
-  var decorator = require('./lib/decorator');
-  var decorateForTrace = function(target){
-    Host.DPApp = target = decorator(target);
+  var decorate = function(){
+    require('./lib/decorator')(_DPApp);
   };
   require('./lib/errortrace');
   // Require different platform js base on userAgent.
@@ -23,11 +22,11 @@
 
   if (DPAppNativeCore._uaVersion == "7.1.x") {
     _DPApp = DPAppNativeCore.extend(require('./lib/patch-7.1'));
-    decorateForTrace(_DPApp);
+    decorate();
   } else if(DPAppNativeCore._uaVersion == "7.0.x"){
     // 目前有修改UA，而api尚未对齐的仅7.0版本
     _DPApp = DPAppNativeCore.extend(require('./lib/patch-7.0'));
-    decorateForTrace(_DPApp);
+    decorate();
   } else{
     var patch6 = require('./lib/patch-6.x');
     var web = require('./lib/web');
@@ -35,12 +34,16 @@
     _DPApp = DPAppNativeCore.extend(patch6);
     _DPApp._patch6Ready = _DPApp.ready;
     _DPApp.ready = function(callback){
+      if(DPApp._isReady){
+        return callback();
+      }
       var cfg = DPApp._cfg;
       var timeout = setTimeout(function(){
         _DPApp._bindDOMReady(function(){
-          web._cfg = cfg;
-          web._isReady = DPApp._isReady;
-          decorateForTrace(web);
+          for(var k in web){
+            _DPApp[k] = web[k]
+          }
+          decorate();
           callback();
         });
       }, 50);
@@ -48,9 +51,9 @@
         clearTimeout(timeout);
         callback();
       });
-      decorateForTrace(_DPApp);
+      decorate();
     }
-    decorateForTrace(_DPApp);
+    decorate();
   }
 
   _DPApp.getQuery = getQuery;

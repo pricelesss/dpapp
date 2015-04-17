@@ -1480,9 +1480,8 @@ define(_13, [_2,_3,_4,_5,_6,_7,_8], function(require, exports, module, __filenam
   var version;
   var userAgent = Host.navigator.userAgent;
   var DPAppNativeCore = require('./lib/native-core');
-  var decorator = require('./lib/decorator');
-  var decorateForTrace = function(target){
-    window.DPApp = decorator(target);
+  var decorate = function(){
+    require('./lib/decorator')(_DPApp);
   };
   require('./lib/errortrace');
   // Require different platform js base on userAgent.
@@ -1499,38 +1498,42 @@ define(_13, [_2,_3,_4,_5,_6,_7,_8], function(require, exports, module, __filenam
   }
 
   if (DPAppNativeCore._uaVersion == "7.1.x") {
-    DPApp = DPAppNativeCore.extend(require('./lib/patch-7.1'));
-    decorateForTrace(DPApp);
+    _DPApp = DPAppNativeCore.extend(require('./lib/patch-7.1'));
+    decorate();
   } else if(DPAppNativeCore._uaVersion == "7.0.x"){
     // 目前有修改UA，而api尚未对齐的仅7.0版本
-    DPApp = DPAppNativeCore.extend(require('./lib/patch-7.0'));
-    decorateForTrace(DPApp);
+    _DPApp = DPAppNativeCore.extend(require('./lib/patch-7.0'));
+    decorate();
   } else{
     var patch6 = require('./lib/patch-6.x');
     var web = require('./lib/web');
     // 默认认为6.x，当接口调用失败，认为是web
-    DPApp = DPAppNativeCore.extend(patch6);
-    DPApp._patch6Ready = DPApp.ready;
-    DPApp.ready = function(callback){
+    _DPApp = DPAppNativeCore.extend(patch6);
+    _DPApp._patch6Ready = _DPApp.ready;
+    _DPApp.ready = function(callback){
+      if(DPApp._isReady){
+        return callback();
+      }
       var cfg = DPApp._cfg;
       var timeout = setTimeout(function(){
-        DPApp._bindDOMReady(function(){
-          web._cfg = cfg;
-          web._isReady = DPApp._isReady;
-          decorateForTrace(web);
+        _DPApp._bindDOMReady(function(){
+          for(var k in web){
+            _DPApp[k] = web[k]
+          }
+          decorate();
           callback();
         });
       }, 50);
-      DPApp._patch6Ready(function(){
+      _DPApp._patch6Ready(function(){
         clearTimeout(timeout);
         callback();
       });
-      decorateForTrace(DPApp);
+      decorate();
     }
-    decorateForTrace(DPApp);
+    decorate();
   }
 
-  DPApp.getQuery = getQuery;
+  _DPApp.getQuery = getQuery;
 
 
   // Export DPApp object, if support AMD, CMD, CommonJS.
@@ -1541,7 +1544,7 @@ define(_13, [_2,_3,_4,_5,_6,_7,_8], function(require, exports, module, __filenam
   // Export DPApp object to Host
   if (typeof Host !== 'undefined') {
     if(Host.DPApp){
-      DPApp._mixin(Host.DPApp, _DPApp);
+      _DPApp._mixin(Host.DPApp, _DPApp);
     }else{
       Host.DPApp = _DPApp;
     }
@@ -1812,7 +1815,6 @@ module.exports = function decorateForTrace(target){
     }
   });
 
-
   apis.forEach(function(api){
     var _origin = target[api];
     if(target[api] && target[api]._decorated){
@@ -1867,8 +1869,6 @@ module.exports = function decorateForTrace(target){
       target[api]._notReady = true;
     }
   });
-
-  return target;
 }
 }, {
     asyncDeps:asyncDeps,
@@ -2588,13 +2588,12 @@ var Patch = module.exports = {
 define(_8, [_12,_9], function(require, exports, module, __filename, __dirname) {
 var core = require('./core');
 var logincss = require('./login.css.js');
-core = core._mixin({}, core);
-
+var web = {};
 /**
  * Common
  * 基础功能，所有app都会用到
  */
- core.extend({
+ core._mixin(web, {
   getUA: function(opt){
     var success = opt && opt.success;
     var ua = {
@@ -2675,7 +2674,7 @@ core = core._mixin({}, core);
 /**
  * Infos
  */
-core.extend({
+core._mixin(web, {
   getLocation: function(opts) {
     var success = opts.success;
     var fail = opts.fail;
@@ -2700,7 +2699,7 @@ core.extend({
 /**
  * Funcs
  */
-core.extend({
+core._mixin(web, {
   pay: function(opts) {
     // 找文东
   },
@@ -2778,7 +2777,7 @@ core.extend({
 /**
  * UI
  */
-core.extend({
+core._mixin(web, {
   setTitle: function(opts) {
     var title = opts.title;
     if(title){
@@ -2791,8 +2790,7 @@ core.extend({
 /**
  * Broadcast
  */
-var _events = {};
-core.extend({
+var _events = {};core._mixin(web, {
   subscribe: function(opts) {
     var name = opts.action;
     var success = opts.success;
@@ -2836,6 +2834,7 @@ core.extend({
     if(!opts.action){return;}
     var name = opts.action;
     var data = opts.data;
+    var success = opts.success;
     var funcs = _events[name];
     funcs && funcs.forEach(function(func){
       func(data);
@@ -2844,7 +2843,7 @@ core.extend({
   }
 });
 
-module.exports = core;
+module.exports = web;
 }, {
     asyncDeps:asyncDeps,
     map:mix({"./login.css.js":_12,"./core":_9},globalMap)
