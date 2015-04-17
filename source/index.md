@@ -538,6 +538,8 @@ DPApp.publish({
 为了避免命名冲突，使用前需要先使用DPApp.config({bizname:"your-biz-name"});进行配置
 
 发布的事件名为 your-biz-name:myMessage 这样。
+预留的事件名之前不会加上bizname
+预留的事件名目前有：phoneChanged
 
 在native端android
 
