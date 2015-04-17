@@ -1513,6 +1513,7 @@ define(_13, [_2,_3,_4,_5,_6,_7,_8], function(require, exports, module, __filenam
       var timeout = setTimeout(function(){
         DPApp._bindDOMReady(function(){
           web._cfg = cfg;
+          web._isReady = DPApp._isReady;
           decorateForTrace(web);
           callback();
         });

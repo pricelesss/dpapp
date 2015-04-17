@@ -36,6 +36,7 @@
       var timeout = setTimeout(function(){
         DPApp._bindDOMReady(function(){
           web._cfg = cfg;
+          web._isReady = DPApp._isReady;
           decorateForTrace(web);
           callback();
         });
