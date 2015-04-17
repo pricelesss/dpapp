@@ -334,12 +334,6 @@ window.onerror = function(e,f,l){
     login: defaultConfig
   }
 
-  DPApp.publish({
-    action:"myaction",
-    data:"data",
-    success: success,
-    fail: fail
-  });
   var isDebug = DPApp.getQuery().debug == "true";
   DPApp.config({
     logFact: 1,
@@ -384,6 +378,13 @@ window.onerror = function(e,f,l){
         }
       }
     })();
+
+    DPApp.publish({
+      action:"myaction",
+      data:"data",
+      success: success,
+      fail: fail
+    });
 
     var ua = DPApp.getUA();
     baseInfos.innerHTML = [

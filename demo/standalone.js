@@ -1824,7 +1824,8 @@ module.exports = function decorateForTrace(target){
           if(target.onerror){
             target.onerror(result);
           }else{
-            var err = new Error(result);
+            var errorMessage = result.errMsg ? result.errMsg : JSON.stringify(result);
+            var err = new Error(errorMessage);
             err.name = "DPAppError";
             throw new Error(err);
           }
@@ -1879,6 +1880,7 @@ window.onerror = function(err, file, line){
   (new Image).src = url
     + "?error=" + e(err)
     + "&v=1"
+    + '&data=' + e(err.stack ? err.stack : "")
     + "&url=" + e(location.href)
     + "&file=" + e(file)
     + "&line=" + e(line)
@@ -2206,7 +2208,7 @@ retrieve: is7_1 ? core._notImplemented : function(opt){
 
 publish: is7_1 ? core._notImplemented : function(opt){
   var bizname = this._getBizName(opt);
-  var CONSTS = ["phoneChanged"];
+  var CONSTS = ["phoneChanged", "AccountBindChange"];
   if(bizname){
     if(CONSTS.indexOf(opt.action) == -1){
       opt.action = bizname + ":" + opt.action;
