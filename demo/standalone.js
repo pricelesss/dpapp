@@ -1421,7 +1421,7 @@ neuron.config({
   "graph": [
     {
       "0": [
-        "1.0.3",
+        "1.1.0",
         {
           "dpapp-share@~0.1.0": 1,
           "easy-login@~0.1.3": 2
@@ -1434,12 +1434,12 @@ neuron.config({
         "0.1.3"
       ],
       "_": {
-        "dpapp@1.0.3": 0
+        "dpapp@1.1.0": 0
       }
     },
     {
       "name": "dpapp",
-      "version": "1.0.3",
+      "version": "1.1.0",
       "asyncDependencies": {
         "dpapp-share": {
           "from": "dpapp-share@~0.1.0",
@@ -1459,18 +1459,18 @@ neuron.config({
 function mix(a,b){for(var k in b){a[k]=b[k];}return a;}
 var _0 = "easy-login@~0.1.3";
 var _1 = "dpapp-share@~0.1.0";
-var _2 = "dpapp@1.0.3/lib/native-core.js";
-var _3 = "dpapp@1.0.3/lib/decorator.js";
-var _4 = "dpapp@1.0.3/lib/errortrace.js";
-var _5 = "dpapp@1.0.3/lib/patch-7.1.js";
-var _6 = "dpapp@1.0.3/lib/patch-7.0.js";
-var _7 = "dpapp@1.0.3/lib/patch-6.x.js";
-var _8 = "dpapp@1.0.3/lib/web.js";
-var _9 = "dpapp@1.0.3/lib/core.js";
-var _10 = "dpapp@1.0.3/lib/queue.js";
-var _11 = "dpapp@1.0.3/lib/apilist.js";
-var _12 = "dpapp@1.0.3/lib/login.css.js";
-var _13 = "dpapp@1.0.3/index.js";
+var _2 = "dpapp@1.1.0/lib/native-core.js";
+var _3 = "dpapp@1.1.0/lib/decorator.js";
+var _4 = "dpapp@1.1.0/lib/errortrace.js";
+var _5 = "dpapp@1.1.0/lib/patch-7.1.js";
+var _6 = "dpapp@1.1.0/lib/patch-7.0.js";
+var _7 = "dpapp@1.1.0/lib/patch-6.x.js";
+var _8 = "dpapp@1.1.0/lib/web.js";
+var _9 = "dpapp@1.1.0/lib/core.js";
+var _10 = "dpapp@1.1.0/lib/queue.js";
+var _11 = "dpapp@1.1.0/lib/apilist.js";
+var _12 = "dpapp@1.1.0/lib/login.css.js";
+var _13 = "dpapp@1.1.0/index.js";
 var asyncDeps = [_0,_1];
 var asyncDepsToMix = {"easy-login":_0,"dpapp-share":_1};
 var globalMap = asyncDepsToMix;
@@ -2170,6 +2170,7 @@ jumpToScheme: is7_1 ? core._notImplemented : function(opt){
     delete opt.extra;
     opt.url = url;
   }
+  opt.toHome = !!opt.toHome ? 1 : 0;
   this._send('jumpToScheme', opt);
 },
 
@@ -2202,8 +2203,11 @@ retrieve: is7_1 ? core._notImplemented : function(opt){
 
 publish: is7_1 ? core._notImplemented : function(opt){
   var bizname = this._getBizName(opt);
+  var CONSTS = ["phoneChanged"];
   if(bizname){
-    opt.action = bizname + ":" + opt.action;
+    if(CONSTS.indexOf(opt.action) == -1){
+      opt.action = bizname + ":" + opt.action;
+    }
     this._send("publish", opt);
   }
 },
@@ -3067,4 +3071,4 @@ module.exports='.dpapp-login-panel{position: fixed;width: 100%;top: 0;left: 0;ba
     asyncDeps:asyncDeps,
     map:globalMap
 });
-})();_use("dpapp@1.0.3",function(){});
+})();_use("dpapp@1.1.0",function(){});
