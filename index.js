@@ -35,8 +35,12 @@
     _DPApp = DPAppNativeCore.extend(patch6);
     _DPApp._patch6Ready = _DPApp.ready;
     _DPApp.ready = function(callback){
+      var _callback = function(){
+        _DPApp._trace('ready');
+        callback();
+      }
       if(DPApp._isReady){
-        return callback();
+        return _callback();
       }
       var timeout = setTimeout(function(){
         _DPApp._bindDOMReady(function(){
@@ -48,20 +52,18 @@
             _DPApp[api] = web[api];
           });
           decorate();
-          callback();
+          _callback();
         });
       }, 50);
       _DPApp._patch6Ready(function(){
         clearTimeout(timeout);
         decorate();
-        callback();
+        _callback();
       });
     }
   }
 
   _DPApp.getQuery = getQuery;
-
-
   // Export DPApp object, if support AMD, CMD, CommonJS.
   if (typeof module !== 'undefined') {
     module.exports = _DPApp;
