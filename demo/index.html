@@ -150,9 +150,33 @@ window.onerror = function(e,f,l){
     getRequestId: defaultConfig,
     getCX: defaultConfig,
     getUA: defaultConfig,
-    store: defaultConfig,
-    retrieve: defaultConfig,
-    jumpToScheme: defaultConfig,
+    store: {
+      key:"key",
+      value:"store-value",
+      success: success,
+      fail: fail
+    },
+    retrieve: {
+      key:"key",
+      success: success,
+      fail: fail
+    },
+    openScheme:{
+      url: "dianping://websearch",
+      extra: {
+        "searchurl": "dianping://searchshoplist",
+        "hotsuggesturl":"http://m.api.dianping.com/advancedsuggest.bin?cityid=1&mylat=31.215870&mylng=121.419100&myacc=0.000000",
+        "keywordurl":"http://m.api.dianping.com/advancedsuggest.bin?cityid=1&mylat=31.215870&mylng=121.419100&myacc=0.000000"
+      }
+    },
+    jumpToScheme: {
+      url: "dianping://websearch",
+      extra: {
+        "searchurl": "dianping://searchshoplist",
+        "hotsuggesturl":"http://m.api.dianping.com/advancedsuggest.bin?cityid=1&mylat=31.215870&mylng=121.419100&myacc=0.000000",
+        "keywordurl":"http://m.api.dianping.com/advancedsuggest.bin?cityid=1&mylat=31.215870&mylng=121.419100&myacc=0.000000"
+      }
+    },
     ajax: {
       url: "http://m.api.dianping.com/indextabicon.bin?cityid=1&version=7.0.1",
       method: "get",
@@ -310,9 +334,16 @@ window.onerror = function(e,f,l){
     login: defaultConfig
   }
 
+  DPApp.publish({
+    action:"myaction",
+    data:"data",
+    success: success,
+    fail: fail
+  });
   var isDebug = DPApp.getQuery().debug == "true";
   DPApp.config({
     logFact: 1,
+    bizname: "demo",
     debug: isDebug
   });
 

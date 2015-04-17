@@ -4,7 +4,7 @@
   var userAgent = Host.navigator.userAgent;
   var DPAppNativeCore = require('./lib/native-core');
   var decorateForTrace = require('./lib/decorator');
-
+  require('./lib/errortrace');
   // Require different platform js base on userAgent.
   // Native part will inject the userAgent with string `DPApp`.
 
@@ -36,7 +36,7 @@
       var timeout = setTimeout(function(){
         DPApp._bindDOMReady(function(){
           web._cfg = cfg;
-          window.DPApp = decorateForTrace(web);
+          decorateForTrace(web);
           callback();
         });
       }, 50);
@@ -46,6 +46,7 @@
       });
       decorateForTrace(DPApp);
     }
+    decorateForTrace(DPApp);
   }
 
   DPApp.getQuery = getQuery;

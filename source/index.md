@@ -281,6 +281,7 @@ DPApp.login({
     "hotsuggesturl":"http://m.api.dianping.com/advancedsuggest.bin?cityid=1&mylat=31.215870&mylng=121.419100&myacc=0.000000",
     "keywordurl":"http://m.api.dianping.com/advancedsuggest.bin?cityid=1&mylat=31.215870&mylng=121.419100&myacc=0.000000"
   },
+  toHome: true, // 跳转后是否pop完所有view堆栈，默认为false，表示只pop出当前webview
   success: function(){
     // 跳转成功
   }
@@ -304,6 +305,9 @@ DPApp.store({
 ```
 
 向native本地空间存值
+
+为了避免命名冲突，使用前需要先使用DPApp.config({bizname:"your-biz-name"});进行配置
+
 支持版本：≥ 7.2.0
 
 ## retrieve
@@ -318,6 +322,9 @@ DPApp.retrieve({
 ```
 
 向native本地空间取值
+
+为了避免命名冲突，使用前需要先使用DPApp.config({bizname:"your-biz-name"});进行配置
+
 支持版本：≥ 7.2.0
 
 ## Ajax请求
@@ -528,6 +535,22 @@ DPApp.publish({
 所有方法实际行为都在web一端发生。
 与传统的javascript sub/pub模式无异。
 
+为了避免命名冲突，使用前需要先使用DPApp.config({bizname:"your-biz-name"});进行配置
+
+发布的事件名为 your-biz-name:myMessage 这样。
+
+在native端android
+
+```java
+IntentFilter intentFilter = new IntentFilter("your-biz-name:myMessage");
+registerReceiver(yourBroadCaseReceiver, intentFilter);
+```
+
+ios
+
+```objective-c
+
+```
 # UI界面
 
 ## 设置标题

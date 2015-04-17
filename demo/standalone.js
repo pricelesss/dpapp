@@ -1418,51 +1418,70 @@ var mods = neuron.mods = {};
 // Use `this`, and never cares about the environment.
 })(this);
 neuron.config({
-  "graph": {
-    "0": [
-      "1.0.3",
-      {
-        "dpapp-share@~0.1.0": 1,
-        "easy-login@~0.1.3": 2
+  "graph": [
+    {
+      "0": [
+        "1.0.3",
+        {
+          "dpapp-share@~0.1.0": 1,
+          "easy-login@~0.1.3": 2
+        }
+      ],
+      "1": [
+        "0.1.0"
+      ],
+      "2": [
+        "0.1.3"
+      ],
+      "_": {
+        "dpapp@1.0.3": 0
       }
-    ],
-    "1": [
-      "0.1.0"
-    ],
-    "2": [
-      "0.1.3"
-    ],
-    "_": {
-      "dpapp@1.0.3": 0,
-      "dpapp@*": 0
+    },
+    {
+      "name": "dpapp",
+      "version": "1.0.3",
+      "asyncDependencies": {
+        "dpapp-share": {
+          "from": "dpapp-share@~0.1.0",
+          "version": "0.1.0",
+          "__id": 1
+        },
+        "easy-login": {
+          "from": "easy-login@~0.1.3",
+          "version": "0.1.3",
+          "__id": 2
+        }
+      },
+      "__id": 0
     }
-  }
+  ]
 });neuron.config({path:"http://i{n}.dpfile.com/mod/"});(function(){
 function mix(a,b){for(var k in b){a[k]=b[k];}return a;}
 var _0 = "easy-login@~0.1.3";
 var _1 = "dpapp-share@~0.1.0";
 var _2 = "dpapp@1.0.3/lib/native-core.js";
 var _3 = "dpapp@1.0.3/lib/decorator.js";
-var _4 = "dpapp@1.0.3/lib/patch-7.1.js";
-var _5 = "dpapp@1.0.3/lib/patch-7.0.js";
-var _6 = "dpapp@1.0.3/lib/patch-6.x.js";
-var _7 = "dpapp@1.0.3/lib/web.js";
-var _8 = "dpapp@1.0.3/lib/core.js";
-var _9 = "dpapp@1.0.3/lib/queue.js";
-var _10 = "dpapp@1.0.3/lib/apilist.js";
-var _11 = "dpapp@1.0.3/lib/login.css.js";
-var _12 = "dpapp@1.0.3/index.js";
+var _4 = "dpapp@1.0.3/lib/errortrace.js";
+var _5 = "dpapp@1.0.3/lib/patch-7.1.js";
+var _6 = "dpapp@1.0.3/lib/patch-7.0.js";
+var _7 = "dpapp@1.0.3/lib/patch-6.x.js";
+var _8 = "dpapp@1.0.3/lib/web.js";
+var _9 = "dpapp@1.0.3/lib/core.js";
+var _10 = "dpapp@1.0.3/lib/queue.js";
+var _11 = "dpapp@1.0.3/lib/apilist.js";
+var _12 = "dpapp@1.0.3/lib/login.css.js";
+var _13 = "dpapp@1.0.3/index.js";
 var asyncDeps = [_0,_1];
 var asyncDepsToMix = {"easy-login":_0,"dpapp-share":_1};
 var globalMap = asyncDepsToMix;
-define(_12, [_2,_3,_4,_5,_6,_7], function(require, exports, module, __filename, __dirname) {
+define(_13, [_2,_3,_4,_5,_6,_7,_8], function(require, exports, module, __filename, __dirname) {
 (function (Host) {
   var DPApp;
   var version;
   var userAgent = Host.navigator.userAgent;
   var DPAppNativeCore = require('./lib/native-core');
   var decorateForTrace = require('./lib/decorator');
-
+  require('./lib/errortrace');
   // Require different platform js base on userAgent.
   // Native part will inject the userAgent with string `DPApp`.
 
@@ -1494,7 +1513,7 @@ define(_12, [_2,_3,_4,_5,_6,_7], function(require, exports, module, __filename, 
       var timeout = setTimeout(function(){
         DPApp._bindDOMReady(function(){
           web._cfg = cfg;
-          window.DPApp = decorateForTrace(web);
+          decorateForTrace(web);
           callback();
         });
       }, 50);
@@ -1504,6 +1523,7 @@ define(_12, [_2,_3,_4,_5,_6,_7], function(require, exports, module, __filename, 
       });
       decorateForTrace(DPApp);
     }
+    decorateForTrace(DPApp);
   }
 
   DPApp.getQuery = getQuery;
@@ -1527,10 +1547,10 @@ define(_12, [_2,_3,_4,_5,_6,_7], function(require, exports, module, __filename, 
 }, {
     asyncDeps:asyncDeps,
     main:true,
-    map:mix({"./lib/native-core":_2,"./lib/decorator":_3,"./lib/patch-7.1":_4,"./lib/patch-7.0":_5,"./lib/patch-6.x":_6,"./lib/web":_7},globalMap)
+    map:mix({"./lib/native-core":_2,"./lib/decorator":_3,"./lib/errortrace":_4,"./lib/patch-7.1":_5,"./lib/patch-7.0":_6,"./lib/patch-6.x":_7,"./lib/web":_8},globalMap)
 });
 
-define(_2, [_8,_9], function(require, exports, module, __filename, __dirname) {
+define(_2, [_9,_10], function(require, exports, module, __filename, __dirname) {
 var core = module.exports = require('./core');
 /**
  * count from 1
@@ -1774,15 +1794,14 @@ core.extend({
 });
 }, {
     asyncDeps:asyncDeps,
-    map:mix({"./core":_8,"./queue":_9},globalMap)
+    map:mix({"./core":_9,"./queue":_10},globalMap)
 });
 
-define(_3, [_10,_8], function(require, exports, module, __filename, __dirname) {
+define(_3, [_11,_9], function(require, exports, module, __filename, __dirname) {
 var apis = require('./apilist');
 var core = require('./core');
 
 module.exports = function decorateForTrace(target){
-
   apis.forEach(function(name){
     if(!target[name]){
       target[name] = core._notImplemented;
@@ -1797,16 +1816,43 @@ module.exports = function decorateForTrace(target){
     }
     target[api] = function(args){
       var _args = core._mixin({}, args);
-      DPApp._trace(api + "_call");
+      target._trace(api + "_call");
       var _success = _args.success;
       var _fail = _args.fail;
+      var _wrapped_fail = function(result){
+        if(!_fail){
+          if(target.onerror){
+            target.onerror(result);
+          }else{
+            var err = new Error(result);
+            err.name = "DPAppError";
+            throw new Error(err);
+          }
+        }else{
+          _fail(result);
+        }
+      }
+      var zero = +new Date;
       _args.success = function(result){
-        target._trace(api + "_success");
-        _success(result);
+        target._trace(api + "_success", {
+          time: +new Date - zero,
+        });
+        _success && _success(result);
       };
       _args.fail = function(result){
-        target._trace(api + "_fail");
-        _fail(result);
+        var note = {};
+        note.args = args;
+        note.result = result;
+        target._trace(api + "_fail", {
+          time: +new Date - zero,
+          note: JSON.stringify(note)
+        });
+        _wrapped_fail(result);
+      }
+
+      if(!this._isReady){
+        _wrapped_fail("use `DPApp.ready(fn)` to wrap api calls");
+        return;
       }
       _origin.call(target, _args);
     }
@@ -1816,14 +1862,32 @@ module.exports = function decorateForTrace(target){
     }
   });
 
-  return target;
+  window.DPApp = target;
 }
 }, {
     asyncDeps:asyncDeps,
-    map:mix({"./apilist":_10,"./core":_8},globalMap)
+    map:mix({"./apilist":_11,"./core":_9},globalMap)
 });
 
-define(_4, [_10,_5,_8], function(require, exports, module, __filename, __dirname) {
+define(_4, [], function(require, exports, module, __filename, __dirname) {
+var _err = window.onerror;
+var url = "http://114.80.165.63/broker-service/api/js";
+window.onerror = function(err, file, line){
+  var e = encodeURIComponent;
+  var time = Date.now();
+  (new Image).src = url
+  	+ "?error=" + e(err)
+  	+ "&file=" + e(file)
+  	+ "&line=" + e(line)
+  	+ "&timestamp=" + time;
+	_err && _err(err, file, line);
+}
+}, {
+    asyncDeps:asyncDeps,
+    map:globalMap
+});
+
+define(_5, [_11,_6,_9], function(require, exports, module, __filename, __dirname) {
 var apis = require('./apilist');
 
 var _events = {};
@@ -1855,8 +1919,12 @@ var is7_1 = core.Semver.lt(ua.appVersion, "7.2.0");
 var Patch = module.exports = {
 getUA: getUA,
 ready : function(callback) {
+  var self = this;
   this._send("ready", {
-    success: callback
+    success: function(){
+      self._isReady = true;
+      callback();
+    }
   });
 },
 _iOSNetworkType: function (result) {
@@ -1961,8 +2029,8 @@ _androidNetworkType: function (result) {
     return "none";
   }
 },
-getNetworkType : function(opts) {
-  var _success = opts.success;
+getNetworkType : function(opt) {
+  var _success = opt.success;
 
   this._send("getNetworkType", {
     success: function(result) {
@@ -1985,13 +2053,13 @@ getNetworkType : function(opts) {
         }
       });
     },
-    fail: opts.fail
+    fail: opt.fail
   });
 },
 
-share : function(opts) {
-  opts.feed = this._parseFeed(opts.feed);
-  this._send("share", opts);
+share : function(opt) {
+  opt.feed = this._parseFeed(opt.feed);
+  this._send("share", opt);
 },
 
 initShare: function(opt){
@@ -2013,18 +2081,18 @@ initShare: function(opt){
   });
 },
 
-subscribe : function(opts) {
-  var name = opts.action;
-  var success = opts.success;
-  var handle = opts.handle;
+subscribe : function(opt) {
+  var name = opt.action;
+  var success = opt.success;
+  var handle = opt.handle;
 
   if (_events[name]) {
-    opts.success && opts.success();
+    opt.success && opt.success();
     _events[name].push(handle);
   } else {
     this._send("subscribe", {
       action: name,
-      success: opts.success,
+      success: opt.success,
       handle: function() {
         _events[name].forEach(function(func) {
           func();
@@ -2035,10 +2103,10 @@ subscribe : function(opts) {
   }
 },
 
-unsubscribe : function(opts) {
-  var name = opts.action;
-  var success = opts.success;
-  var handle = opts.handle;
+unsubscribe : function(opt) {
+  var name = opt.action;
+  var success = opt.success;
+  var handle = opt.handle;
 
   var index = _events[name] ? _events[name].indexOf(handle) : -1;
   if (index != -1) {
@@ -2067,12 +2135,12 @@ ajax : function(args) {
 },
 
 
-uploadImage : function(opts){
-  var success = opts.success;
-  var fail = opts.fail;
-  var handle = opts.handle;
+uploadImage : function(opt){
+  var success = opt.success;
+  var fail = opt.fail;
+  var handle = opt.handle;
 
-  this._sendMessage("uploadImage", opts, function(result){
+  this._sendMessage("uploadImage", opt, function(result){
     var status = result.status;
     if(status == "fail"){
       fail && fail(result);
@@ -2083,13 +2151,15 @@ uploadImage : function(opts){
   });
 },
 
-openScheme: function(opts){
+openScheme: function(opt){
   var url = opt.url;
   var extra = opt.extra;
   if(extra){
     url += "?" + this._convertUrlParams(extra);
+    delete opt.extra;
+    opt.url = url;
   }
-  this._send('openScheme', {url: url});
+  this._send('openScheme', opt);
 },
 
 jumpToScheme: is7_1 ? core._notImplemented : function(opt){
@@ -2097,19 +2167,48 @@ jumpToScheme: is7_1 ? core._notImplemented : function(opt){
   var extra = opt.extra;
   if(extra){
     url += "?" + this._convertUrlParams(extra);
+    delete opt.extra;
+    opt.url = url;
   }
-  this._send('jumpToScheme', {url: url});
+  this._send('jumpToScheme', opt);
+},
+
+_getBizName: function(opt, callback){
+  var fail = opt.fail;
+  var bizname = this._cfg.bizname;
+  if(!bizname){
+    fail && fail("use `DPApp.config({bizname:'<your-bizname>'})` first");
+    return false;
+  }else{
+    return bizname;
+  }
 },
 
 store: is7_1 ? core._notImplemented : function(opt){
-  this._send("store", opt);
+  var bizname = this._getBizName(opt);
+  if(bizname){
+    opt.key = bizname + ":" + opt.key;
+    this._send("store", opt);
+  }
 },
 
 retrieve: is7_1 ? core._notImplemented : function(opt){
-  this._send("retrieve", opt);
+  var bizname = this._getBizName(opt);
+  if(bizname){
+    opt.key = bizname + ":" + opt.key;
+    this._send("store", opt);
+  }
 },
 
-login : function(opts) {
+publish: is7_1 ? core._notImplemented : function(opt){
+  var bizname = this._getBizName(opt);
+  if(bizname){
+    opt.action = bizname + ":" + opt.action;
+    this._send("publish", opt);
+  }
+},
+
+login : function(opt) {
   var self = this;
   function getUser(callback) {
     self.getUserInfo({
@@ -2118,23 +2217,23 @@ login : function(opts) {
   }
   getUser(function(result) {
     if (result.token) {
-      opts.success && opts.success(result);
+      opt.success && opt.success(result);
     } else {
       var handler = function() {
         getUser(function(result) {
-          opts.success && opts.success(result);
+          opt.success && opt.success(result);
         });
         this.unsubscribe({
           "action": "loginSuccess",
           handle: handler
         });
       };
-      this.subscribe({
+      self.subscribe({
         action: "loginSuccess",
         handle: handler
       });
 
-      this.openScheme({
+      self.openScheme({
         url: "dianping://login"
       });
     }
@@ -2152,10 +2251,10 @@ apis.forEach(function(name) {
 });
 }, {
     asyncDeps:asyncDeps,
-    map:mix({"./apilist":_10,"./patch-7.0":_5,"./core":_8},globalMap)
+    map:mix({"./apilist":_11,"./patch-7.0":_6,"./core":_9},globalMap)
 });
 
-define(_5, [_8,_6], function(require, exports, module, __filename, __dirname) {
+define(_6, [_9,_7], function(require, exports, module, __filename, __dirname) {
 var core = require('./core');
 var patch6 = require('./patch-6.x');
 var Patch = module.exports = core._mixin(patch6, {
@@ -2254,10 +2353,10 @@ var Patch = module.exports = core._mixin(patch6, {
 });
 }, {
     asyncDeps:asyncDeps,
-    map:mix({"./core":_8,"./patch-6.x":_6},globalMap)
+    map:mix({"./core":_9,"./patch-6.x":_7},globalMap)
 });
 
-define(_6, [_8], function(require, exports, module, __filename, __dirname) {
+define(_7, [_9], function(require, exports, module, __filename, __dirname) {
 var core = require('./core');
 var NOOP = function() {};
 var cachedEnv = {};
@@ -2442,6 +2541,7 @@ var Patch = module.exports = {
   ready : function(callback){
     var self = this;
     this._getEnv(function(){
+      self._isReady = true;
       callback.call(self);
     });
   },
@@ -2469,10 +2569,10 @@ var Patch = module.exports = {
 });
 }, {
     asyncDeps:asyncDeps,
-    map:mix({"./core":_8},globalMap)
+    map:mix({"./core":_9},globalMap)
 });
 
-define(_7, [_11,_8], function(require, exports, module, __filename, __dirname) {
+define(_8, [_12,_9], function(require, exports, module, __filename, __dirname) {
 var core = require('./core');
 var logincss = require('./login.css.js');
 core = core._mixin({}, core);
@@ -2681,11 +2781,14 @@ core.extend({
 var _events = {};
 core.extend({
   subscribe: function(opts) {
-    if(!opts.action){return;}
     var name = opts.action;
     var success = opts.success;
     var handle = opts.handle;
-    if(!handle){return;}
+    var fail = opts.fail;
+    if(!name || !handle){
+      fail && fail("missing params");
+      return
+    }
     if(_events[name]){
       _events[name].push(handle);
     }else{
@@ -2694,13 +2797,20 @@ core.extend({
     success && success();
   },
   unsubscribe: function(opts){
-    if(!opts.action){return;}
     var name = opts.action;
     var success = opts.success;
     var handle = opts.handle;
+    var fail = opts.fail;
+    if(!name){
+      fail && fail("Missing params");
+      return
+    }
     var events = _events;
     var funcs = events[name];
-    if(!funcs){return}
+    if(!funcs){
+      success && success();
+      return
+    }
     if(handle){
       var index = funcs.indexOf(handle);
       events[name] = funcs.splice(index,1);
@@ -2724,10 +2834,10 @@ core.extend({
 module.exports = core;
 }, {
     asyncDeps:asyncDeps,
-    map:mix({"./login.css.js":_11,"./core":_8},globalMap)
+    map:mix({"./login.css.js":_12,"./core":_9},globalMap)
 });
 
-define(_8, [], function(require, exports, module, __filename, __dirname) {
+define(_9, [], function(require, exports, module, __filename, __dirname) {
 function mixin(to, from) {
   for (var key in from) {
     to[key] = from[key];
@@ -2738,15 +2848,23 @@ var core = module.exports = {
   _cfg: {
     debug: false
   },
+  _isReady: false,
   config: function(config) {
-    this._cfg = config;
+    for(var key in config){
+      this._cfg[key] = config[key];
+    }
   },
   _bindDOMReady: function(fn){
+    var self = this;
     var readyRE = /complete|loaded|interactive/;
     if (readyRE.test(document.readyState) && document.body){
+      self._isReady = true;
       fn();
     }else{
-      document.addEventListener('DOMContentLoaded', function(){ fn() }, false);
+      document.addEventListener('DOMContentLoaded', function(){
+      self._isReady = true;
+      fn()
+    }, false);
     }
   },
   Semver: {
@@ -2816,13 +2934,16 @@ var core = module.exports = {
       return "6.9.x";
     }
   })(),
-  _trace: function(name){
+  _trace: function(name, params){
     var logFact = (this._cfg && this._cfg.logFact) || 0.01;
+    params = params || {};
+    params = this._mixin(params, {
+      version: this.getUA().appVersion,
+      module: name
+    });
     if(Math.random() < logFact){
       console.log("_trace", name)
-      _hip && _hip.push(['mv', {
-        module: name
-      }]);
+      _hip && _hip.push(['mv', params]);
     }
   },
   log: function() {
@@ -2869,7 +2990,7 @@ if(window.DPApp){
     map:globalMap
 });
 
-define(_9, [], function(require, exports, module, __filename, __dirname) {
+define(_10, [], function(require, exports, module, __filename, __dirname) {
 var queue = module.exports = function(worker){
 	var currentData = null;
 	var currentCallback = null;
@@ -2911,7 +3032,7 @@ var queue = module.exports = function(worker){
     map:globalMap
 });
 
-define(_10, [], function(require, exports, module, __filename, __dirname) {
+define(_11, [], function(require, exports, module, __filename, __dirname) {
 module.exports = [
   /**
    * Infos
@@ -2940,7 +3061,7 @@ module.exports = [
     map:globalMap
 });
 
-define(_11, [], function(require, exports, module, __filename, __dirname) {
+define(_12, [], function(require, exports, module, __filename, __dirname) {
 module.exports='.dpapp-login-panel{position: fixed;width: 100%;top: 0;left: 0;background-color: #f0f0f0;height: 100%;padding: 20px;box-sizing: border-box;}.dpapp-login-panel .EasyLogin_row{margin: 0;padding: 5px 5px 5px 10px;overflow: hidden;border: 1px solid #ccc;background-color: #fff;margin-bottom: 10px;}.dpapp-login-panel .EasyLogin_row input{border: none;display: block;width: 120px;float: left;padding: 5px 0;font-size: 14px;height: 14px;}.dpapp-login-panel .EasyLogin_row .EasyLogin_send{text-decoration: none;color: #999;font-size: 14px;border: 1px solid #ccc;padding: 5px;border-radius: 4px;background-color: #fff;float: right;}.dpapp-login-panel .login-btn{border: none;margin: 0;display: block;width: 100%;background-color: #ff8400;height: 40px;margin-bottom: 12px;line-height: 40px;color: #fff;font-size: 18px;text-align: center;border-radius: 5px;}'
 }, {
     asyncDeps:asyncDeps,
