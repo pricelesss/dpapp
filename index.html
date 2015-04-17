@@ -281,6 +281,72 @@ open，login，loginsuccess，cx，signup，payorder，createorder</p>
 
 <p>支持版本：≥ 7.1.0</p>
 
+<h2 id="openscheme">openScheme</h2>
+<pre class="highlight javascript"><code><span class="nx">DPApp</span><span class="p">.</span><span class="nx">login</span><span class="p">({</span>
+  <span class="na">url</span><span class="p">:</span> <span class="s2">"dianping://websearch"</span><span class="p">,</span>
+  <span class="na">extra</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">"searchurl"</span><span class="p">:</span> <span class="s2">"dianping://searchshoplist"</span><span class="p">,</span>
+    <span class="s2">"hotsuggesturl"</span><span class="p">:</span><span class="s2">"http://m.api.dianping.com/advancedsuggest.bin?cityid=1&amp;mylat=31.215870&amp;mylng=121.419100&amp;myacc=0.000000"</span><span class="p">,</span>
+    <span class="s2">"keywordurl"</span><span class="p">:</span><span class="s2">"http://m.api.dianping.com/advancedsuggest.bin?cityid=1&amp;mylat=31.215870&amp;mylng=121.419100&amp;myacc=0.000000"</span>
+  <span class="p">},</span>
+  <span class="na">success</span><span class="p">:</span> <span class="kd">function</span><span class="p">(){</span>
+    <span class="c1">// 跳转成功</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+</code></pre>
+
+<p>打开scheme
+支持版本：≥ 7.1.0</p>
+
+<h2 id="jumptoscheme">jumpToScheme</h2>
+<pre class="highlight javascript"><code><span class="nx">DPApp</span><span class="p">.</span><span class="nx">login</span><span class="p">({</span>
+  <span class="na">url</span><span class="p">:</span> <span class="s2">"dianping://websearch"</span><span class="p">,</span>
+  <span class="na">extra</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">"searchurl"</span><span class="p">:</span> <span class="s2">"dianping://searchshoplist"</span><span class="p">,</span>
+    <span class="s2">"hotsuggesturl"</span><span class="p">:</span><span class="s2">"http://m.api.dianping.com/advancedsuggest.bin?cityid=1&amp;mylat=31.215870&amp;mylng=121.419100&amp;myacc=0.000000"</span><span class="p">,</span>
+    <span class="s2">"keywordurl"</span><span class="p">:</span><span class="s2">"http://m.api.dianping.com/advancedsuggest.bin?cityid=1&amp;mylat=31.215870&amp;mylng=121.419100&amp;myacc=0.000000"</span>
+  <span class="p">},</span>
+  <span class="na">toHome</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span> <span class="c1">// 跳转后是否pop完所有view堆栈，默认为false，表示只pop出当前webview</span>
+  <span class="na">success</span><span class="p">:</span> <span class="kd">function</span><span class="p">(){</span>
+    <span class="c1">// 跳转成功</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+</code></pre>
+
+<p>打开scheme，并关闭原窗口。
+支持版本：≥ 7.2.0</p>
+
+<h2 id="store">store</h2>
+<pre class="highlight javascript"><code><span class="nx">DPApp</span><span class="p">.</span><span class="nx">store</span><span class="p">({</span>
+  <span class="na">key</span><span class="p">:</span> <span class="s2">"key"</span><span class="p">,</span>
+  <span class="na">value</span><span class="p">:</span> <span class="s2">"value"</span>
+  <span class="na">success</span><span class="p">:</span> <span class="kd">function</span><span class="p">(){</span>
+    <span class="c1">// 存值成功</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+</code></pre>
+
+<p>向native本地空间存值</p>
+
+<p>为了避免命名冲突，使用前需要先使用DPApp.config({bizname:&ldquo;your-biz-name&rdquo;});进行配置</p>
+
+<p>支持版本：≥ 7.2.0</p>
+
+<h2 id="retrieve">retrieve</h2>
+<pre class="highlight javascript"><code><span class="nx">DPApp</span><span class="p">.</span><span class="nx">retrieve</span><span class="p">({</span>
+  <span class="na">key</span><span class="p">:</span> <span class="s2">"key"</span><span class="p">,</span>
+  <span class="na">success</span><span class="p">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">value</span><span class="p">){</span>
+    <span class="c1">// 获取值成功</span>
+  <span class="p">}</span>
+<span class="p">});</span>
+</code></pre>
+
+<p>向native本地空间取值</p>
+
+<p>为了避免命名冲突，使用前需要先使用DPApp.config({bizname:&ldquo;your-biz-name&rdquo;});进行配置</p>
+
+<p>支持版本：≥ 7.2.0</p>
+
 <h2 id="ajax请求">Ajax请求</h2>
 <pre class="highlight javascript"><code><span class="nx">DPApp</span><span class="p">.</span><span class="nx">ajax</span><span class="p">({</span>
   <span class="na">url</span><span class="p">:</span> <span class="s2">"http://m.api.dianping.com/indextabicon.bin?cityid=1&amp;version=7.0.1"</span><span class="p">,</span>
@@ -489,6 +555,19 @@ foreground: 应用切换回前台</p>
 <p>注意，在web上因为没有native的参与，
 所有方法实际行为都在web一端发生。
 与传统的javascript sub/pub模式无异。</p>
+
+<p>为了避免命名冲突，使用前需要先使用DPApp.config({bizname:&ldquo;your-biz-name&rdquo;});进行配置</p>
+
+<p>发布的事件名为 your-biz-name:myMessage 这样。</p>
+
+<p>在native端android</p>
+<pre class="highlight java"><code><span class="n">IntentFilter</span> <span class="n">intentFilter</span> <span class="o">=</span> <span class="k">new</span> <span class="n">IntentFilter</span><span class="o">(</span><span class="s">"your-biz-name:myMessage"</span><span class="o">);</span>
+<span class="n">registerReceiver</span><span class="o">(</span><span class="n">yourBroadCaseReceiver</span><span class="o">,</span> <span class="n">intentFilter</span><span class="o">);</span>
+</code></pre>
+
+<p>ios</p>
+<pre class="highlight plaintext"><code>
+</code></pre>
 
 <h1 id="ui界面">UI界面</h1>
 
