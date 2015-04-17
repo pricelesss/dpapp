@@ -1459,26 +1459,27 @@ neuron.config({
 function mix(a,b){for(var k in b){a[k]=b[k];}return a;}
 var _0 = "easy-login@~0.1.3";
 var _1 = "dpapp-share@~0.1.0";
-var _2 = "dpapp@1.1.0/lib/native-core.js";
-var _3 = "dpapp@1.1.0/lib/decorator.js";
-var _4 = "dpapp@1.1.0/lib/errortrace.js";
-var _5 = "dpapp@1.1.0/lib/patch-7.1.js";
-var _6 = "dpapp@1.1.0/lib/patch-7.0.js";
-var _7 = "dpapp@1.1.0/lib/patch-6.x.js";
-var _8 = "dpapp@1.1.0/lib/web.js";
-var _9 = "dpapp@1.1.0/lib/core.js";
-var _10 = "dpapp@1.1.0/lib/queue.js";
-var _11 = "dpapp@1.1.0/lib/apilist.js";
+var _2 = "dpapp@1.1.0/lib/apilist.js";
+var _3 = "dpapp@1.1.0/lib/native-core.js";
+var _4 = "dpapp@1.1.0/lib/decorator.js";
+var _5 = "dpapp@1.1.0/lib/errortrace.js";
+var _6 = "dpapp@1.1.0/lib/patch-7.1.js";
+var _7 = "dpapp@1.1.0/lib/patch-7.0.js";
+var _8 = "dpapp@1.1.0/lib/patch-6.x.js";
+var _9 = "dpapp@1.1.0/lib/web.js";
+var _10 = "dpapp@1.1.0/lib/core.js";
+var _11 = "dpapp@1.1.0/lib/queue.js";
 var _12 = "dpapp@1.1.0/lib/login.css.js";
 var _13 = "dpapp@1.1.0/index.js";
 var asyncDeps = [_0,_1];
 var asyncDepsToMix = {"easy-login":_0,"dpapp-share":_1};
 var globalMap = asyncDepsToMix;
-define(_13, [_2,_3,_4,_5,_6,_7,_8], function(require, exports, module, __filename, __dirname) {
+define(_13, [_2,_3,_4,_5,_6,_7,_8,_9], function(require, exports, module, __filename, __dirname) {
 (function (Host) {
   var _DPApp;
   var version;
   var userAgent = Host.navigator.userAgent;
+  var apis = require('./lib/apilist');
   var DPAppNativeCore = require('./lib/native-core');
   var decorate = function(){
     require('./lib/decorator')(_DPApp);
@@ -1514,23 +1515,25 @@ define(_13, [_2,_3,_4,_5,_6,_7,_8], function(require, exports, module, __filenam
       if(DPApp._isReady){
         return callback();
       }
-      var cfg = DPApp._cfg;
       var timeout = setTimeout(function(){
         _DPApp._bindDOMReady(function(){
-          for(var k in web){
-            _DPApp[k] = web[k]
-          }
+          // remove 6.x apis and append web apis
+          apis.forEach(function(api){
+            if(_DPApp[api]){
+              delete _DPApp[api];
+            }
+            _DPApp[api] = web[api];
+          });
           decorate();
           callback();
         });
       }, 50);
       _DPApp._patch6Ready(function(){
         clearTimeout(timeout);
+        decorate();
         callback();
       });
-      decorate();
     }
-    decorate();
   }
 
   _DPApp.getQuery = getQuery;
@@ -1554,10 +1557,39 @@ define(_13, [_2,_3,_4,_5,_6,_7,_8], function(require, exports, module, __filenam
 }, {
     asyncDeps:asyncDeps,
     main:true,
-    map:mix({"./lib/native-core":_2,"./lib/decorator":_3,"./lib/errortrace":_4,"./lib/patch-7.1":_5,"./lib/patch-7.0":_6,"./lib/patch-6.x":_7,"./lib/web":_8},globalMap)
+    map:mix({"./lib/apilist":_2,"./lib/native-core":_3,"./lib/decorator":_4,"./lib/errortrace":_5,"./lib/patch-7.1":_6,"./lib/patch-7.0":_7,"./lib/patch-6.x":_8,"./lib/web":_9},globalMap)
 });
 
-define(_2, [_9,_10], function(require, exports, module, __filename, __dirname) {
+define(_2, [], function(require, exports, module, __filename, __dirname) {
+module.exports = [
+  /**
+   * Infos
+   */
+  "getUserInfo", "getCityId", "getLocation", "getContactList", "getCX",
+  /**
+   * Common
+   */
+  "getRequestId", "downloadImage", "closeWindow", "getNetworkType", "share",
+  /**
+   * Funcs
+   */
+  "sendSMS", "openScheme", "jumpToScheme", "store", "retrieve", "ajax",
+  /**
+   * Broadcast
+   */
+  "publish", "subscribe", "unsubscribe", "login",
+  /**
+   * UI
+   */
+  "setTitle", "setLLButton", "setLRButton", "setRLButton", "setRRButton"
+];
+
+}, {
+    asyncDeps:asyncDeps,
+    map:globalMap
+});
+
+define(_3, [_10,_11], function(require, exports, module, __filename, __dirname) {
 var core = module.exports = require('./core');
 /**
  * count from 1
@@ -1801,10 +1833,10 @@ core.extend({
 });
 }, {
     asyncDeps:asyncDeps,
-    map:mix({"./core":_9,"./queue":_10},globalMap)
+    map:mix({"./core":_10,"./queue":_11},globalMap)
 });
 
-define(_3, [_11,_9], function(require, exports, module, __filename, __dirname) {
+define(_4, [_2,_10], function(require, exports, module, __filename, __dirname) {
 var apis = require('./apilist');
 var core = require('./core');
 
@@ -1865,17 +1897,16 @@ module.exports = function decorateForTrace(target){
       _origin.call(target, _args);
     }
     target[api]._decorated = true;
-    if(_origin == target._notImplemented){
-      target[api]._notReady = true;
-    }
+    console.log(api, _origin, _origin !== target._notImplemented);
+    target[api]._notReady = _origin == target._notImplemented;
   });
 }
 }, {
     asyncDeps:asyncDeps,
-    map:mix({"./apilist":_11,"./core":_9},globalMap)
+    map:mix({"./apilist":_2,"./core":_10},globalMap)
 });
 
-define(_4, [], function(require, exports, module, __filename, __dirname) {
+define(_5, [], function(require, exports, module, __filename, __dirname) {
 var _err = window.onerror;
 var url = "http://114.80.165.63/broker-service/api/js";
 window.onerror = function(err, file, line){
@@ -1896,7 +1927,7 @@ window.onerror = function(err, file, line){
     map:globalMap
 });
 
-define(_5, [_11,_6,_9], function(require, exports, module, __filename, __dirname) {
+define(_6, [_2,_7,_10], function(require, exports, module, __filename, __dirname) {
 var apis = require('./apilist');
 
 var _events = {};
@@ -2264,10 +2295,10 @@ apis.forEach(function(name) {
 });
 }, {
     asyncDeps:asyncDeps,
-    map:mix({"./apilist":_11,"./patch-7.0":_6,"./core":_9},globalMap)
+    map:mix({"./apilist":_2,"./patch-7.0":_7,"./core":_10},globalMap)
 });
 
-define(_6, [_9,_7], function(require, exports, module, __filename, __dirname) {
+define(_7, [_10,_8], function(require, exports, module, __filename, __dirname) {
 var core = require('./core');
 var patch6 = require('./patch-6.x');
 var Patch = module.exports = core._mixin(patch6, {
@@ -2366,10 +2397,10 @@ var Patch = module.exports = core._mixin(patch6, {
 });
 }, {
     asyncDeps:asyncDeps,
-    map:mix({"./core":_9,"./patch-6.x":_7},globalMap)
+    map:mix({"./core":_10,"./patch-6.x":_8},globalMap)
 });
 
-define(_7, [_9], function(require, exports, module, __filename, __dirname) {
+define(_8, [_10], function(require, exports, module, __filename, __dirname) {
 var core = require('./core');
 var NOOP = function() {};
 var cachedEnv = {};
@@ -2582,10 +2613,10 @@ var Patch = module.exports = {
 });
 }, {
     asyncDeps:asyncDeps,
-    map:mix({"./core":_9},globalMap)
+    map:mix({"./core":_10},globalMap)
 });
 
-define(_8, [_12,_9], function(require, exports, module, __filename, __dirname) {
+define(_9, [_12,_10], function(require, exports, module, __filename, __dirname) {
 var core = require('./core');
 var logincss = require('./login.css.js');
 var web = {};
@@ -2846,10 +2877,10 @@ var _events = {};core._mixin(web, {
 module.exports = web;
 }, {
     asyncDeps:asyncDeps,
-    map:mix({"./login.css.js":_12,"./core":_9},globalMap)
+    map:mix({"./login.css.js":_12,"./core":_10},globalMap)
 });
 
-define(_9, [], function(require, exports, module, __filename, __dirname) {
+define(_10, [], function(require, exports, module, __filename, __dirname) {
 function mixin(to, from) {
   for (var key in from) {
     to[key] = from[key];
@@ -2987,10 +3018,10 @@ var core = module.exports = {
   },
   isSupport: function(funcName) {
     var api = this[funcName];
-    return api
+    return !!(api
       && typeof api == "function"
       && api != core._notImplemented
-      && api._notReady != true
+      && api._notReady != true)
   }
 };
 
@@ -3002,7 +3033,7 @@ if(window.DPApp){
     map:globalMap
 });
 
-define(_10, [], function(require, exports, module, __filename, __dirname) {
+define(_11, [], function(require, exports, module, __filename, __dirname) {
 var queue = module.exports = function(worker){
 	var currentData = null;
 	var currentCallback = null;
@@ -3039,35 +3070,6 @@ var queue = module.exports = function(worker){
 	}
 	return q;
 };
-}, {
-    asyncDeps:asyncDeps,
-    map:globalMap
-});
-
-define(_11, [], function(require, exports, module, __filename, __dirname) {
-module.exports = [
-  /**
-   * Infos
-   */
-  "getUserInfo", "getCityId", "getLocation", "getContactList", "getCX",
-  /**
-   * Common
-   */
-  "getRequestId", "downloadImage", "closeWindow", "getNetworkType", "share",
-  /**
-   * Funcs
-   */
-  "sendSMS", "openScheme", "jumpToScheme", "store", "retrieve", "ajax",
-  /**
-   * Broadcast
-   */
-  "publish", "subscribe", "unsubscribe", "login",
-  /**
-   * UI
-   */
-  "setTitle", "setLLButton", "setLRButton", "setRLButton", "setRRButton"
-];
-
 }, {
     asyncDeps:asyncDeps,
     map:globalMap

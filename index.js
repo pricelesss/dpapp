@@ -2,6 +2,7 @@
   var _DPApp;
   var version;
   var userAgent = Host.navigator.userAgent;
+  var apis = require('./lib/apilist');
   var DPAppNativeCore = require('./lib/native-core');
   var decorate = function(){
     require('./lib/decorator')(_DPApp);
@@ -37,23 +38,25 @@
       if(DPApp._isReady){
         return callback();
       }
-      var cfg = DPApp._cfg;
       var timeout = setTimeout(function(){
         _DPApp._bindDOMReady(function(){
-          for(var k in web){
-            _DPApp[k] = web[k]
-          }
+          // remove 6.x apis and append web apis
+          apis.forEach(function(api){
+            if(_DPApp[api]){
+              delete _DPApp[api];
+            }
+            _DPApp[api] = web[api];
+          });
           decorate();
           callback();
         });
       }, 50);
       _DPApp._patch6Ready(function(){
         clearTimeout(timeout);
+        decorate();
         callback();
       });
-      decorate();
     }
-    decorate();
   }
 
   _DPApp.getQuery = getQuery;
