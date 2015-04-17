@@ -1476,11 +1476,14 @@ var asyncDepsToMix = {"easy-login":_0,"dpapp-share":_1};
 var globalMap = asyncDepsToMix;
 define(_13, [_2,_3,_4,_5,_6,_7,_8], function(require, exports, module, __filename, __dirname) {
 (function (Host) {
-  var DPApp;
+  var _DPApp;
   var version;
   var userAgent = Host.navigator.userAgent;
   var DPAppNativeCore = require('./lib/native-core');
-  var decorateForTrace = require('./lib/decorator');
+  var decorator = require('./lib/decorator');
+  var decorateForTrace = function(target){
+    window.DPApp = decorator(target);
+  };
   require('./lib/errortrace');
   // Require different platform js base on userAgent.
   // Native part will inject the userAgent with string `DPApp`.
@@ -1532,15 +1535,15 @@ define(_13, [_2,_3,_4,_5,_6,_7,_8], function(require, exports, module, __filenam
 
   // Export DPApp object, if support AMD, CMD, CommonJS.
   if (typeof module !== 'undefined') {
-    module.exports = DPApp;
+    module.exports = _DPApp;
   }
 
   // Export DPApp object to Host
   if (typeof Host !== 'undefined') {
     if(Host.DPApp){
-      DPApp._mixin(Host.DPApp, DPApp);
+      DPApp._mixin(Host.DPApp, _DPApp);
     }else{
-      Host.DPApp = DPApp;
+      Host.DPApp = _DPApp;
     }
   }
 
@@ -1828,6 +1831,7 @@ module.exports = function decorateForTrace(target){
             var errorMessage = result.errMsg ? result.errMsg : JSON.stringify(result);
             var err = new Error(errorMessage);
             err.name = "DPAppError";
+            console.error("`DPApp." + api + "` call faild");
             throw new Error(err);
           }
         }else{
@@ -1853,7 +1857,6 @@ module.exports = function decorateForTrace(target){
       }
 
       if(!this._isReady){
-        console.error("`DPApp." + api + "` should be called after DPApp.ready");
         _wrapped_fail("use `DPApp.ready(fn)` to wrap api calls");
         return;
       }
@@ -1865,7 +1868,7 @@ module.exports = function decorateForTrace(target){
     }
   });
 
-  window.DPApp = target;
+  return target;
 }
 }, {
     asyncDeps:asyncDeps,

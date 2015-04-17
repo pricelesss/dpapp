@@ -1,9 +1,12 @@
 (function (Host) {
-  var DPApp;
+  var _DPApp;
   var version;
   var userAgent = Host.navigator.userAgent;
   var DPAppNativeCore = require('./lib/native-core');
-  var decorateForTrace = require('./lib/decorator');
+  var decorator = require('./lib/decorator');
+  var decorateForTrace = function(target){
+    window.DPApp = decorator(target);
+  };
   require('./lib/errortrace');
   // Require different platform js base on userAgent.
   // Native part will inject the userAgent with string `DPApp`.
@@ -55,15 +58,15 @@
 
   // Export DPApp object, if support AMD, CMD, CommonJS.
   if (typeof module !== 'undefined') {
-    module.exports = DPApp;
+    module.exports = _DPApp;
   }
 
   // Export DPApp object to Host
   if (typeof Host !== 'undefined') {
     if(Host.DPApp){
-      DPApp._mixin(Host.DPApp, DPApp);
+      DPApp._mixin(Host.DPApp, _DPApp);
     }else{
-      Host.DPApp = DPApp;
+      Host.DPApp = _DPApp;
     }
   }
 
