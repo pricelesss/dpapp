@@ -1442,8 +1442,8 @@ function mix(a,b){for(var k in b){a[k]=b[k];}return a;}
 var _0 = "easy-login@~0.1.3";
 var _1 = "dpapp-share@~0.1.0";
 var _2 = "dpapp@1.1.0/lib/apilist.js";
-var _3 = "dpapp@1.1.0/lib/native-core.js";
-var _4 = "dpapp@1.1.0/lib/decorator.js";
+var _3 = "dpapp@1.1.0/lib/decorator.js";
+var _4 = "dpapp@1.1.0/lib/native-core.js";
 var _5 = "dpapp@1.1.0/lib/errortrace.js";
 var _6 = "dpapp@1.1.0/lib/patch-7.1.js";
 var _7 = "dpapp@1.1.0/lib/patch-7.0.js";
@@ -1541,7 +1541,7 @@ define(_13, [_2,_3,_4,_5,_6,_7,_8,_9], function(require, exports, module, __file
 }, {
     asyncDeps:asyncDeps,
     main:true,
-    map:mix({"./lib/apilist":_2,"./lib/native-core":_3,"./lib/decorator":_4,"./lib/errortrace":_5,"./lib/patch-7.1":_6,"./lib/patch-7.0":_7,"./lib/patch-6.x":_8,"./lib/web":_9},globalMap)
+    map:mix({"./lib/apilist":_2,"./lib/decorator":_3,"./lib/native-core":_4,"./lib/errortrace":_5,"./lib/patch-7.1":_6,"./lib/patch-7.0":_7,"./lib/patch-6.x":_8,"./lib/web":_9},globalMap)
 });
 
 define(_2, [], function(require, exports, module, __filename, __dirname) {
@@ -1573,7 +1573,82 @@ module.exports = [
     map:globalMap
 });
 
-define(_3, [_10,_11], function(require, exports, module, __filename, __dirname) {
+define(_3, [_2,_10], function(require, exports, module, __filename, __dirname) {
+var apis = require('./apilist');
+var core = require('./core');
+var allowBeforReady = ['getRequestId'];
+
+module.exports = function decorateForTrace(target){
+  apis.forEach(function(name){
+    if(!target[name]){
+      target[name] = core._notImplemented;
+    }
+  });
+
+  apis.forEach(function(api){
+    var _origin = target[api];
+    if(target[api] && target[api]._decorated){
+      return;
+    }
+    target[api] = function(args){
+      var _args = core._mixin({}, args);
+      target._trace(api + "_call");
+      var _success = _args.success;
+      var _fail = _args.fail;
+      var _wrapped_fail = function(result){
+        if(!_fail){
+          if(target.onerror){
+            target.onerror(result);
+          }else{
+            var errorMessage = result.errMsg ? result.errMsg : JSON.stringify(result);
+            var err = new Error(errorMessage);
+            err.name = "DPAppError";
+            console.error("`DPApp." + api + "` call faild");
+            target._trace('throw');
+            throw new Error(err);
+          }
+        }else{
+          _fail(result);
+        }
+      }
+      var zero = +new Date;
+      _args.success = function(result){
+        target._trace(api + "_success", {
+          time: +new Date - zero,
+        });
+        _success && _success(result);
+      };
+      _args.fail = function(result){
+        var note = {};
+        note.args = args;
+        note.result = result;
+        target._trace(api + "_fail", {
+          time: +new Date - zero,
+          note: JSON.stringify(note)
+        });
+        _wrapped_fail(result);
+      }
+
+      if(!this._isReady
+        && allowBeforReady.indexOf(api) === -1
+        && !target._isProduct // 非正式环境
+        && target._uaVersion == "6.9.x" // 且非新版本，为了判断环境，必须wrap在DPApp.ready中
+      ){
+        _wrapped_fail("use `DPApp.ready(fn)` to wrap api calls");
+        return;
+      }
+      _origin.call(target, _args);
+    }
+    target[api]._decorated = true;
+    target[api]._notReady = _origin == target._notImplemented;
+  });
+}
+}, {
+    asyncDeps:asyncDeps,
+    map:mix({"./apilist":_2,"./core":_10},globalMap)
+});
+
+define(_4, [_10,_11], function(require, exports, module, __filename, __dirname) {
 var core = module.exports = require('./core');
 /**
  * count from 1
@@ -1818,82 +1893,6 @@ core.extend({
 }, {
     asyncDeps:asyncDeps,
     map:mix({"./core":_10,"./queue":_11},globalMap)
-});
-
-define(_4, [_2,_10], function(require, exports, module, __filename, __dirname) {
-var apis = require('./apilist');
-var core = require('./core');
-var allowBeforReady = ['getRequestId'];
-
-module.exports = function decorateForTrace(target){
-  apis.forEach(function(name){
-    if(!target[name]){
-      target[name] = core._notImplemented;
-    }
-  });
-
-  apis.forEach(function(api){
-    var _origin = target[api];
-    if(target[api] && target[api]._decorated){
-      return;
-    }
-    target[api] = function(args){
-      var _args = core._mixin({}, args);
-      target._trace(api + "_call");
-      var _success = _args.success;
-      var _fail = _args.fail;
-      var _wrapped_fail = function(result){
-        if(!_fail){
-          if(target.onerror){
-            target.onerror(result);
-          }else{
-            var errorMessage = result.errMsg ? result.errMsg : JSON.stringify(result);
-            var err = new Error(errorMessage);
-            err.name = "DPAppError";
-            console.error("`DPApp." + api + "` call faild");
-            target._trace('throw');
-            throw new Error(err);
-          }
-        }else{
-          _fail(result);
-        }
-      }
-      var zero = +new Date;
-      _args.success = function(result){
-        target._trace(api + "_success", {
-          time: +new Date - zero,
-        });
-        _success && _success(result);
-      };
-      _args.fail = function(result){
-        var note = {};
-        note.args = args;
-        note.result = result;
-        target._trace(api + "_fail", {
-          time: +new Date - zero,
-          note: JSON.stringify(note)
-        });
-        _wrapped_fail(result);
-      }
-
-      // 暂且去掉ready必须限制
-      // if(!this._isReady
-      //   && allowBeforReady.indexOf(api) === -1
-      //   && !target._isProduct // 非测试环境
-      //   && target._uaVersion.indexOf("7.") == 0 // 且非新版本，为了判断环境，必须wrap在DPApp.ready中
-      // ){
-      //   _wrapped_fail("use `DPApp.ready(fn)` to wrap api calls");
-      //   return;
-      // }
-      _origin.call(target, _args);
-    }
-    target[api]._decorated = true;
-    target[api]._notReady = _origin == target._notImplemented;
-  });
-}
-}, {
-    asyncDeps:asyncDeps,
-    map:mix({"./apilist":_2,"./core":_10},globalMap)
 });
 
 define(_5, [], function(require, exports, module, __filename, __dirname) {
