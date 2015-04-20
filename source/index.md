@@ -299,7 +299,6 @@ DPApp.login({
     "hotsuggesturl":"http://m.api.dianping.com/advancedsuggest.bin?cityid=1&mylat=31.215870&mylng=121.419100&myacc=0.000000",
     "keywordurl":"http://m.api.dianping.com/advancedsuggest.bin?cityid=1&mylat=31.215870&mylng=121.419100&myacc=0.000000"
   },
-  toHome: true, // 跳转后是否pop完所有view堆栈，默认为false，表示只pop出当前webview
   success: function(){
     // 跳转成功
   }

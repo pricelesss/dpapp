@@ -106,6 +106,7 @@ window.onerror = function(e,f,l){
   <a class="btn" id="sendSMS" href="javascript:;">发送短信</a>
   <a class="btn" id="openScheme" href="javascript:;">openScheme</a>
   <a class="btn" id="jumpToScheme" href="javascript:;">jumpToScheme</a>
+  <a class="btn" data-api="jumpToSchemeToHome" id="jumpToSchemeToHome" data-api href="javascript:;">jumpToSchemeToHome</a>
   <a class="btn" id="store" href="javascript:;">store</a>
   <a class="btn" id="retrieve" href="javascript:;">retrieve</a>
 
@@ -172,6 +173,16 @@ window.onerror = function(e,f,l){
     },
     jumpToScheme: {
       url: "dianping://websearch",
+      extra: {
+        "searchurl": "dianping://searchshoplist",
+        "defaultKey": "demokey",
+        "hotsuggesturl":"http://m.api.dianping.com/advancedsuggest.bin?cityid=1&mylat=31.215870&mylng=121.419100&myacc=0.000000",
+        "keywordurl":"http://m.api.dianping.com/advancedsuggest.bin?cityid=1&mylat=31.215870&mylng=121.419100&myacc=0.000000"
+      }
+    },
+    jumpToSchemeToHome: {
+      url: "dianping://websearch",
+      toHome: true,
       extra: {
         "searchurl": "dianping://searchshoplist",
         "defaultKey": "demokey",
