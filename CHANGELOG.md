@@ -14,7 +14,6 @@
 1.1.0
 
 - 修复web中ready的问题
-- 改进区分web/6.9.x的方式，不依赖product=dpapp
 - 新增DPApp.onerror，可用于统一处理未handle的fail
 - 新增全局js错误监控
 - 新增调用成功率打点

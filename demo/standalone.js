@@ -1418,43 +1418,25 @@ var mods = neuron.mods = {};
 // Use `this`, and never cares about the environment.
 })(this);
 neuron.config({
-  "graph": [
-    {
-      "0": [
-        "1.1.0",
-        {
-          "dpapp-share@~0.1.0": 1,
-          "easy-login@~0.1.3": 2
-        }
-      ],
-      "1": [
-        "0.1.0"
-      ],
-      "2": [
-        "0.1.3"
-      ],
-      "_": {
-        "dpapp@1.1.0": 0
+  "graph": {
+    "0": [
+      "1.1.0",
+      {
+        "dpapp-share@~0.1.0": 1,
+        "easy-login@~0.1.3": 2
       }
-    },
-    {
-      "name": "dpapp",
-      "version": "1.1.0",
-      "asyncDependencies": {
-        "dpapp-share": {
-          "from": "dpapp-share@~0.1.0",
-          "version": "0.1.0",
-          "__id": 1
-        },
-        "easy-login": {
-          "from": "easy-login@~0.1.3",
-          "version": "0.1.3",
-          "__id": 2
-        }
-      },
-      "__id": 0
+    ],
+    "1": [
+      "0.1.0"
+    ],
+    "2": [
+      "0.1.3"
+    ],
+    "_": {
+      "dpapp@1.1.0": 0,
+      "dpapp@*": 0
     }
-  ]
+  }
 });neuron.config({path:"http://i{n}.dpfile.com/mod/"});(function(){
 function mix(a,b){for(var k in b){a[k]=b[k];}return a;}
 var _0 = "easy-login@~0.1.3";
@@ -1567,7 +1549,7 @@ module.exports = [
   /**
    * Infos
    */
-  "getUA", "getUserInfo", "getCityId", "getLocation", "getContactList", "getCX",
+  "getUserInfo", "getCityId", "getLocation", "getContactList", "getCX",
   /**
    * Common
    */
@@ -1894,10 +1876,15 @@ module.exports = function decorateForTrace(target){
         _wrapped_fail(result);
       }
 
-      if(!this._isReady && allowBeforReady.indexOf(api) === -1 && !target._isProduct){
-        _wrapped_fail("use `DPApp.ready(fn)` to wrap api calls");
-        return;
-      }
+      // 暂且去掉ready必须限制
+      // if(!this._isReady
+      //   && allowBeforReady.indexOf(api) === -1
+      //   && !target._isProduct // 非测试环境
+      //   && target._uaVersion.indexOf("7.") == 0 // 且非新版本，为了判断环境，必须wrap在DPApp.ready中
+      // ){
+      //   _wrapped_fail("use `DPApp.ready(fn)` to wrap api calls");
+      //   return;
+      // }
       _origin.call(target, _args);
     }
     target[api]._decorated = true;
