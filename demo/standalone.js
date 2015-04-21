@@ -1420,7 +1420,7 @@ var mods = neuron.mods = {};
 neuron.config({
   "graph": {
     "0": [
-      "1.1.0",
+      "1.1.1",
       {
         "dpapp-share@~0.1.0": 1,
         "easy-login@~0.1.3": 2
@@ -1433,7 +1433,7 @@ neuron.config({
       "0.1.3"
     ],
     "_": {
-      "dpapp@1.1.0": 0,
+      "dpapp@1.1.1": 0,
       "dpapp@*": 0
     }
   }
@@ -1441,18 +1441,18 @@ neuron.config({
 function mix(a,b){for(var k in b){a[k]=b[k];}return a;}
 var _0 = "easy-login@~0.1.3";
 var _1 = "dpapp-share@~0.1.0";
-var _2 = "dpapp@1.1.0/lib/apilist.js";
-var _3 = "dpapp@1.1.0/lib/native-core.js";
-var _4 = "dpapp@1.1.0/lib/decorator.js";
-var _5 = "dpapp@1.1.0/lib/errortrace.js";
-var _6 = "dpapp@1.1.0/lib/patch-7.1.js";
-var _7 = "dpapp@1.1.0/lib/patch-7.0.js";
-var _8 = "dpapp@1.1.0/lib/patch-6.x.js";
-var _9 = "dpapp@1.1.0/lib/web.js";
-var _10 = "dpapp@1.1.0/lib/core.js";
-var _11 = "dpapp@1.1.0/lib/queue.js";
-var _12 = "dpapp@1.1.0/lib/login.css.js";
-var _13 = "dpapp@1.1.0/index.js";
+var _2 = "dpapp@1.1.1/lib/apilist.js";
+var _3 = "dpapp@1.1.1/lib/native-core.js";
+var _4 = "dpapp@1.1.1/lib/decorator.js";
+var _5 = "dpapp@1.1.1/lib/errortrace.js";
+var _6 = "dpapp@1.1.1/lib/patch-7.1.js";
+var _7 = "dpapp@1.1.1/lib/patch-7.0.js";
+var _8 = "dpapp@1.1.1/lib/patch-6.x.js";
+var _9 = "dpapp@1.1.1/lib/web.js";
+var _10 = "dpapp@1.1.1/lib/core.js";
+var _11 = "dpapp@1.1.1/lib/queue.js";
+var _12 = "dpapp@1.1.1/lib/login.css.js";
+var _13 = "dpapp@1.1.1/index.js";
 var asyncDeps = [_0,_1];
 var asyncDepsToMix = {"easy-login":_0,"dpapp-share":_1};
 var globalMap = asyncDepsToMix;
@@ -1599,12 +1599,16 @@ core.extend({
     q.dequeue();
   },
   _sendMessage: function(method, args, callback){
+    var self = this;
     q.push({
       method: method,
       args: args,
       callback: callback
     });
-    this._dequeueTimeout = setTimeout(this.dequeue.bind(this),1000);
+    this._dequeueTimeout = setTimeout(function(){
+      self.dequeue();
+    },1000);
+
   },
   /**
    * send message to native
@@ -3076,4 +3080,4 @@ module.exports='.dpapp-login-panel{position: fixed;width: 100%;top: 0;left: 0;ba
     asyncDeps:asyncDeps,
     map:globalMap
 });
-})();_use("dpapp@1.1.0",function(){});
+})();_use("dpapp@1.1.1",function(){});
