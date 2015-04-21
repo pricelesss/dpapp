@@ -1549,7 +1549,7 @@ module.exports = [
   /**
    * Infos
    */
-  "getUserInfo", "getCityId", "getLocation", "getContactList", "getCX",
+  "getUserInfo", "getUA", "getCityId", "getLocation", "getContactList", "getCX",
   /**
    * Common
    */
@@ -1888,10 +1888,11 @@ module.exports = function decorateForTrace(target){
         _wrapped_fail("use `DPApp.ready(fn)` to wrap api calls");
         return;
       }
-      _origin.call(target, _args);
+      return _origin.call(target, _args);
     }
     target[api]._decorated = true;
     target[api]._notReady = _origin == target._notImplemented;
+
   });
 }
 }, {
@@ -2977,15 +2978,14 @@ var core = module.exports = {
     }
   })(),
   _trace: function(name, params){
-    var logFact = (this._cfg && this._cfg.logFact) || 0.01;
+    var logFact = (this._cfg && this._cfg.logFact) || 0.05;
     params = params || {};
     params = this._mixin(params, {
-      version: this.getUA().appVersion,
       module: "dpapp_" + name
     });
     if(Math.random() < logFact){
       console.log("_trace", name)
-      _hip && _hip.push(['mv', params]);
+      window._hip && _hip.push(['mv', params]);
     }
   },
   log: function() {
