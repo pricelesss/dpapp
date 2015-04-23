@@ -68,6 +68,20 @@
 
 <h1 id="基础方法">基础方法</h1>
 
+<h2 id="配置">配置</h2>
+
+<p>在开始之前，你可以选择配置DPApp
+<code class="prettyprint">javascript
+  DPApp.config({
+    debug:true,
+    bizname:&quot;your-bizname&quot;
+  })
+</code></p>
+
+<p>参数说明：
+debug: 是否开启调试模式。开启后会以alert的方式打印调试信息。默认为关闭。
+bizname: native存储及广播相关api需要该配置</p>
+
 <h2 id="调用协议">调用协议</h2>
 <pre class="highlight javascript"><code><span class="c1">// 示例：调出分享界面</span>
 <span class="nx">DPApp</span><span class="p">.</span><span class="nx">ready</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
@@ -86,9 +100,6 @@
 <span class="p">});</span>
 </code></pre>
 
-<p>在开始之前，你可以选择配置DPApp，目前可选配置只有debug一个，表示是否开启调试模式。
-<code class="prettyprint">DPApp.config({debug:true})</code> 开启后会以alert的方式打印调试信息。默认为关闭。</p>
-
 <p>DPApp默认开启校验，目前的校验规则基于域名，即只有在点评的域名下才可以使用jsbridge，包含 alpha.dp、 51ping.com、 dpfile.com、 dianping.com。可以在测试版的debug控制台中关闭校验。</p>
 
 <p>所有若非特别说明，方法接受一个javascript对象作为参数，其中success，fail分别为成功与失败后的回调。
@@ -104,6 +115,13 @@
 <p>所有方法调用之前，需要使用DPApp.ready确保native已就绪。</p>
 
 <p>支持版本：≥ 6.9.8</p>
+
+<h2 id="错误处理">错误处理</h2>
+
+<p>错误处理分几个层级，首先可以在api调用的fail回调中，处理对应的错误。
+也可以配置<code class="prettyprint">DPApp.onerror = handler</code>来接收未使用fail回调处理的错误。
+如果<code class="prettyprint">DPApp.onerror</code>未定义，则会抛出<code class="prettyprint">DPAppError</code>
+所有抛到window上的错误都会被记录到cat平台的js报错收集中</p>
 
 <h2 id="版本比对">版本比对</h2>
 <pre class="highlight javascript"><code><span class="nx">DPApp</span><span class="p">.</span><span class="nx">Semver</span><span class="p">.</span><span class="nx">gt</span><span class="p">(</span><span class="nx">versionA</span><span class="p">,</span><span class="nx">versionB</span><span class="p">);</span> <span class="c1">// 是否大于</span>
@@ -306,7 +324,6 @@ open，login，loginsuccess，cx，signup，payorder，createorder</p>
     <span class="s2">"hotsuggesturl"</span><span class="p">:</span><span class="s2">"http://m.api.dianping.com/advancedsuggest.bin?cityid=1&amp;mylat=31.215870&amp;mylng=121.419100&amp;myacc=0.000000"</span><span class="p">,</span>
     <span class="s2">"keywordurl"</span><span class="p">:</span><span class="s2">"http://m.api.dianping.com/advancedsuggest.bin?cityid=1&amp;mylat=31.215870&amp;mylng=121.419100&amp;myacc=0.000000"</span>
   <span class="p">},</span>
-  <span class="na">toHome</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span> <span class="c1">// 跳转后是否pop完所有view堆栈，默认为false，表示只pop出当前webview</span>
   <span class="na">success</span><span class="p">:</span> <span class="kd">function</span><span class="p">(){</span>
     <span class="c1">// 跳转成功</span>
   <span class="p">}</span>
@@ -485,6 +502,7 @@ web中由于无法分享到微信，短信等，故只支持部分渠道。</p>
   <span class="na">content</span><span class="p">:</span><span class="s2">"分享内容"</span><span class="p">,</span> <span class="c1">// 7.1.0 支持</span>
   <span class="na">image</span><span class="p">:</span><span class="s2">"http://www.dpfile.com/toevent/img/16d05c85a71b135edc39d197273746d6.png"</span><span class="p">,</span>
   <span class="na">url</span><span class="p">:</span><span class="s2">"http://m.dianping.com"</span><span class="p">,</span>
+  <span class="na">feed</span><span class="p">:</span> <span class="p">[</span><span class="nx">DPApp</span><span class="p">.</span><span class="nx">Share</span><span class="p">.</span><span class="nx">WECHAT_FRIENDS</span><span class="p">,</span> <span class="nx">DPApp</span><span class="p">.</span><span class="nx">Share</span><span class="p">.</span><span class="nx">WECHAT_TIMELINE</span><span class="p">,</span> <span class="nx">DPApp</span><span class="p">.</span><span class="nx">Share</span><span class="p">.</span><span class="nx">WEIBO</span><span class="p">],</span>
   <span class="na">success</span><span class="p">:</span> <span class="kd">function</span><span class="p">(){</span>
     <span class="nx">alert</span><span class="p">(</span><span class="s1">'分享成功'</span><span class="p">);</span>
   <span class="p">},</span>
@@ -648,7 +666,7 @@ foreground: 应用切换回前台</p>
 <p>支持版本：≥ 7.1.0</p>
 
 <p>文字按钮或者图片按钮。
-icon属性定义了本地资源的名称，目前仅支持H5_Search、H5_Back、H5_Share
+icon属性定义了本地资源的名称，目前仅支持H5_Search、H5_Back、H5_Custom_Back、H5_Share
 icon属性会覆盖text属性。</p>
 
       </div>
