@@ -120,10 +120,12 @@ window.onerror = function(e,f,l){
 
   <h2>调整界面</h2>
   <a class="btn" id="setTitle" href="javascript:;">设置标题</a>
+  <a class="btn" id="setLLButton" href="javascript:;">设置LL按钮</a>
   <a class="btn" id="setRLButton" href="javascript:;">设置RL按钮</a>
   <a class="btn" id="setRRButton" href="javascript:;">设置RR按钮</a>
   <a class="btn" data-api="setRRButton" id="setSearchButton" href="javascript:;">设置RR搜索按钮</a>
 
+  <a class="btn" href="dianping://web?url=http%3a%2f%2fm.dianping.com%2foverseas%2fmapple%2fsakura%2findex.html">scheme link</a>
   <a class="btn" id="login" href="javascript:;">登录</a>
 <script>
   function $(id){return document.getElementById(id);}
@@ -308,6 +310,11 @@ window.onerror = function(e,f,l){
     setTitle: {
       title: "新标题",
       success: success
+    },
+    setLLButton: {
+      icon: "H5_Custom_Back",
+      success: success,
+      fail: fail
     },
     setRLButton: {
       text: "默认",

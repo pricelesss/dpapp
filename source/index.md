@@ -477,6 +477,7 @@ DPApp.initShare({
   content:"分享内容", // 7.1.0 支持
   image:"http://www.dpfile.com/toevent/img/16d05c85a71b135edc39d197273746d6.png",
   url:"http://m.dianping.com",
+  feed: [DPApp.Share.WECHAT_FRIENDS, DPApp.Share.WECHAT_TIMELINE, DPApp.Share.WEIBO],
   success: function(){
     alert('分享成功');
   },
@@ -650,7 +651,7 @@ DPApp.setRRButton({
 支持版本：≥ 7.1.0
 
 文字按钮或者图片按钮。
-icon属性定义了本地资源的名称，目前仅支持H5_Search、H5_Back、H5_Share
+icon属性定义了本地资源的名称，目前仅支持H5_Search、H5_Back、H5_Custom_Back、H5_Share
 icon属性会覆盖text属性。
 
 
