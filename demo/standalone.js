@@ -1565,7 +1565,7 @@ module.exports = [
   /**
    * UI
    */
-  "setTitle", "setLLButton", "setLRButton", "setRLButton", "setRRButton"
+  "setTitle", "setBackgroundColor", "setLLButton", "setLRButton", "setRLButton", "setRRButton"
 ];
 
 }, {
