@@ -17,6 +17,9 @@ window.onerror = function(e,f,l){
 <script src="./standalone.js"></script>
 <link rel="stylesheet" href="../lib/login.css">
 <style>
+  html{
+    background-color: transparent;
+  }
   body{
     overflow: scroll;
   }
@@ -106,7 +109,7 @@ window.onerror = function(e,f,l){
   <a class="btn" id="sendSMS" href="javascript:;">发送短信</a>
   <a class="btn" id="openScheme" href="javascript:;">openScheme</a>
   <a class="btn" id="jumpToScheme" href="javascript:;">jumpToScheme</a>
-  <a class="btn" data-api="jumpToSchemeToHome" id="jumpToSchemeToHome" data-api href="javascript:;">jumpToSchemeToHome</a>
+  <a class="btn" data-api="jumpToScheme" id="jumpToSchemeToHome" data-api href="javascript:;">jumpToSchemeToHome</a>
   <a class="btn" id="store" href="javascript:;">store</a>
   <a class="btn" id="retrieve" href="javascript:;">retrieve</a>
 
@@ -121,6 +124,7 @@ window.onerror = function(e,f,l){
   <h2>调整界面</h2>
   <a class="btn" id="setTitle" href="javascript:;">设置标题</a>
   <a class="btn" id="setBackgroundColor" href="javascript:;">设置背景色</a>
+  <a class="btn" id="datepicker" href="javascript:;">日期选择</a>
   <a class="btn" id="setLLButton" href="javascript:;">设置LL按钮</a>
   <a class="btn" id="setRLButton" href="javascript:;">设置RL按钮</a>
   <a class="btn" id="setRRButton" href="javascript:;">设置RR按钮</a>
@@ -173,6 +177,17 @@ window.onerror = function(e,f,l){
         "hotsuggesturl":"http://m.api.dianping.com/advancedsuggest.bin?cityid=1&mylat=31.215870&mylng=121.419100&myacc=0.000000",
         "keywordurl":"http://m.api.dianping.com/advancedsuggest.bin?cityid=1&mylat=31.215870&mylng=121.419100&myacc=0.000000"
       }
+    },
+    setBackgroundColor: {
+      color:"3399dd",
+      success: success
+    },
+    datepicker:{
+      "type": "datetime",
+      "default": "2014-11-11 12:12:12",
+      "minuteInterval": 15,
+      "minDate": +new Date("2000-01-01"),
+      "maxDate": +new Date("2050-02-01")
     },
     jumpToScheme: {
       url: "dianping://websearch",
@@ -385,6 +400,20 @@ window.onerror = function(e,f,l){
     DPApp.getLocation({success:success});
     DPApp.getNetworkType({success:success});
   }
+
+  document.addEventListener("DPJSBridgeReady", function(e){
+    alert("DPJSBridgeReady:" + JSON.stringify({
+      osName : e.osName,
+      osVersion : e.osVersion,
+      appName : e.appName,
+      appVersion : e.appVersion,
+      dpid : e.dpid,
+      token : e.token,
+      cityId : e.cityId,
+      lat : e.lat,
+      lng : e.lng
+    }));
+  });
 
   DPApp.ready(function(){
     (function(){
