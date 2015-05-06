@@ -392,7 +392,7 @@ window.onerror = function(e,f,l){
       $(id).onclick = function(){
         var funcName = this.getAttribute('data-api')
          || id;
-        DPApp[funcName](args[id]);
+        DPApp[funcName] && DPApp[funcName](args[id]);
       };
     })(id);
   }
