@@ -188,7 +188,9 @@ window.onerror = function(e,f,l){
       success: success
     },
     updateAccount: {
-      success: success,
+      success: function(data){
+        console.log("更新账户成功", data);
+      },
       fail: fail
     },
     datepicker:{
