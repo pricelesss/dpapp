@@ -1420,7 +1420,7 @@ var mods = neuron.mods = {};
 neuron.config({
   "graph": {
     "0": [
-      "1.1.5",
+      "1.1.6",
       {
         "dpapp-share@~0.1.0": 1,
         "easy-login@~0.1.3": 2
@@ -1433,7 +1433,7 @@ neuron.config({
       "0.1.3"
     ],
     "_": {
-      "dpapp@1.1.5": 0,
+      "dpapp@1.1.6": 0,
       "dpapp@*": 0
     }
   }
@@ -1441,18 +1441,18 @@ neuron.config({
 function mix(a,b){for(var k in b){a[k]=b[k];}return a;}
 var _0 = "easy-login@~0.1.3";
 var _1 = "dpapp-share@~0.1.0";
-var _2 = "dpapp@1.1.5/lib/apilist.js";
-var _3 = "dpapp@1.1.5/lib/native-core.js";
-var _4 = "dpapp@1.1.5/lib/decorator.js";
-var _5 = "dpapp@1.1.5/lib/errortrace.js";
-var _6 = "dpapp@1.1.5/lib/patch-7.1.js";
-var _7 = "dpapp@1.1.5/lib/patch-7.0.js";
-var _8 = "dpapp@1.1.5/lib/patch-6.x.js";
-var _9 = "dpapp@1.1.5/lib/web.js";
-var _10 = "dpapp@1.1.5/lib/core.js";
-var _11 = "dpapp@1.1.5/lib/queue.js";
-var _12 = "dpapp@1.1.5/lib/login.css.js";
-var _13 = "dpapp@1.1.5/index.js";
+var _2 = "dpapp@1.1.6/lib/apilist.js";
+var _3 = "dpapp@1.1.6/lib/native-core.js";
+var _4 = "dpapp@1.1.6/lib/decorator.js";
+var _5 = "dpapp@1.1.6/lib/errortrace.js";
+var _6 = "dpapp@1.1.6/lib/patch-7.1.js";
+var _7 = "dpapp@1.1.6/lib/patch-7.0.js";
+var _8 = "dpapp@1.1.6/lib/patch-6.x.js";
+var _9 = "dpapp@1.1.6/lib/web.js";
+var _10 = "dpapp@1.1.6/lib/core.js";
+var _11 = "dpapp@1.1.6/lib/queue.js";
+var _12 = "dpapp@1.1.6/lib/login.css.js";
+var _13 = "dpapp@1.1.6/index.js";
 var asyncDeps = [_0,_1];
 var asyncDepsToMix = {"easy-login":_0,"dpapp-share":_1};
 var globalMap = asyncDepsToMix;
@@ -2255,24 +2255,47 @@ updateAccount: function(opt){
     keys: ["Token","NewToken"],
     success: function(result) {
 
-      var handler = function() {
-        getUser(function(result) {
-          opt.success && opt.success(result);
+      // 该版本先不注册时间
+      // var handler = function() {
+      //   getUser(function(result) {
+      //     opt.success && opt.success(result);
+      //   });
+      //   this.unsubscribe({
+      //     "action": "loginSuccess",
+      //     handle: handler
+      //   });
+      // };
+      // self.subscribe({
+      //   action: "loginSuccess",
+      //   handle: handler
+      // });
+
+      var retries = 0;
+      function loopGetUserInfo(){
+        self.getUserInfo({
+          success: function(info){
+            if(info.token){
+              opt.success && opt.success(info);
+            }else{
+              if(retries > 5){
+                opt.fail && opt.fail();
+              }else{
+                retries++;
+                setTimeout(function(){
+                  loopGetUserInfo();
+                }, 100);
+              }
+            }
+          }
         });
-        this.unsubscribe({
-          "action": "loginSuccess",
-          handle: handler
-        });
-      };
-      self.subscribe({
-        action: "loginSuccess",
-        handle: handler
-      });
+      }
 
       self._send("loginsuccess", {
         token: result.Token,
         newtoken: result.NewToken
       });
+
+      loopGetUserInfo();
     },
     fail: opt.fail
   });
@@ -3133,4 +3156,4 @@ module.exports='.dpapp-login-panel{position: fixed;width: 100%;top: 0;left: 0;ba
     asyncDeps:asyncDeps,
     map:globalMap
 });
-})();_use("dpapp@1.1.5",function(){});
+})();_use("dpapp@1.1.6",function(){});
