@@ -110,6 +110,9 @@ window.onerror = function(e,f,l){
   <a class="btn" id="openScheme" href="javascript:;">openScheme</a>
   <a class="btn" id="jumpToScheme" href="javascript:;">jumpToScheme</a>
   <a class="btn" data-api="jumpToScheme" id="jumpToSchemeToHome" data-api href="javascript:;">jumpToSchemeToHome</a>
+  <a class="btn" id="updateAccount" href="javascript:;">
+    updateAccount（更新native登录状态）
+  </a>
   <a class="btn" id="store" href="javascript:;">store</a>
   <a class="btn" id="retrieve" href="javascript:;">retrieve</a>
 
@@ -138,6 +141,8 @@ window.onerror = function(e,f,l){
 </script>
 <script src="./pay.js"></script>
 <script>
+
+  document.cookie = "dper=a93e3dc32dd5d1a55798a871cf6bdb57054b05e67a56376abf519176858d4abb;cy=1;";
 
   var success = function(ret){
     DPApp.log("业务调用成功", ret);
@@ -181,6 +186,10 @@ window.onerror = function(e,f,l){
     setBackgroundColor: {
       color:"3399dd",
       success: success
+    },
+    updateAccount: {
+      success: success,
+      fail: fail
     },
     datepicker:{
       "type": "datetime",
@@ -416,6 +425,14 @@ window.onerror = function(e,f,l){
   });
 
   DPApp.ready(function(){
+
+    DPApp.subscribe({
+      action: "loginSuccess",
+      handle: function(data){
+        DPApp.log('登录成功', data);
+      }  
+    });
+
     (function(){
       var buttons = document.querySelectorAll('.btn');
       for(var i = 0; i < buttons.length; i++){
