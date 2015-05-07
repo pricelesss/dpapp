@@ -1616,9 +1616,10 @@ core.extend({
    * @param  {Object}   args
    * @param  {Function} callback
    */
-  _doSendMessage: function (method, args, callback) {
+  _doSendMessage: function (method, args, callback, options) {
       var hasCallback = callback && typeof callback == 'function';
-
+      options = options || {};
+      var type = options.type;
       this.log('调用方法', method, args);
 
       /**
@@ -1644,27 +1645,38 @@ core.extend({
       args = JSON.stringify(args);
 
       var bridgeUrl = 'js://_?method=' + method + '&args=' + encodeURIComponent(args) + '&callbackId=' + callbackId;
-      this._createIframe(bridgeUrl);
+
+      if(type == "script"){
+        this._createScript(bridgeUrl);
+      }else{
+        this._createIframe(bridgeUrl);
+      }
   },
-  _createIframe: function(src){
+  _createNode: function(src, type){
     /**
-     * create iframe，
+     * create node
      * and native will intercept and handle the process
      */
-    var ifr = document.createElement('iframe');
-    ifr.style.display = 'none';
-    document.body.appendChild(ifr);
+    var node = document.createElement(type);
+    node.style.display = 'none';
+    document.body.appendChild(node);
 
-    function removeIframe(){
-      ifr.onload = ifr.onerror = null;
-      ifr.parentNode && ifr.parentNode.removeChild(ifr);
+    function removeNode(){
+      node.onload = node.onerror = null;
+      node.parentNode && node.parentNode.removeChild(node);
     }
     /**
-     * remove iframe after loaded
+     * remove node after loaded
      */
-    ifr.onload = ifr.onerror = removeIframe;
-    setTimeout(removeIframe,5000);
-    ifr.src = src;
+    node.onload = node.onerror = removeNode;
+    setTimeout(removeNode, 5000);
+    node.src = src;
+  },
+  _createScript: function(src){
+    this._createNode(src, "script");
+  },
+  _createIframe: function(src){
+    this._createNode(src, "iframe");
   },
   _send: function(method, args){
     args = args || {};
@@ -2491,15 +2503,17 @@ function dealCallback(key, value) {
 
 var Patch = module.exports = {
 
-  _sendMessage : function(key, args, callback) {
+  _sendMessage : function(key, args, callback, options) {
 
-    this._doSendMessage(key, args, callback);
+    this._doSendMessage(key, args, callback, options);
   },
 
   _getEnv : function(callback) {
     this._sendMessage("getEnv", null, function(env){
       cachedEnv = env;
       callback.call(this, env);
+    }, {
+      type: 'script'
     });
   },
 
