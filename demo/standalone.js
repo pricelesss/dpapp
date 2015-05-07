@@ -1616,10 +1616,8 @@ core.extend({
    * @param  {Object}   args
    * @param  {Function} callback
    */
-  _doSendMessage: function (method, args, callback, options) {
+  _doSendMessage: function (method, args, callback) {
       var hasCallback = callback && typeof callback == 'function';
-      options = options || {};
-      var type = options.type;
       this.log('调用方法', method, args);
 
       /**
@@ -1646,11 +1644,7 @@ core.extend({
 
       var bridgeUrl = 'js://_?method=' + method + '&args=' + encodeURIComponent(args) + '&callbackId=' + callbackId;
 
-      if(type == "script"){
-        this._createScript(bridgeUrl);
-      }else{
-        this._createIframe(bridgeUrl);
-      }
+      this._createIframe(bridgeUrl);
   },
   _createNode: function(src, type){
     /**
@@ -1671,9 +1665,6 @@ core.extend({
     node.onload = node.onerror = removeNode;
     setTimeout(removeNode, 5000);
     node.src = src;
-  },
-  _createScript: function(src){
-    this._createNode(src, "script");
   },
   _createIframe: function(src){
     this._createNode(src, "iframe");
@@ -2503,17 +2494,15 @@ function dealCallback(key, value) {
 
 var Patch = module.exports = {
 
-  _sendMessage : function(key, args, callback, options) {
+  _sendMessage : function(key, args, callback) {
 
-    this._doSendMessage(key, args, callback, options);
+    this._doSendMessage(key, args, callback);
   },
 
   _getEnv : function(callback) {
     this._sendMessage("getEnv", null, function(env){
       cachedEnv = env;
       callback.call(this, env);
-    }, {
-      type: 'script'
     });
   },
 
@@ -3011,7 +3000,7 @@ var core = module.exports = {
         if (+splitedA[1] !== splitedB[1]) {
           return +splitedA[1] > splitedB[1];
         } else {
-          return splitedA[2] > splitedB[2];
+          return splitedA[2] > (splitedB[2] || 0);
         }
       }
     },

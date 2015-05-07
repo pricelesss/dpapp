@@ -77,12 +77,22 @@ window.onerror = function(e,f,l){
     font-size: 24px;
   }
 
+  #input{
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+    padding: 10px;
+  }
+
 </style>
 </head>
 
 <body>
 
   <h1 id="baseInfos"></h1>
+  <input id="input" />
   <a class="btn" href="./">刷新</a>
   <a class="btn" onclick="toggleDebug()" href="javascript:;">切换调试模式</a>
   <a class="btn" onclick="callMulti()" href="javascript:;">连续方法调用</a>
@@ -433,6 +443,28 @@ window.onerror = function(e,f,l){
       handle: function(data){
         DPApp.log('登录成功', data);
       }  
+    });
+
+    DPApp.subscribe({
+      action: "appear",
+      handle: function(data){
+        DPApp.log('触发事件appear', data);
+      }
+    });
+
+    DPApp.subscribe({
+      action: "resize",
+      handle: function(data){
+        DPApp.log('触发事件resize', data);
+      }
+    });
+
+
+    DPApp.subscribe({
+      action: "appear",
+      handle: function(data){
+        DPApp.log('触发事件disappear', data);
+      }
     });
 
     (function(){
