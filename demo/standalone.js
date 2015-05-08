@@ -2350,9 +2350,8 @@ login : function(opt) {
     if (result.token) {
       opt.success && opt.success(result);
     } else {
-      if(ua.osName == "android" && self.Semver.lt(ua.osVersion, "7.5.0")){
-        self._loopGetUserInfo(opt.success, opt.fail);
-      }else{
+      var oldAndroid = ua.osName == "android" && self.Semver.lt(ua.osVersion, "7.5.0");
+      if(!oldAndroid){
         var handler = function() {
           getUser(function(result) {
             opt.success && opt.success(result);
@@ -2371,6 +2370,10 @@ login : function(opt) {
       self.openScheme({
         url: "dianping://login"
       });
+
+      if(oldAndroid){
+        self._loopGetUserInfo(opt.success, opt.fail);
+      }
     }
   });
 }
