@@ -423,7 +423,7 @@ window.onerror = function(e,f,l){
   }
 
   document.addEventListener("DPJSBridgeReady", function(e){
-    alert("DPJSBridgeReady:" + JSON.stringify({
+    DPApp.log("DPJSBridgeReady:" + JSON.stringify({
       osName : e.osName,
       osVersion : e.osVersion,
       appName : e.appName,
@@ -461,7 +461,7 @@ window.onerror = function(e,f,l){
 
 
     DPApp.subscribe({
-      action: "appear",
+      action: "disappear",
       handle: function(data){
         DPApp.log('触发事件disappear', data);
       }
