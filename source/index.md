@@ -268,6 +268,18 @@ DPApp.login({
 
 支持版本：≥ 7.1.0
 
+## 更新native用户信息
+
+```
+DPApp.updateAccount({
+  dper: "xxxx", // 可以不传，默认会取当前页面名为dper的cookie
+  success: function(user){
+    // 获取用户信息 
+  }
+});
+```
+
+支持版本：≥ 7.1.0
 
 ## openScheme
 

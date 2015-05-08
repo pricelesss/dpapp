@@ -1420,7 +1420,7 @@ var mods = neuron.mods = {};
 neuron.config({
   "graph": {
     "0": [
-      "1.1.7",
+      "1.1.8",
       {
         "dpapp-share@~0.1.0": 1,
         "easy-login@~0.1.3": 2
@@ -1433,7 +1433,7 @@ neuron.config({
       "0.1.3"
     ],
     "_": {
-      "dpapp@1.1.7": 0,
+      "dpapp@1.1.8": 0,
       "dpapp@*": 0
     }
   }
@@ -1441,18 +1441,18 @@ neuron.config({
 function mix(a,b){for(var k in b){a[k]=b[k];}return a;}
 var _0 = "easy-login@~0.1.3";
 var _1 = "dpapp-share@~0.1.0";
-var _2 = "dpapp@1.1.7/lib/apilist.js";
-var _3 = "dpapp@1.1.7/lib/native-core.js";
-var _4 = "dpapp@1.1.7/lib/decorator.js";
-var _5 = "dpapp@1.1.7/lib/errortrace.js";
-var _6 = "dpapp@1.1.7/lib/patch-7.1.js";
-var _7 = "dpapp@1.1.7/lib/patch-7.0.js";
-var _8 = "dpapp@1.1.7/lib/patch-6.x.js";
-var _9 = "dpapp@1.1.7/lib/web.js";
-var _10 = "dpapp@1.1.7/lib/core.js";
-var _11 = "dpapp@1.1.7/lib/queue.js";
-var _12 = "dpapp@1.1.7/lib/login.css.js";
-var _13 = "dpapp@1.1.7/index.js";
+var _2 = "dpapp@1.1.8/lib/apilist.js";
+var _3 = "dpapp@1.1.8/lib/native-core.js";
+var _4 = "dpapp@1.1.8/lib/decorator.js";
+var _5 = "dpapp@1.1.8/lib/errortrace.js";
+var _6 = "dpapp@1.1.8/lib/patch-7.1.js";
+var _7 = "dpapp@1.1.8/lib/patch-7.0.js";
+var _8 = "dpapp@1.1.8/lib/patch-6.x.js";
+var _9 = "dpapp@1.1.8/lib/web.js";
+var _10 = "dpapp@1.1.8/lib/core.js";
+var _11 = "dpapp@1.1.8/lib/queue.js";
+var _12 = "dpapp@1.1.8/lib/login.css.js";
+var _13 = "dpapp@1.1.8/index.js";
 var asyncDeps = [_0,_1];
 var asyncDepsToMix = {"easy-login":_0,"dpapp-share":_1};
 var globalMap = asyncDepsToMix;
@@ -1490,6 +1490,8 @@ define(_13, [_2,_3,_4,_5,_6,_7,_8,_9], function(require, exports, module, __file
   } else{
     var patch6 = require('./lib/patch-6.x');
     var web = require('./lib/web');
+    var query = getQuery();
+
     // 默认认为6.x，当接口调用失败，认为是web
     _DPApp = DPAppNativeCore.extend(patch6);
     _DPApp._patch6Ready = _DPApp.ready;
@@ -1501,7 +1503,13 @@ define(_13, [_2,_3,_4,_5,_6,_7,_8,_9], function(require, exports, module, __file
       if(DPApp._isReady){
         return _callback();
       }
-      var timeout = setTimeout(function(){
+
+      if(query.cityid=="!"){
+        patchWeb();
+        return;
+      }
+
+      function patchWeb(){
         _DPApp._bindDOMReady(function(){
           // remove 6.x apis and append web apis
           apis.forEach(function(api){
@@ -1513,13 +1521,14 @@ define(_13, [_2,_3,_4,_5,_6,_7,_8,_9], function(require, exports, module, __file
           decorate();
           _callback();
         });
-      }, 50);
+      }
+      var timeout = setTimeout(patchWeb, 50);
       _DPApp._patch6Ready(function(){
         clearTimeout(timeout);
         decorate();
         _callback();
       });
-    }
+    } 
   }
 
   _DPApp.getQuery = getQuery;
@@ -2234,6 +2243,30 @@ store: is7_1 ? core._notImplemented : function(opt){
   }
 },
 
+_loopGetUserInfo: function(success, fail){
+  var self = this;
+  var retries = 0;
+  function loopGetUserInfo(){
+    self.getUserInfo({
+      success: function(info){
+        if(info.token){
+          success && success(info);
+        }else{
+          if(retries > 5){
+            fail && fail();
+          }else{
+            retries++;
+            setTimeout(function(){
+              loopGetUserInfo();
+            }, 100);
+          }
+        }
+      }
+    });
+  }
+  loopGetUserInfo();
+},
+
 updateAccount: function(opt){
   opt = opt || {};
   var self = this;
@@ -2270,32 +2303,12 @@ updateAccount: function(opt){
           fail: opt.fail
         });
       }else{
-        var retries = 0;
-        function loopGetUserInfo(){
-          self.getUserInfo({
-            success: function(info){
-              if(info.token){
-                opt.success && opt.success(info);
-              }else{
-                if(retries > 5){
-                  opt.fail && opt.fail();
-                }else{
-                  retries++;
-                  setTimeout(function(){
-                    loopGetUserInfo();
-                  }, 100);
-                }
-              }
-            }
-          });
-        }
-
         self._send("loginsuccess", {
           token: result.Token,
           newtoken: result.NewToken
         });
 
-        loopGetUserInfo();
+        self._loopGetUserInfo(opt.success, opt.fail);
       }
     },
     fail: opt.fail
@@ -2327,6 +2340,7 @@ publish: function(opt){
 
 login : function(opt) {
   var self = this;
+  var ua = self.getUA();
   function getUser(callback) {
     self.getUserInfo({
       success: callback
@@ -2336,19 +2350,23 @@ login : function(opt) {
     if (result.token) {
       opt.success && opt.success(result);
     } else {
-      var handler = function() {
-        getUser(function(result) {
-          opt.success && opt.success(result);
-        });
-        this.unsubscribe({
-          "action": "loginSuccess",
+      if(ua.osName == "android" && self.Semver.lt(ua.osVersion, "7.5.0")){
+        self._loopGetUserInfo(opt.success, opt.fail);
+      }else{
+        var handler = function() {
+          getUser(function(result) {
+            opt.success && opt.success(result);
+          });
+          this.unsubscribe({
+            "action": "loginSuccess",
+            handle: handler
+          });
+        };
+        self.subscribe({
+          action: "loginSuccess",
           handle: handler
         });
-      };
-      self.subscribe({
-        action: "loginSuccess",
-        handle: handler
-      });
+      }
 
       self.openScheme({
         url: "dianping://login"
@@ -3157,4 +3175,4 @@ module.exports='.dpapp-login-panel{position: fixed;width: 100%;top: 0;left: 0;ba
     asyncDeps:asyncDeps,
     map:globalMap
 });
-})();_use("dpapp@1.1.7",function(){});
+})();_use("dpapp@1.1.8",function(){});

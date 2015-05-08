@@ -31,6 +31,8 @@
   } else{
     var patch6 = require('./lib/patch-6.x');
     var web = require('./lib/web');
+    var query = getQuery();
+
     // 默认认为6.x，当接口调用失败，认为是web
     _DPApp = DPAppNativeCore.extend(patch6);
     _DPApp._patch6Ready = _DPApp.ready;
@@ -42,7 +44,13 @@
       if(DPApp._isReady){
         return _callback();
       }
-      var timeout = setTimeout(function(){
+
+      if(query.cityid=="!"){
+        patchWeb();
+        return;
+      }
+
+      function patchWeb(){
         _DPApp._bindDOMReady(function(){
           // remove 6.x apis and append web apis
           apis.forEach(function(api){
@@ -54,13 +62,14 @@
           decorate();
           _callback();
         });
-      }, 50);
+      }
+      var timeout = setTimeout(patchWeb, 50);
       _DPApp._patch6Ready(function(){
         clearTimeout(timeout);
         decorate();
         _callback();
       });
-    }
+    } 
   }
 
   _DPApp.getQuery = getQuery;
